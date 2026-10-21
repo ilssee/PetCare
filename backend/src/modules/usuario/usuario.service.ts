@@ -1,0 +1,73 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { env } from '../../config/env';
+import { HttpError } from '../../common/errors/http-error';
+import * as repositorio from './usuario.repository';
+import { DatosLogin, DatosRegistro, UsuarioPublico } from './usuario.types';
+
+/** Capa de lógica de negocio: valida, cifra, compara y genera el token. */
+
+const COSTO_CIFRADO = 10;
+const FORMATO_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validarRegistro(datos: Partial<DatosRegistro>): DatosRegistro {
+  const nombre = (datos.nombre ?? '').trim();
+  const correo = (datos.correo ?? '').trim().toLowerCase();
+  const contrasena = datos.contrasena ?? '';
+
+  // RF01: si algún campo está vacío, el mensaje es el mismo para todos.
+  if (nombre === '' || correo === '' || contrasena === '') {
+    throw new HttpError(400, 'Todos los campos son obligatorios');
+  }
+  if (nombre.length < 2 || nombre.length > 100) {
+    throw new HttpError(400, 'El nombre debe tener entre 2 y 100 caracteres');
+  }
+  if (!FORMATO_CORREO.test(correo) || correo.length > 255) {
+    throw new HttpError(400, 'El correo no tiene un formato válido');
+  }
+  if (contrasena.length < 8 || contrasena.length > 72) {
+    throw new HttpError(400, 'La contraseña debe tener entre 8 y 72 caracteres');
+  }
+  return { nombre, correo, contrasena };
+}
+
+export async function registrar(datos: Partial<DatosRegistro>): Promise<UsuarioPublico> {
+  const { nombre, correo, contrasena } = validarRegistro(datos);
+
+  if (await repositorio.buscarPorCorreo(correo)) {
+    throw new HttpError(409, 'El correo ya está en uso. Intente con otro');
+  }
+
+  const hash = await bcrypt.hash(contrasena, COSTO_CIFRADO);
+  return repositorio.crear(nombre, correo, hash);
+}
+
+export async function iniciarSesion(datos: Partial<DatosLogin>) {
+  const correo = (datos.correo ?? '').trim().toLowerCase();
+  const contrasena = datos.contrasena ?? '';
+
+  // RF02: si algún campo está vacío, el mensaje es el mismo para ambos.
+  if (correo === '' || contrasena === '') {
+    throw new HttpError(400, 'Todos los campos son obligatorios');
+  }
+
+  const usuario = await repositorio.buscarPorCorreo(correo);
+  // Mismo mensaje si falla el correo o la contraseña: no revela cuál de los dos es.
+  if (!usuario || !(await bcrypt.compare(contrasena, usuario.contrasena))) {
+    throw new HttpError(401, 'Correo o contraseña incorrectos');
+  }
+
+  const token = jwt.sign({ id: usuario.id }, env.jwt.secreto, { expiresIn: env.jwt.expiraSegundos });
+  return {
+    token,
+    usuario: { id: usuario.id, nombre: usuario.nombre, correo: usuario.correo },
+  };
+}
+
+export async function obtenerPerfil(id: number): Promise<UsuarioPublico> {
+  const usuario = await repositorio.buscarPorId(id);
+  if (!usuario) {
+    throw new HttpError(404, 'Usuario no encontrado');
+  }
+  return usuario;
+}

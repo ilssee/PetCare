@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Paleta del prototipo de Figma -->
+    <color name="petcare_primary">#329DA3</color>
+    <color name="petcare_primary_dark">#267E84</color>
+    <color name="petcare_text">#1D2A30</color>
+    <color name="petcare_text_muted">#6B7A83</color>
+    <color name="petcare_field">#F4F7F8</color>
+    <color name="petcare_border">#E3E9EC</color>
+    <color name="petcare_error">#D6455D</color>
+
+    <!-- Colores por especie (tomados del prototipo) -->
+    <color name="especie_perro">#FCE6C8</color>
+    <color name="especie_gato">#E6E0F6</color>
+    <color name="especie_conejo">#FBDDE7</color>
+    <color name="estado_activa_fondo">#DDF3E6</color>
+    <color name="estado_activa_texto">#2F8F5B</color>
+    <color name="estado_inactiva_fondo">#3A4349</color>
+    <color name="hint_gris">#757575</color>
+    <color name="petcare_primary_soft">#E0F1F2</color>
+</resources>

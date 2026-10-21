@@ -1,0 +1,44 @@
+package com.petcare.app.mascota
+
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import com.petcare.app.R
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+/** Cómo se ve cada especie en la app: color de fondo, ilustración y nombre. */
+object Especies {
+    @ColorRes
+    fun color(especie: String) = when (especie) {
+        "gato" -> R.color.especie_gato
+        "conejo" -> R.color.especie_conejo
+        else -> R.color.especie_perro
+    }
+
+    @DrawableRes
+    fun ilustracion(especie: String) = when (especie) {
+        "gato" -> R.drawable.ilustracion_gato
+        "conejo" -> R.drawable.ilustracion_conejo
+        else -> R.drawable.ilustracion_perro
+    }
+
+    @StringRes
+    fun nombre(especie: String) = when (especie) {
+        "gato" -> R.string.especie_gato
+        "conejo" -> R.string.especie_conejo
+        else -> R.string.especie_perro
+    }
+}
+
+/** "hembra" -> "Hembra" */
+fun String.conPrimeraMayuscula() = replaceFirstChar { it.uppercase() }
+
+/** "25.0" -> "25", "24.5" -> "24.5" */
+fun Double.comoPeso(): String = if (this % 1.0 == 0.0) toInt().toString() else toString()
+
+/** "2023-08-05" -> "5 ago 2023" */
+fun String.comoFechaLegible(): String = runCatching {
+    LocalDate.parse(this).format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale("es", "PE")))
+}.getOrDefault(this)

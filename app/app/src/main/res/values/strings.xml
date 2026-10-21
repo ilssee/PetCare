@@ -1,0 +1,113 @@
+<resources>
+    <string name="app_name">PetCare</string>
+    <string name="lema">Cuida a quien más quieres</string>
+
+    <!-- Login -->
+    <string name="login_titulo">Iniciar sesión</string>
+    <string name="etiqueta_correo">Correo electrónico</string>
+    <string name="etiqueta_contrasena">Contraseña</string>
+    <string name="hint_correo_login">ana@correo.com</string>
+    <string name="login_boton">Ingresar</string>
+    <string name="login_sin_cuenta">¿No tienes cuenta?</string>
+    <string name="login_ir_registro">Regístrate</string>
+
+    <!-- Registro -->
+    <string name="registro_titulo">Crear cuenta</string>
+    <string name="registro_descripcion">Regístrate para llevar el control de los cuidados de tus mascotas.</string>
+    <string name="etiqueta_nombre">Nombre</string>
+    <string name="hint_nombre">Ana Torres</string>
+    <string name="hint_correo_registro">tucorreo@ejemplo.com</string>
+    <string name="hint_contrasena">Tu contraseña</string>
+    <string name="registro_boton">Registrarse</string>
+    <string name="registro_con_cuenta">¿Ya tienes cuenta?</string>
+    <string name="registro_ir_login">Inicia sesión</string>
+
+    <!-- Inicio -->
+    <string name="inicio_saludo">Hola, %1$s</string>
+    <string name="inicio_mensaje">Tu sesión está iniciada y la app está conectada con el servidor.</string>
+    <string name="inicio_cerrar_sesion">Cerrar sesión</string>
+
+    <!-- Mensajes -->
+    <string name="descripcion_logo">Logo de PetCare</string>
+    <string name="descripcion_volver">Volver</string>
+    <string name="descripcion_ver_contrasena">Mostrar u ocultar la contraseña</string>
+    <string name="error_sin_conexion">No se pudo conectar con el servidor. Revisa que el backend esté encendido.</string>
+    <string name="error_campos_vacios">Completa todos los campos.</string>
+
+    <!-- Navegación -->
+    <string name="nav_cronograma">Cronograma</string>
+    <string name="nav_cuidados">Cuidados</string>
+    <string name="nav_mapa">Mapa</string>
+    <string name="nav_mascotas">Mascotas</string>
+    <string name="nav_perfil">Perfil</string>
+    <string name="proximamente">Próximamente</string>
+    <string name="cancelar">Cancelar</string>
+
+    <!-- Mascotas -->
+    <string name="mascotas_titulo">Mis mascotas</string>
+    <string name="mascotas_vacio">Aún no tienes mascotas. Toca «Mascota» para registrar la primera.</string>
+    <string name="mascota_boton_nueva">Mascota</string>
+    <string name="especie_perro">Perro</string>
+    <string name="especie_gato">Gato</string>
+    <string name="especie_conejo">Conejo</string>
+    <string name="etiqueta_especie">Especie</string>
+    <string name="etiqueta_raza">Raza</string>
+    <string name="hint_raza">Siamés</string>
+    <string name="etiqueta_nombre_mascota">Nombre</string>
+    <string name="hint_nombre_mascota">Coco</string>
+    <string name="etiqueta_nacimiento">Fecha de nacimiento</string>
+    <string name="hint_fecha">dd/mm/aaaa</string>
+    <string name="etiqueta_sexo">Sexo</string>
+    <string name="sexo_macho">Macho</string>
+    <string name="sexo_hembra">Hembra</string>
+    <string name="etiqueta_peso">Peso (kg)</string>
+    <string name="hint_peso">12.5</string>
+    <string name="mascota_nueva_titulo">Nueva mascota</string>
+    <string name="mascota_editar_titulo">Editar mascota</string>
+    <string name="mascota_registrar">Registrar mascota</string>
+    <string name="mascota_guardar_cambios">Guardar cambios</string>
+    <string name="estado_activa">Activa</string>
+    <string name="estado_inactiva">Inactiva</string>
+    <string name="mascota_menu_editar">Editar mascota</string>
+    <string name="mascota_menu_inactivar">Marcar como inactiva</string>
+    <string name="mascota_menu_reactivar">Reactivar mascota</string>
+    <string name="mascota_menu_eliminar">Eliminar mascota</string>
+    <string name="mascota_eliminar_titulo">¿Eliminar a %1$s?</string>
+    <string name="mascota_eliminar_mensaje">Se borrará la mascota con todos sus cuidados y su historial. Esta acción no se puede deshacer.</string>
+    <string name="unidad_kg">kg</string>
+    <string name="unidad_sexo">sexo</string>
+    <string name="descripcion_opciones">Más opciones</string>
+
+    <!-- Mensajes del ERS -->
+    <string name="error_todos_obligatorios">Todos los campos son obligatorios</string>
+    <string name="error_campo_obligatorio">Este campo es obligatorio</string>
+    <string name="error_peso_invalido">Ingrese un peso válido</string>
+    <string name="cuenta_creada">Cuenta creada. Inicia sesión para continuar.</string>
+    <string name="dato_vacio">—</string>
+
+    <!-- Campos opcionales -->
+    <string name="etiqueta_raza_opcional">Raza (opcional)</string>
+    <string name="etiqueta_nacimiento_opcional">Fecha de nacimiento (opcional)</string>
+    <string name="etiqueta_peso_opcional">Peso (kg) (opcional)</string>
+    <string name="descripcion_quitar_fecha">Quitar la fecha</string>
+
+    <!-- Confirmaciones y avisos -->
+    <string name="cerrar_sesion_titulo">¿Cerrar sesión?</string>
+    <string name="cerrar_sesion_mensaje">Tendrás que iniciar sesión de nuevo para volver a entrar.</string>
+    <string name="mascota_inactivar_titulo">¿Marcar a %1$s como inactiva?</string>
+    <string name="mascota_inactivar_mensaje">Se detendrá la generación de nuevos cuidados en su cronograma. Su historial se conserva.</string>
+    <string name="mascota_reactivar_titulo">¿Reactivar a %1$s?</string>
+    <string name="mascota_reactivar_mensaje">Se reanudarán sus cuidados y se recalcularán las próximas fechas desde hoy.</string>
+    <string name="mascota_inactivada">La mascota ha sido marcada como inactiva</string>
+    <string name="mascota_reactivada">La mascota ha sido reactivada</string>
+    <string name="mascota_registrada">Mascota registrada correctamente</string>
+    <string name="mascota_actualizada">Mascota actualizada correctamente</string>
+    <string name="mascota_eliminada">Mascota eliminada correctamente</string>
+
+    <!-- Perfil de la mascota -->
+    <string name="info_preventiva_titulo">Info preventiva</string>
+    <string name="info_preventiva_subtitulo">Qué cuidados recomendamos para %1$s y por qué</string>
+    <string name="proximos_cuidados">Próximos cuidados</string>
+    <string name="ver_todos">Ver todos</string>
+    <string name="sin_cuidados">No hay cuidados registrados para esta mascota</string>
+</resources>
