@@ -19,7 +19,7 @@
             android:paddingBottom="14dp"
             android:text="@string/mascotas_titulo"
             android:textColor="@color/petcare_text"
-            android:textSize="17sp" />
+            android:textSize="19sp" />
 
         <TextView
             android:id="@+id/textoError"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:textColor="@color/petcare_error"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -39,16 +39,12 @@
             android:paddingBottom="96dp" />
     </LinearLayout>
 
-    <TextView
+    <include
         android:id="@+id/vacio"
+        layout="@layout/vista_estado_vacio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="32dp"
-        android:text="@string/mascotas_vacio"
-        android:textColor="@color/petcare_text_muted"
-        android:textSize="13sp"
         android:visibility="gone" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

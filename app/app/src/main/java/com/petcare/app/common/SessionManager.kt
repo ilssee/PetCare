@@ -26,6 +26,10 @@ object SessionManager {
         preferencias.edit().putString(CLAVE_TOKEN, token).putString(CLAVE_NOMBRE, nombre).apply()
     }
 
+    fun guardarNombre(nombre: String) {
+        preferencias.edit().putString(CLAVE_NOMBRE, nombre).apply()
+    }
+
     fun cerrar() {
         preferencias.edit().clear().apply()
     }

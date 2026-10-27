@@ -41,6 +41,16 @@
         <activity
             android:name=".mascota.MascotaPerfilActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".usuario.EditarPerfilActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".usuario.CambiarContrasenaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

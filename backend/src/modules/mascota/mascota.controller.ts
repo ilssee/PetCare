@@ -35,6 +35,14 @@ export async function reactivar(req: Request, res: Response) {
   res.json(await servicio.cambiarEstado(idDeLaRuta(req), res.locals.usuarioId, 'activa'));
 }
 
+export async function subirFoto(req: Request, res: Response) {
+  res.json(await servicio.guardarFoto(idDeLaRuta(req), res.locals.usuarioId, req.file));
+}
+
+export async function quitarFoto(req: Request, res: Response) {
+  res.json(await servicio.quitarFoto(idDeLaRuta(req), res.locals.usuarioId));
+}
+
 export async function eliminar(req: Request, res: Response) {
   await servicio.eliminar(idDeLaRuta(req), res.locals.usuarioId);
   res.status(204).send();

@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import com.petcare.app.common.PlaceholderFragment
 import com.petcare.app.common.SessionManager
 import com.petcare.app.databinding.ActivityMainBinding
+import com.petcare.app.cronograma.CronogramaFragment
+import com.petcare.app.cuidado.CuidadosFragment
 import com.petcare.app.mascota.MascotasFragment
 import com.petcare.app.usuario.LoginActivity
 import com.petcare.app.usuario.PerfilFragment
@@ -33,15 +35,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.raiz) { vista, insets ->
             val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(barras.left, barras.top, barras.right, 0)
+            vista.setPadding(barras.left, 0, barras.right, 0)
             insets
         }
 
         binding.navegacion.setOnItemSelectedListener { opcion ->
             mostrar(
                 when (opcion.itemId) {
-                    R.id.nav_cronograma -> PlaceholderFragment.nuevo(getString(R.string.nav_cronograma))
-                    R.id.nav_cuidados -> PlaceholderFragment.nuevo(getString(R.string.nav_cuidados))
+                    R.id.nav_cronograma -> CronogramaFragment()
+                    R.id.nav_cuidados -> CuidadosFragment()
                     R.id.nav_mapa -> PlaceholderFragment.nuevo(getString(R.string.nav_mapa))
                     R.id.nav_perfil -> PerfilFragment()
                     else -> MascotasFragment()

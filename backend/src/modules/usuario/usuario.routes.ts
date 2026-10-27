@@ -8,3 +8,5 @@ export const usuarioRoutes = Router();
 usuarioRoutes.post('/registro', controlador.registrar);
 usuarioRoutes.post('/login', controlador.iniciarSesion);
 usuarioRoutes.get('/yo', exigirSesion, controlador.obtenerPerfil);
+usuarioRoutes.put('/yo', exigirSesion, controlador.actualizarPerfil);
+usuarioRoutes.put('/yo/contrasena', exigirSesion, controlador.cambiarContrasena);

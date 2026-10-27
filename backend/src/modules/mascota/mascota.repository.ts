@@ -51,6 +51,14 @@ export async function actualizar(id: number, usuarioId: number, datos: DatosMasc
   return resultado.affectedRows > 0;
 }
 
+export async function actualizarFoto(id: number, usuarioId: number, ruta: string | null): Promise<boolean> {
+  const [resultado] = await pool.query<ResultSetHeader>(
+    'UPDATE mascota SET foto = ? WHERE id = ? AND usuario_id = ?',
+    [ruta, id, usuarioId],
+  );
+  return resultado.affectedRows > 0;
+}
+
 export async function cambiarEstado(id: number, usuarioId: number, estado: EstadoMascota): Promise<boolean> {
   const [resultado] = await pool.query<ResultSetHeader>(
     'UPDATE mascota SET estado = ? WHERE id = ? AND usuario_id = ?',

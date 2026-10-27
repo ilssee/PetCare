@@ -34,7 +34,7 @@ class MascotaAdapter(
         b.edad.visibility = if (mascota.edadTexto == null) View.GONE else View.VISIBLE
         b.sexo.text = mascota.sexo.conPrimeraMayuscula()
         b.inactiva.visibility = if (mascota.estaInactiva) View.VISIBLE else View.GONE
-        b.ilustracion.setImageResource(Especies.ilustracion(mascota.especie))
+        b.ilustracion.mostrarMascota(mascota)
         b.tarjeta.setOnClickListener { alTocar(mascota) }
     }
 

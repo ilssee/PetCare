@@ -25,8 +25,8 @@ function validarRegistro(datos: Partial<DatosRegistro>): DatosRegistro {
   if (!FORMATO_CORREO.test(correo) || correo.length > 255) {
     throw new HttpError(400, 'El correo no tiene un formato válido');
   }
-  if (contrasena.length < 8 || contrasena.length > 72) {
-    throw new HttpError(400, 'La contraseña debe tener entre 8 y 72 caracteres');
+  if (contrasena.length < 8 || contrasena.length > 32) {
+    throw new HttpError(400, 'La contraseña debe tener entre 8 y 32 caracteres');
   }
   return { nombre, correo, contrasena };
 }
@@ -70,4 +70,60 @@ export async function obtenerPerfil(id: number): Promise<UsuarioPublico> {
     throw new HttpError(404, 'Usuario no encontrado');
   }
   return usuario;
+}
+
+const CAMPO_OBLIGATORIO = 'Este campo es obligatorio';
+
+/** RF04: el usuario edita su nombre y su correo. */
+export async function actualizarPerfil(id: number, datos: Partial<{ nombre: string; correo: string }>): Promise<UsuarioPublico> {
+  const nombre = (datos.nombre ?? '').trim();
+  const correo = (datos.correo ?? '').trim().toLowerCase();
+
+  if (nombre === '' || correo === '') throw new HttpError(400, CAMPO_OBLIGATORIO);
+  if (nombre.length < 2 || nombre.length > 100) {
+    throw new HttpError(400, 'El nombre debe tener entre 2 y 100 caracteres');
+  }
+  if (!FORMATO_CORREO.test(correo) || correo.length > 255) {
+    throw new HttpError(400, 'El correo no tiene un formato válido');
+  }
+
+  const existente = await repositorio.buscarPorCorreo(correo);
+  if (existente && existente.id !== id) {
+    throw new HttpError(409, 'El correo ya está en uso. Intente con otro');
+  }
+
+  try {
+    await repositorio.actualizarDatos(id, nombre, correo);
+  } catch (error) {
+    // Por si otro usuario tomó el correo justo en este instante.
+    if ((error as { code?: string }).code === 'ER_DUP_ENTRY') {
+      throw new HttpError(409, 'El correo ya está en uso. Intente con otro');
+    }
+    throw error;
+  }
+  return obtenerPerfil(id);
+}
+
+/** RF04: cambio de contraseña. Se pide la actual para confirmar que es el dueño de la cuenta. */
+export async function cambiarContrasena(
+  id: number,
+  datos: Partial<{ contrasenaActual: string; contrasenaNueva: string }>,
+): Promise<void> {
+  const actual = datos.contrasenaActual ?? '';
+  const nueva = datos.contrasenaNueva ?? '';
+
+  if (actual === '' || nueva === '') throw new HttpError(400, CAMPO_OBLIGATORIO);
+  if (nueva.length < 8 || nueva.length > 32) {
+    throw new HttpError(400, 'La contraseña debe tener entre 8 y 32 caracteres');
+  }
+
+  const hashGuardado = await repositorio.obtenerHash(id);
+  if (!hashGuardado || !(await bcrypt.compare(actual, hashGuardado))) {
+    throw new HttpError(400, 'La contraseña actual es incorrecta');
+  }
+  if (actual === nueva) {
+    throw new HttpError(400, 'La nueva contraseña debe ser distinta de la actual');
+  }
+
+  await repositorio.cambiarContrasena(id, await bcrypt.hash(nueva, COSTO_CIFRADO));
 }

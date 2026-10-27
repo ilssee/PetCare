@@ -1,6 +1,7 @@
 import express from 'express';
 import { pool } from './config/database';
 import { manejarErrores } from './common/middlewares/error-handler';
+import { carpetaUploads } from './config/uploads';
 import { usuarioRoutes } from './modules/usuario/usuario.routes';
 import { mascotaRoutes } from './modules/mascota/mascota.routes';
 
@@ -24,6 +25,9 @@ app.get('/salud/bd', async (_req, res) => {
     res.status(500).json({ estado: 'error', baseDeDatos: 'sin conexión' });
   }
 });
+
+// Fotos subidas: públicas, pero con nombres aleatorios imposibles de adivinar.
+app.use('/uploads', express.static(carpetaUploads));
 
 // Rutas de los módulos
 app.use('/usuarios', usuarioRoutes);

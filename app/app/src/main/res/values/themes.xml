@@ -1,16 +1,46 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.PetCare" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Verde azulado de PetCare en todos los roles de color de Material -->
         <item name="colorPrimary">@color/petcare_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/petcare_primary_soft</item>
+        <item name="colorOnPrimaryContainer">@color/petcare_primary_dark</item>
+        <item name="colorSecondary">@color/petcare_primary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/petcare_primary_soft</item>
+        <item name="colorOnSecondaryContainer">@color/petcare_primary_dark</item>
+        <item name="colorTertiary">@color/petcare_primary_dark</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/petcare_primary_soft</item>
+        <item name="colorOnTertiaryContainer">@color/petcare_primary_dark</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/petcare_text</item>
+        <item name="colorSurfaceVariant">@color/petcare_field</item>
+        <item name="colorOnSurfaceVariant">@color/petcare_text_muted</item>
+        <item name="colorOutline">@color/petcare_border</item>
+        <item name="colorError">@color/petcare_error</item>
+
         <item name="android:fontFamily">@font/poppins</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="Theme.PetCare" parent="Base.Theme.PetCare" />
 
+    <!-- Etiquetas de la barra inferior: algo más pequeñas para que "Cronograma" quepa completa -->
+    <style name="TextoNavegacionInactivo" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">10.5sp</item>
+        <item name="android:fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="TextoNavegacionActivo" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">10.5sp</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
+    </style>
+
     <!-- Textos reutilizables -->
     <style name="Etiqueta">
         <item name="android:textColor">@color/petcare_text_muted</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
     </style>
 
@@ -18,7 +48,7 @@
         <item name="android:background">@null</item>
         <item name="android:textColor">@color/petcare_text</item>
         <item name="android:textColorHint">#757575</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:singleLine">true</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingBottom">0dp</item>
@@ -27,7 +57,7 @@
     <style name="BotonPrincipal">
         <item name="android:background">@drawable/bg_boton_principal</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:stateListAnimator">@null</item>

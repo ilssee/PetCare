@@ -1,6 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+// La dirección de la API se lee de local.properties (que no se sube a Git):
+//   api.baseUrl=http://IP_DE_TU_LAPTOP:3000/
+// Si no está definida, se usa 10.0.2.2, que es la laptop vista desde el emulador.
+val propiedadesLocales = Properties().apply {
+    val archivo = rootProject.file("local.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
+}
+val apiBaseUrl: String = propiedadesLocales.getProperty("api.baseUrl") ?: "http://10.0.2.2:3000/"
 
 android {
     namespace = "com.petcare.app"
@@ -17,9 +28,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // Dirección de la API. 10.0.2.2 es la laptop vista desde el emulador.
-        // Para un celular real, cambiarla por la IP de la laptop en la red wifi.
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000/\"")
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,6 +61,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+    implementation(libs.coil)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

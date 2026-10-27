@@ -110,4 +110,52 @@
     <string name="proximos_cuidados">Próximos cuidados</string>
     <string name="ver_todos">Ver todos</string>
     <string name="sin_cuidados">No hay cuidados registrados para esta mascota</string>
+
+    <!-- Foto de la mascota -->
+    <string name="foto_subir">Toca para subir una foto (opcional)</string>
+    <string name="foto_quitar">Quitar foto</string>
+    <string name="foto_error_subida">La mascota se guardó, pero no se pudo subir la foto</string>
+    <string name="foto_error_leer">No se pudo leer la imagen elegida</string>
+
+    <!-- Vistas para un usuario nuevo -->
+    <string name="boton_agregar_mascota">Agregar mascota</string>
+    <string name="mascotas_vacio_titulo">Aún no tienes mascotas</string>
+    <string name="mascotas_vacio_mensaje">Registra a tu perro, gato o conejo para empezar a cuidarlo.</string>
+    <string name="cuidados_titulo">Cuidados</string>
+    <string name="cronograma_saludo">Hola, %1$s</string>
+    <string name="cronograma_titulo">Todo al día\nesta semana</string>
+    <string name="cronograma_sin_cuidados">No hay cuidados programados.</string>
+    <string name="filtro_todas">Todas</string>
+    <string name="descripcion_buscar">Buscar</string>
+
+    <!-- Mascotas existentes, pero ninguna activa -->
+    <string name="sin_activas_titulo">Sin mascotas activas</string>
+    <string name="sin_activas_mensaje">Reactiva una mascota o agrega otra para gestionar sus cuidados.</string>
+
+    <!-- Con mascotas, pero sin ningún cuidado registrado -->
+    <string name="sin_cuidados_titulo">Aún no hay cuidados registrados</string>
+    <string name="sin_cuidados_mensaje">Revisa los cuidados recomendados para tu mascota o agrega uno propio.</string>
+    <string name="boton_ver_recomendados">Ver recomendados</string>
+
+    <!-- Perfil (RF04) -->
+    <string name="perfil_stat_mascotas">mascotas</string>
+    <string name="perfil_stat_cuidados">cuidados</string>
+    <string name="perfil_stat_resenas">reseñas</string>
+    <string name="perfil_editar">Editar perfil</string>
+    <string name="perfil_editar_sub">Nombre y correo</string>
+    <string name="perfil_recordatorios">Recordatorios</string>
+    <string name="perfil_recordatorios_sub">Días en que prefieres que te avisemos</string>
+    <string name="perfil_avisos">Avisos cerca de ti</string>
+    <string name="perfil_avisos_sub">Campañas y veterinarias nuevas en tu zona</string>
+    <string name="perfil_cerrar_sesion">Cerrar sesión</string>
+    <string name="perfil_cambiar_contrasena">Cambiar contraseña</string>
+    <string name="boton_guardar">Guardar</string>
+    <string name="boton_guardar_contrasena">Guardar contraseña</string>
+    <string name="etiqueta_contrasena_actual">Contraseña actual</string>
+    <string name="etiqueta_contrasena_nueva">Nueva contraseña</string>
+    <string name="etiqueta_contrasena_repetir">Repetir nueva contraseña</string>
+    <string name="perfil_actualizado">Perfil actualizado correctamente</string>
+    <string name="contrasena_actualizada">Contraseña actualizada correctamente</string>
+    <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
+    <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 32 caracteres</string>
 </resources>

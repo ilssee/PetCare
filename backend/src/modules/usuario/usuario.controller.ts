@@ -17,3 +17,12 @@ export async function obtenerPerfil(_req: Request, res: Response) {
   const usuario = await servicio.obtenerPerfil(res.locals.usuarioId);
   res.json(usuario);
 }
+
+export async function actualizarPerfil(req: Request, res: Response) {
+  res.json(await servicio.actualizarPerfil(res.locals.usuarioId, req.body ?? {}));
+}
+
+export async function cambiarContrasena(req: Request, res: Response) {
+  await servicio.cambiarContrasena(res.locals.usuarioId, req.body ?? {});
+  res.json({ mensaje: 'Contraseña actualizada correctamente' });
+}

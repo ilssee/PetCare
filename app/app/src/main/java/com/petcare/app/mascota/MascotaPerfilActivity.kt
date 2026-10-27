@@ -4,7 +4,10 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
-import android.widget.PopupMenu
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import androidx.appcompat.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
@@ -67,7 +70,7 @@ class MascotaPerfilActivity : AppCompatActivity() {
         val vacio = getString(R.string.dato_vacio)
         val color = ContextCompat.getColor(this, Especies.color(m.especie))
         binding.raiz.setBackgroundColor(color)
-        binding.ilustracion.setImageResource(Especies.ilustracion(m.especie))
+        binding.ilustracion.mostrarMascota(m)
         binding.textoError.visibility = View.GONE
 
         binding.nombre.text = m.nombre
@@ -96,7 +99,10 @@ class MascotaPerfilActivity : AppCompatActivity() {
         val menu = PopupMenu(this, ancla)
         menu.menu.add(0, ID_EDITAR, 0, R.string.mascota_menu_editar)
         menu.menu.add(0, ID_ESTADO, 1, if (m.estaInactiva) R.string.mascota_menu_reactivar else R.string.mascota_menu_inactivar)
-        menu.menu.add(0, ID_ELIMINAR, 2, R.string.mascota_menu_eliminar)
+        val eliminar = SpannableString(getString(R.string.mascota_menu_eliminar)).apply {
+            setSpan(ForegroundColorSpan(ContextCompat.getColor(this@MascotaPerfilActivity, R.color.petcare_error)), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        menu.menu.add(0, ID_ELIMINAR, 2, eliminar)
         menu.setOnMenuItemClickListener { opcion ->
             when (opcion.itemId) {
                 ID_EDITAR -> startActivity(

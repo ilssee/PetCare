@@ -9,7 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.petcare.app.common.Resultado
+import com.petcare.app.R
+import com.petcare.app.common.configurar
 import com.petcare.app.common.paraMostrar
+import com.petcare.app.common.respetarBarraDeEstado
 import com.petcare.app.databinding.FragmentMascotasBinding
 import kotlinx.coroutines.launch
 
@@ -31,9 +34,10 @@ class MascotasFragment : Fragment() {
         _binding = FragmentMascotasBinding.inflate(inflater, contenedor, false)
         binding.lista.layoutManager = LinearLayoutManager(requireContext())
         binding.lista.adapter = adaptador
-        binding.botonNuevaMascota.setOnClickListener {
-            startActivity(Intent(requireContext(), MascotaFormActivity::class.java))
-        }
+        val abrirFormulario = { startActivity(Intent(requireContext(), MascotaFormActivity::class.java)) }
+        binding.botonNuevaMascota.setOnClickListener { abrirFormulario() }
+        binding.vacio.configurar(R.drawable.ic_huella, R.string.mascotas_vacio_titulo, R.string.mascotas_vacio_mensaje, alTocarBoton = abrirFormulario)
+        binding.root.respetarBarraDeEstado()
         return binding.root
     }
 
@@ -48,7 +52,10 @@ class MascotasFragment : Fragment() {
             when (val resultado = repositorio.listar()) {
                 is Resultado.Exito -> {
                     adaptador.submitList(resultado.dato)
-                    binding.vacio.visibility = if (resultado.dato.isEmpty()) View.VISIBLE else View.GONE
+                    // Sin mascotas: se muestra la invitación a registrar la primera (y se oculta el botón flotante).
+                    val sinMascotas = resultado.dato.isEmpty()
+                    binding.vacio.root.visibility = if (sinMascotas) View.VISIBLE else View.GONE
+                    binding.botonNuevaMascota.visibility = if (sinMascotas) View.GONE else View.VISIBLE
                     binding.textoError.visibility = View.GONE
                 }
                 is Resultado.Fallo -> {

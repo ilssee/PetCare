@@ -1,8 +1,12 @@
 package com.petcare.app.mascota
 
+import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import coil.load
+import coil.transform.CircleCropTransformation
+import com.petcare.app.BuildConfig
 import com.petcare.app.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -42,3 +46,21 @@ fun Double.comoPeso(): String = if (this % 1.0 == 0.0) toInt().toString() else t
 fun String.comoFechaLegible(): String = runCatching {
     LocalDate.parse(this).format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale("es", "PE")))
 }.getOrDefault(this)
+
+/** Dirección pública de una foto guardada en el servidor ("mascotas/xxxx.jpg"). */
+fun String.comoUrlFoto(): String = BuildConfig.API_BASE_URL + "uploads/" + this
+
+/** Muestra la foto de la mascota si tiene; si no, la ilustración de su especie. */
+fun ImageView.mostrarMascota(mascota: MascotaRespuesta) {
+    val ilustracion = Especies.ilustracion(mascota.especie)
+    val foto = mascota.foto
+    if (foto.isNullOrEmpty()) {
+        setImageResource(ilustracion)
+    } else {
+        load(foto.comoUrlFoto()) {
+            transformations(CircleCropTransformation())
+            placeholder(ilustracion)
+            error(ilustracion)
+        }
+    }
+}

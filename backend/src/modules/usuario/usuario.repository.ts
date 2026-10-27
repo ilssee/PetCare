@@ -51,3 +51,17 @@ export async function crear(nombre: string, correo: string, hash: string): Promi
     conexion.release();
   }
 }
+
+export async function actualizarDatos(id: number, nombre: string, correo: string): Promise<void> {
+  await pool.query('UPDATE usuario SET nombre = ?, correo = ? WHERE id = ?', [nombre, correo, id]);
+}
+
+/** Devuelve la contraseña cifrada del usuario (solo para comparar; nunca se envía a la app). */
+export async function obtenerHash(id: number): Promise<string | null> {
+  const [filas] = await pool.query<RowDataPacket[]>('SELECT contrasena FROM usuario WHERE id = ?', [id]);
+  return filas[0] ? (filas[0].contrasena as string) : null;
+}
+
+export async function cambiarContrasena(id: number, hash: string): Promise<void> {
+  await pool.query('UPDATE usuario SET contrasena = ? WHERE id = ?', [hash, id]);
+}

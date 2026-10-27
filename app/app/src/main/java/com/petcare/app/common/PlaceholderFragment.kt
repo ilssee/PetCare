@@ -17,6 +17,7 @@ class PlaceholderFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, contenedor: ViewGroup?, estado: Bundle?): View {
         _binding = FragmentPlaceholderBinding.inflate(inflater, contenedor, false)
         binding.titulo.text = requireArguments().getString(ARG_TITULO)
+        binding.root.respetarBarraDeEstado()
         return binding.root
     }
 

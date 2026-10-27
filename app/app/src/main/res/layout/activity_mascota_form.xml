@@ -31,7 +31,7 @@
             android:fontFamily="@font/poppins_semibold"
             android:text="@string/mascota_nueva_titulo"
             android:textColor="@color/petcare_text"
-            android:textSize="17sp" />
+            android:textSize="19sp" />
     </LinearLayout>
 
     <ScrollView
@@ -48,6 +48,45 @@
             android:paddingTop="4dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/fotoMascota"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:background="@drawable/bg_circulo_foto"
+                    android:clipToOutline="true"
+                    android:contentDescription="@string/foto_subir"
+                    android:padding="8dp" />
+
+                <TextView
+                    android:id="@+id/textoFoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:padding="4dp"
+                    android:text="@string/foto_subir"
+                    android:textColor="@color/petcare_text_muted"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/quitarFoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:padding="4dp"
+                    android:text="@string/foto_quitar"
+                    android:textColor="@color/petcare_error"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <TextView
                 style="@style/Etiqueta"
@@ -84,7 +123,7 @@
                         android:fontFamily="@font/poppins_semibold"
                         android:text="@string/especie_perro"
                         android:textColor="@color/petcare_text"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -110,7 +149,7 @@
                         android:fontFamily="@font/poppins_semibold"
                         android:text="@string/especie_gato"
                         android:textColor="@color/petcare_text"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -136,7 +175,7 @@
                         android:fontFamily="@font/poppins_semibold"
                         android:text="@string/especie_conejo"
                         android:textColor="@color/petcare_text"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -148,7 +187,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/error_campo_obligatorio"
                 android:textColor="@color/petcare_error"
-                android:textSize="11sp"
+                android:textSize="13sp"
                 android:visibility="gone" />
 
             <TextView
@@ -184,7 +223,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/error_campo_obligatorio"
                 android:textColor="@color/petcare_error"
-                android:textSize="11sp"
+                android:textSize="13sp"
                 android:visibility="gone" />
 
             <TextView
@@ -237,7 +276,7 @@
                     android:paddingStart="16dp"
                     android:text="@string/hint_fecha"
                     android:textColor="@color/hint_gris"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
                 <ImageView
                     android:id="@+id/botonQuitarFecha"
@@ -273,7 +312,7 @@
                     android:gravity="center"
                     android:text="@string/sexo_macho"
                     android:textColor="@color/texto_segmento"
-                    android:textSize="13sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/sexoHembra"
@@ -285,7 +324,7 @@
                     android:gravity="center"
                     android:text="@string/sexo_hembra"
                     android:textColor="@color/texto_segmento"
-                    android:textSize="13sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -295,7 +334,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/error_campo_obligatorio"
                 android:textColor="@color/petcare_error"
-                android:textSize="11sp"
+                android:textSize="13sp"
                 android:visibility="gone" />
 
             <TextView
@@ -331,7 +370,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/error_peso_invalido"
                 android:textColor="@color/petcare_error"
-                android:textSize="11sp"
+                android:textSize="13sp"
                 android:visibility="gone" />
 
             <TextView
@@ -340,7 +379,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/petcare_error"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone" />
         </LinearLayout>
     </ScrollView>

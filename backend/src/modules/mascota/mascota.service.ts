@@ -1,4 +1,5 @@
 import { HttpError } from '../../common/errors/http-error';
+import * as fotos from './mascota.fotos';
 import * as repositorio from './mascota.repository';
 import { DatosMascota, EstadoMascota, MascotaRegistro, MascotaRespuesta } from './mascota.types';
 
@@ -135,6 +136,32 @@ export async function cambiarEstado(
 }
 
 export async function eliminar(id: number, usuarioId: number): Promise<void> {
-  await obtenerPropia(id, usuarioId);
+  const mascota = await obtenerPropia(id, usuarioId);
   await repositorio.eliminar(id, usuarioId);
+  await fotos.borrarArchivo(mascota.foto); // también se borra su foto
+}
+
+/** Guarda la foto de la mascota (reemplaza la anterior si había una). */
+export async function guardarFoto(
+  id: number,
+  usuarioId: number,
+  archivo: Express.Multer.File | undefined,
+): Promise<MascotaRespuesta> {
+  const mascota = await obtenerPropia(id, usuarioId);
+  if (!archivo) throw new HttpError(400, 'Seleccione una imagen');
+
+  const formato = fotos.detectarFormato(archivo.buffer);
+  if (!formato) throw new HttpError(400, 'La imagen debe ser JPG, PNG o WebP');
+
+  const ruta = await fotos.guardarArchivo(archivo.buffer, formato);
+  await repositorio.actualizarFoto(id, usuarioId, ruta);
+  await fotos.borrarArchivo(mascota.foto);
+  return obtener(id, usuarioId);
+}
+
+export async function quitarFoto(id: number, usuarioId: number): Promise<MascotaRespuesta> {
+  const mascota = await obtenerPropia(id, usuarioId);
+  await repositorio.actualizarFoto(id, usuarioId, null);
+  await fotos.borrarArchivo(mascota.foto);
+  return obtener(id, usuarioId);
 }

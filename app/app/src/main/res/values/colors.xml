@@ -21,4 +21,5 @@
     <color name="estado_inactiva_fondo">#3A4349</color>
     <color name="hint_gris">#757575</color>
     <color name="petcare_primary_soft">#E0F1F2</color>
+    <color name="petcare_texto_suave">#7F8C94</color>
 </resources>

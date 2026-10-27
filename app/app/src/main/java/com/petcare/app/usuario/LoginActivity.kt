@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        binding.botonOjo.setOnClickListener { binding.campoContrasena.alternarVisibilidadContrasena() }
+        binding.botonOjo.setOnClickListener { binding.campoContrasena.alternarVisibilidadContrasena(binding.botonOjo) }
         binding.botonIngresar.setOnClickListener { iniciarSesion() }
         binding.enlaceRegistro.setOnClickListener {
             pantallaRegistro.launch(Intent(this, RegistroActivity::class.java))

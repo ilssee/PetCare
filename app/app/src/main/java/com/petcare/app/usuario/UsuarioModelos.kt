@@ -8,4 +8,10 @@ data class LoginPeticion(val correo: String, val contrasena: String)
 
 data class UsuarioRespuesta(val id: Int, val nombre: String, val correo: String)
 
+data class PerfilPeticion(val nombre: String, val correo: String)
+
+data class ContrasenaPeticion(val contrasenaActual: String, val contrasenaNueva: String)
+
+data class MensajeRespuesta(val mensaje: String)
+
 data class LoginRespuesta(val token: String, val usuario: UsuarioRespuesta)

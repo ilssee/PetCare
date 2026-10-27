@@ -1,16 +1,23 @@
 package com.petcare.app.mascota
 
 import android.app.DatePickerDialog
+import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.petcare.app.R
+import com.petcare.app.common.Imagenes
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.databinding.ActivityMascotaFormBinding
@@ -30,6 +37,27 @@ class MascotaFormActivity : AppCompatActivity() {
     private var especie: String? = null
     private var sexo: String? = null
     private var fechaNacimiento: String? = null // AAAA-MM-DD
+
+    // Foto: la elegida ahora (ya preparada), la que ya tenía en el servidor y si se pidió quitarla.
+    private var fotoNueva: ByteArray? = null
+    private var fotoActual: String? = null
+    private var quitarFotoActual = false
+
+    // Selector de fotos de Android: no necesita pedir permisos al usuario.
+    private val elegirFoto = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            lifecycleScope.launch {
+                val datos = Imagenes.prepararFoto(this@MascotaFormActivity, uri)
+                if (datos == null) {
+                    mostrarError(getString(R.string.foto_error_leer))
+                } else {
+                    fotoNueva = datos
+                    quitarFotoActual = false
+                    actualizarFoto()
+                }
+            }
+        }
+    }
 
     private val editando get() = mascotaId != 0
 
@@ -55,6 +83,17 @@ class MascotaFormActivity : AppCompatActivity() {
         binding.campoFecha.setOnClickListener { abrirCalendario() }
         binding.botonQuitarFecha.setOnClickListener { quitarFecha() }
         binding.botonGuardar.setOnClickListener { guardar() }
+        val pedirFoto = View.OnClickListener {
+            elegirFoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+        binding.fotoMascota.setOnClickListener(pedirFoto)
+        binding.textoFoto.setOnClickListener(pedirFoto)
+        binding.quitarFoto.setOnClickListener {
+            fotoNueva = null
+            if (fotoActual != null) quitarFotoActual = true
+            actualizarFoto()
+        }
+        actualizarFoto()
 
         if (editando) {
             binding.titulo.setText(R.string.mascota_editar_titulo)
@@ -79,6 +118,8 @@ class MascotaFormActivity : AppCompatActivity() {
                     binding.campoNombre.setText(m.nombre)
                     binding.campoRaza.setText(m.raza ?: "")
                     binding.campoPeso.setText(m.peso?.comoPeso() ?: "")
+                    fotoActual = m.foto
+                    actualizarFoto()
                 }
                 is Resultado.Fallo -> mostrarError(resultado.paraMostrar(this@MascotaFormActivity))
             }
@@ -91,6 +132,40 @@ class MascotaFormActivity : AppCompatActivity() {
         binding.tarjetaPerro.isSelected = nueva == "perro"
         binding.tarjetaGato.isSelected = nueva == "gato"
         binding.tarjetaConejo.isSelected = nueva == "conejo"
+        actualizarFoto()
+    }
+
+    /** Muestra la foto elegida o la que ya tenía; si no hay ninguna, la ilustración de la especie. */
+    private fun actualizarFoto() {
+        val imagen = binding.fotoMascota
+        val nueva = fotoNueva
+        val actual = fotoActual
+        imagen.imageTintList = null
+        when {
+            nueva != null -> {
+                imagen.scaleType = ImageView.ScaleType.CENTER_CROP
+                imagen.setPadding(0, 0, 0, 0)
+                imagen.setImageBitmap(BitmapFactory.decodeByteArray(nueva, 0, nueva.size))
+            }
+            actual != null && !quitarFotoActual -> {
+                imagen.scaleType = ImageView.ScaleType.CENTER_CROP
+                imagen.setPadding(0, 0, 0, 0)
+                imagen.load(actual.comoUrlFoto())
+            }
+            else -> {
+                val elegida = especie
+                imagen.scaleType = ImageView.ScaleType.FIT_CENTER
+                imagen.setPadding(16, 16, 16, 16)
+                if (elegida != null) {
+                    imagen.setImageResource(Especies.ilustracion(elegida))
+                } else {
+                    imagen.setImageResource(R.drawable.ic_huella)
+                    imagen.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.hint_gris))
+                }
+            }
+        }
+        val hayFoto = nueva != null || (actual != null && !quitarFotoActual)
+        binding.quitarFoto.visibility = if (hayFoto) View.VISIBLE else View.GONE
     }
 
     private fun elegirSexo(nuevo: String) {
@@ -174,7 +249,20 @@ class MascotaFormActivity : AppCompatActivity() {
             val resultado = if (editando) repositorio.editar(mascotaId, datos) else repositorio.crear(datos)
             when (resultado) {
                 is Resultado.Exito -> {
-                    val mensaje = if (editando) R.string.mascota_actualizada else R.string.mascota_registrada
+                    // Con la mascota ya guardada, se sube (o se quita) la foto.
+                    val id = resultado.dato.id
+                    val bytes = fotoNueva
+                    var fotoGuardada = true
+                    if (bytes != null) {
+                        fotoGuardada = repositorio.subirFoto(id, bytes) is Resultado.Exito
+                    } else if (quitarFotoActual) {
+                        repositorio.quitarFoto(id)
+                    }
+                    val mensaje = when {
+                        !fotoGuardada -> R.string.foto_error_subida
+                        editando -> R.string.mascota_actualizada
+                        else -> R.string.mascota_registrada
+                    }
                     Toast.makeText(this@MascotaFormActivity, mensaje, Toast.LENGTH_SHORT).show()
                     finish()
                 }

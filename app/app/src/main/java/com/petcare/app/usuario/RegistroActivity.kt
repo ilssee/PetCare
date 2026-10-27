@@ -33,7 +33,7 @@ class RegistroActivity : AppCompatActivity() {
 
         binding.botonVolver.setOnClickListener { finish() }
         binding.enlaceLogin.setOnClickListener { finish() }
-        binding.botonOjo.setOnClickListener { binding.campoContrasena.alternarVisibilidadContrasena() }
+        binding.botonOjo.setOnClickListener { binding.campoContrasena.alternarVisibilidadContrasena(binding.botonOjo) }
         binding.botonRegistrarse.setOnClickListener { registrar() }
     }
 

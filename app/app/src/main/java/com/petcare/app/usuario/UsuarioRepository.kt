@@ -16,6 +16,18 @@ class UsuarioRepository(private val api: UsuarioApi = ApiClient.crear(UsuarioApi
         return resultado
     }
 
+    suspend fun obtenerPerfil(): Resultado<UsuarioRespuesta> = llamarApi { api.obtenerPerfil() }
+
+    /** Guarda el nombre y el correo; si sale bien, actualiza el nombre que recuerda la sesión. */
+    suspend fun actualizarPerfil(nombre: String, correo: String): Resultado<UsuarioRespuesta> {
+        val resultado = llamarApi { api.actualizarPerfil(PerfilPeticion(nombre.trim(), correo.trim())) }
+        if (resultado is Resultado.Exito) SessionManager.guardarNombre(resultado.dato.nombre)
+        return resultado
+    }
+
+    suspend fun cambiarContrasena(actual: String, nueva: String): Resultado<MensajeRespuesta> =
+        llamarApi { api.cambiarContrasena(ContrasenaPeticion(actual, nueva)) }
+
     /** Registra al usuario. Según el ERS (RF01), después debe iniciar sesión desde el login. */
     suspend fun registrar(nombre: String, correo: String, contrasena: String): Resultado<UsuarioRespuesta> =
         llamarApi { api.registrar(RegistroPeticion(nombre.trim(), correo.trim(), contrasena)) }

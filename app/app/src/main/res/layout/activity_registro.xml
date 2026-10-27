@@ -31,7 +31,7 @@
             android:fontFamily="@font/poppins_semibold"
             android:text="@string/registro_titulo"
             android:textColor="@color/petcare_text"
-            android:textSize="17sp" />
+            android:textSize="19sp" />
     </LinearLayout>
 
     <!-- Formulario -->
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/registro_descripcion"
                 android:textColor="@color/petcare_text_muted"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
         <TextView
             style="@style/Etiqueta"
@@ -179,7 +179,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/petcare_error"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
@@ -214,7 +214,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/registro_con_cuenta"
                 android:textColor="@color/petcare_text_muted"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/enlaceLogin"
@@ -225,7 +225,7 @@
                 android:padding="4dp"
                 android:text="@string/registro_ir_login"
                 android:textColor="@color/petcare_primary_dark"
-                android:textSize="13sp" />
+                android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
