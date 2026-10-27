@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_cronograma"
+        android:icon="@drawable/ic_calendario"
+        android:title="@string/nav_cronograma" />
+    <item
+        android:id="@+id/nav_cuidados"
+        android:icon="@drawable/ic_corazon"
+        android:title="@string/nav_cuidados" />
+    <item
+        android:id="@+id/nav_mapa"
+        android:icon="@drawable/ic_mapa"
+        android:title="@string/nav_mapa" />
+    <item
+        android:id="@+id/nav_mascotas"
+        android:icon="@drawable/ic_huella"
+        android:title="@string/nav_mascotas" />
+    <item
+        android:id="@+id/nav_perfil"
+        android:icon="@drawable/ic_persona"
+        android:title="@string/nav_perfil" />
+</menu>
