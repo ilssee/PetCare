@@ -10,6 +10,9 @@ class CuidadoRepository(private val api: CuidadoApi = ApiClient.crear(CuidadoApi
     suspend fun recomendaciones(mascotaId: Int): Resultado<List<RecomendacionRespuesta>> =
         llamarApi { api.recomendaciones(mascotaId) }
 
+    suspend fun informacionPreventiva(mascotaId: Int): Resultado<List<RecomendacionRespuesta>> =
+        llamarApi { api.informacionPreventiva(mascotaId) }
+
     suspend fun activarRecomendados(
         mascotaId: Int,
         cuidados: List<CuidadoElegido>,
@@ -26,10 +29,26 @@ class CuidadoRepository(private val api: CuidadoApi = ApiClient.crear(CuidadoApi
     suspend fun cronograma(mascotaId: Int?): Resultado<CronogramaRespuesta> =
         llamarApi { api.cronograma(mascotaId, "pendientes") }
 
+    suspend fun conteo(): Resultado<ConteoCuidados> = llamarApi { api.conteo() }
+
     suspend fun obtener(cuidadoId: Int): Resultado<CuidadoRespuesta> = llamarApi { api.obtener(cuidadoId) }
 
     suspend fun editar(cuidadoId: Int, datos: CuidadoPeticion): Resultado<GuardarCuidadoRespuesta> =
         llamarApi { api.editar(cuidadoId, datos) }
 
     suspend fun eliminar(cuidadoId: Int): Resultado<Unit> = llamarApiSinContenido { api.eliminar(cuidadoId) }
+
+    /** RF16 y RF17: registra la actividad. Devuelve el cuidado ya actualizado, con su nueva fecha. */
+    suspend fun completar(cuidadoId: Int, datos: CompletarPeticion): Resultado<GuardarCuidadoRespuesta> =
+        llamarApi { api.completar(cuidadoId, datos) }
+
+    /** RF18: agrega o modifica la nota de una actividad. */
+    suspend fun guardarNota(actividadId: Int, nota: String): Resultado<GuardarCuidadoRespuesta> =
+        llamarApi { api.guardarNota(actividadId, NotaPeticion(nota)) }
+
+    suspend fun eliminarNota(actividadId: Int): Resultado<GuardarCuidadoRespuesta> =
+        llamarApi { api.eliminarNota(actividadId) }
+
+    /** RF19: anula una actividad completada por error. */
+    suspend fun anular(actividadId: Int): Resultado<GuardarCuidadoRespuesta> = llamarApi { api.anular(actividadId) }
 }

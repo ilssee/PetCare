@@ -8,12 +8,11 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.petcare.app.MainActivity
 import com.petcare.app.R
+import com.petcare.app.common.respetarBarrasYTeclado
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.configurar
 import com.petcare.app.common.paraMostrar
@@ -61,11 +60,7 @@ class PropuestaActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityPropuestaBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.raiz) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(0, barras.top, 0, barras.bottom)
-            insets
-        }
+        binding.raiz.respetarBarrasYTeclado()
 
         mascotaId = intent.getIntExtra(EXTRA_MASCOTA_ID, 0)
         recienRegistrada = intent.getBooleanExtra(EXTRA_RECIEN_REGISTRADA, false)

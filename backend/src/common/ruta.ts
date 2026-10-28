@@ -16,3 +16,8 @@ export function idDeLaRuta(req: Request): number {
 export function idDelCuidado(req: Request): number {
   return leerId(req, 'El id del cuidado no es válido');
 }
+
+/** Lee el id de la actividad que viene en la ruta (/actividades/:id). */
+export function idDeLaActividad(req: Request): number {
+  return leerId(req, 'El id de la actividad no es válido');
+}

@@ -1,8 +1,27 @@
 import { RowDataPacket } from 'mysql2';
 import { pool } from '../../config/database';
-import { ReglaDisponible } from './regla.types';
+import { ReglaConEstado, ReglaDisponible } from './regla.types';
 
 /** Capa de acceso a datos del módulo regla. */
+
+/**
+ * RF24: todas las reglas que aplican a la mascota (misma especie y, si la regla lo exige, mismo sexo),
+ * indicando cuáles ya están en su cronograma. Primero las que faltan por agregar.
+ */
+export async function listarConEstado(mascotaId: number): Promise<ReglaConEstado[]> {
+  const [filas] = await pool.query<RowDataPacket[]>(
+    `SELECT r.id, r.nombre, r.descripcion, r.importancia,
+            EXISTS (
+              SELECT 1 FROM cuidado c
+              WHERE c.mascota_id = m.id AND c.regla_id = r.id AND c.estado <> 'eliminado') AS enCronograma
+     FROM regla r
+     JOIN mascota m ON m.especie_id = r.especie_id
+     WHERE m.id = ? AND (r.sexo_aplicable IS NULL OR r.sexo_aplicable = m.sexo)
+     ORDER BY enCronograma, r.id`,
+    [mascotaId],
+  );
+  return filas.map((fila) => ({ ...fila, enCronograma: Boolean(fila.enCronograma) })) as ReglaConEstado[];
+}
 
 /**
  * Reglas que aplican a la mascota (misma especie y, si la regla lo exige, mismo sexo)

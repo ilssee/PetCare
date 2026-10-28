@@ -5,7 +5,7 @@ import { carpetaUploads } from './config/uploads';
 import { usuarioRoutes } from './modules/usuario/usuario.routes';
 import { mascotaRoutes } from './modules/mascota/mascota.routes';
 import { reglaRoutes } from './modules/regla/regla.routes';
-import { cuidadoDeMascotaRoutes, cuidadoRoutes } from './modules/cuidado/cuidado.routes';
+import { actividadRoutes, cuidadoDeMascotaRoutes, cuidadoRoutes } from './modules/cuidado/cuidado.routes';
 
 /** Aplicación Express. Aquí se registran las rutas de cada módulo. */
 export const app = express();
@@ -37,6 +37,7 @@ app.use('/mascotas', mascotaRoutes);
 app.use('/mascotas', reglaRoutes); // /mascotas/:id/recomendaciones
 app.use('/mascotas', cuidadoDeMascotaRoutes); // /mascotas/:id/cuidados/...
 app.use('/cuidados', cuidadoRoutes); // /cuidados/:id
+app.use('/actividades', actividadRoutes); // /actividades/:id/...
 
 // Debe ir al final: atrapa los errores de todas las rutas anteriores.
 app.use(manejarErrores);

@@ -7,10 +7,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
+import com.petcare.app.common.respetarBarrasYTeclado
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.databinding.ActivityCuidadoFormBinding
@@ -19,8 +18,10 @@ import com.petcare.app.mascota.mostrarMascota
 import kotlinx.coroutines.launch
 
 /**
- * Agregar un cuidado personalizado (RF12) o editar uno existente (RF14).
- * Si recibe EXTRA_CUIDADO_ID edita ese cuidado; si no, agrega uno nuevo a la mascota de EXTRA_MASCOTA_ID.
+ * Formulario de un cuidado, con tres usos:
+ *  - agregar un cuidado personalizado (RF12): solo recibe la mascota;
+ *  - editar un cuidado existente (RF14): recibe EXTRA_CUIDADO_ID;
+ *  - agregar una recomendación al cronograma (RF25): recibe la mascota y los datos de la recomendación.
  */
 class CuidadoFormActivity : AppCompatActivity() {
 
@@ -32,6 +33,7 @@ class CuidadoFormActivity : AppCompatActivity() {
     private var mascotaId = 0
     private var cuidadoId = 0
     private var cuidado: CuidadoRespuesta? = null
+    private var recomendacion: RecomendacionRespuesta? = null
 
     private val editando get() = cuidadoId != 0
 
@@ -40,17 +42,29 @@ class CuidadoFormActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityCuidadoFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.raiz) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(0, barras.top, 0, barras.bottom)
-            insets
-        }
+        binding.raiz.respetarBarrasYTeclado()
 
         mascotaId = intent.getIntExtra(EXTRA_MASCOTA_ID, 0)
         cuidadoId = intent.getIntExtra(EXTRA_CUIDADO_ID, 0)
+        val reglaId = intent.getIntExtra(EXTRA_REGLA_ID, 0)
+        if (reglaId != 0) {
+            recomendacion = RecomendacionRespuesta(
+                id = reglaId,
+                nombre = intent.getStringExtra(EXTRA_REGLA_NOMBRE).orEmpty(),
+                descripcion = intent.getStringExtra(EXTRA_REGLA_DESCRIPCION).orEmpty(),
+                importancia = intent.getStringExtra(EXTRA_REGLA_IMPORTANCIA).orEmpty(),
+            )
+        }
         formulario = FormularioCuidado(this, binding.formulario)
 
-        binding.tituloPantalla.setText(if (editando) R.string.cuidado_editar_titulo else R.string.cuidado_personalizado_titulo)
+        binding.tituloPantalla.setText(
+            when {
+                editando -> R.string.cuidado_editar_titulo
+                recomendacion != null -> R.string.cuidado_configurar_titulo_simple
+                else -> R.string.cuidado_personalizado_titulo
+            },
+        )
+        if (recomendacion != null) binding.botonGuardar.setText(R.string.cuidado_confirmar)
         binding.botonVolver.setOnClickListener { finish() }
         binding.botonGuardar.setOnClickListener { guardar() }
 
@@ -69,7 +83,8 @@ class CuidadoFormActivity : AppCompatActivity() {
                     is Resultado.Fallo -> return@launch mostrarError(resultado.paraMostrar(this@CuidadoFormActivity))
                 }
             } else {
-                formulario.cargarPersonalizado()
+                val elegida = recomendacion
+                if (elegida != null) formulario.cargarRecomendacion(elegida) else formulario.cargarPersonalizado()
             }
 
             when (val resultado = mascotas.obtener(mascotaId)) {
@@ -90,21 +105,35 @@ class CuidadoFormActivity : AppCompatActivity() {
             return
         }
 
-        // En un cuidado recomendado el nombre y la descripción están bloqueados: no se envían.
-        val escribeNombre = !editando || cuidado?.esRecomendado == false
-        val peticion = configuracion.paraGuardar(
-            nombre = if (escribeNombre) formulario.nombrePersonalizado else null,
-            descripcion = if (escribeNombre) formulario.descripcionPersonalizada else null,
-        )
-
         binding.textoError.visibility = View.GONE
         binding.botonGuardar.isEnabled = false
+        val elegida = recomendacion
+
         lifecycleScope.launch {
-            val resultado = if (editando) repositorio.editar(cuidadoId, peticion)
-            else repositorio.crearPersonalizado(mascotaId, peticion)
+            // Cada caso devuelve el mensaje de éxito o el error, y se termina igual en todos.
+            val resultado: Resultado<String> = if (elegida != null) {
+                // RF25: una recomendación se agrega con su nombre y descripción de la regla.
+                when (val r = repositorio.activarRecomendados(mascotaId, listOf(configuracion.paraRecomendacion(elegida.id)))) {
+                    is Resultado.Exito -> Resultado.Exito(getString(R.string.recomendacion_agregada))
+                    is Resultado.Fallo -> r
+                }
+            } else {
+                // En un cuidado recomendado el nombre y la descripción están bloqueados: no se envían.
+                val escribeNombre = !editando || cuidado?.esRecomendado == false
+                val peticion = configuracion.paraGuardar(
+                    nombre = if (escribeNombre) formulario.nombrePersonalizado else null,
+                    descripcion = if (escribeNombre) formulario.descripcionPersonalizada else null,
+                )
+                val r = if (editando) repositorio.editar(cuidadoId, peticion) else repositorio.crearPersonalizado(mascotaId, peticion)
+                when (r) {
+                    is Resultado.Exito -> Resultado.Exito(r.dato.mensaje)
+                    is Resultado.Fallo -> r
+                }
+            }
+
             when (resultado) {
                 is Resultado.Exito -> {
-                    Toast.makeText(this@CuidadoFormActivity, resultado.dato.mensaje, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@CuidadoFormActivity, resultado.dato, Toast.LENGTH_SHORT).show()
                     SeleccionCuidados.mascotaId = mascotaId // la lista debe mostrar la mascota que se acaba de tocar
                     finish()
                 }
@@ -124,9 +153,22 @@ class CuidadoFormActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_MASCOTA_ID = "mascota_id"
         private const val EXTRA_CUIDADO_ID = "cuidado_id"
+        private const val EXTRA_REGLA_ID = "regla_id"
+        private const val EXTRA_REGLA_NOMBRE = "regla_nombre"
+        private const val EXTRA_REGLA_DESCRIPCION = "regla_descripcion"
+        private const val EXTRA_REGLA_IMPORTANCIA = "regla_importancia"
 
         fun intentNuevo(contexto: Context, mascotaId: Int) =
             Intent(contexto, CuidadoFormActivity::class.java).putExtra(EXTRA_MASCOTA_ID, mascotaId)
+
+        /** RF25: configurar una recomendación para agregarla al cronograma de la mascota. */
+        fun intentRecomendacion(contexto: Context, mascotaId: Int, recomendacion: RecomendacionRespuesta) =
+            Intent(contexto, CuidadoFormActivity::class.java)
+                .putExtra(EXTRA_MASCOTA_ID, mascotaId)
+                .putExtra(EXTRA_REGLA_ID, recomendacion.id)
+                .putExtra(EXTRA_REGLA_NOMBRE, recomendacion.nombre)
+                .putExtra(EXTRA_REGLA_DESCRIPCION, recomendacion.descripcion)
+                .putExtra(EXTRA_REGLA_IMPORTANCIA, recomendacion.importancia)
 
         fun intentEditar(contexto: Context, cuidadoId: Int) =
             Intent(contexto, CuidadoFormActivity::class.java).putExtra(EXTRA_CUIDADO_ID, cuidadoId)

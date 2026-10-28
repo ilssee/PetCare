@@ -8,6 +8,7 @@ data class RecomendacionRespuesta(
     val nombre: String,
     val descripcion: String,
     val importancia: String,
+    val enCronograma: Boolean = false, // solo viene en la información preventiva
 )
 
 /**
@@ -108,6 +109,14 @@ data class ConteoCuidados(val todos: Int, val pendientes: Int, val finalizados: 
 data class ListaCuidadosRespuesta(val conteos: ConteoCuidados, val cuidados: List<CuidadoRespuesta>)
 
 data class GuardarCuidadoRespuesta(val mensaje: String, val cuidado: CuidadoRespuesta)
+
+/**
+ * Para marcar un cuidado como completado. [fechaBase] (planificada o realizacion) solo hace falta
+ * cuando el cuidado se repite y la fecha de realización difiere de la planificada.
+ */
+data class CompletarPeticion(val fechaRealizacion: String, val nota: String?, val fechaBase: String?)
+
+data class NotaPeticion(val nota: String)
 
 /** Cuidados de todas las mascotas activas del usuario (cronograma). */
 data class CronogramaRespuesta(val cuidados: List<CuidadoRespuesta>)

@@ -4,10 +4,6 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import androidx.appcompat.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
@@ -18,9 +14,17 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.petcare.app.R
+import com.petcare.app.common.OpcionHoja
 import com.petcare.app.common.Resultado
+import com.petcare.app.common.mostrarHojaOpciones
 import com.petcare.app.common.paraMostrar
+import com.petcare.app.cuidado.CuidadoRepository
+import com.petcare.app.cuidado.CuidadoRespuesta
+import com.petcare.app.cuidado.InfoPreventivaActivity
+import com.petcare.app.cuidado.abrirCuidadosDe
+import com.petcare.app.cuidado.mostrarCuidado
 import com.petcare.app.databinding.ActivityMascotaPerfilBinding
+import com.petcare.app.databinding.ItemCronogramaBinding
 import kotlinx.coroutines.launch
 
 /** Perfil de una mascota: datos, y menú para editar, inactivar/reactivar o eliminar (con confirmación). */
@@ -28,6 +32,7 @@ class MascotaPerfilActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMascotaPerfilBinding
     private val repositorio = MascotaRepository()
+    private val cuidados = CuidadoRepository()
     private var mascotaId = 0
     private var mascota: MascotaRespuesta? = null
 
@@ -44,10 +49,12 @@ class MascotaPerfilActivity : AppCompatActivity() {
 
         mascotaId = intent.getIntExtra(EXTRA_ID, 0)
         binding.botonVolver.setOnClickListener { finish() }
-        binding.botonOpciones.setOnClickListener { mostrarMenu(it) }
-        // Info preventiva y Próximos cuidados dependen de módulos que aún no están construidos.
-        binding.tarjetaInfoPreventiva.setOnClickListener { avisar(R.string.proximamente) }
-        binding.verTodos.setOnClickListener { avisar(R.string.proximamente) }
+        binding.botonOpciones.setOnClickListener { mostrarMenu() }
+        binding.tarjetaInfoPreventiva.setOnClickListener {
+            startActivity(InfoPreventivaActivity.intent(this, mascotaId))
+        }
+        // "Ver todos" lleva a la pestaña Cuidados con esta mascota elegida.
+        binding.verTodos.setOnClickListener { abrirCuidadosDe(mascotaId) }
     }
 
     // Se recarga al volver del formulario de edición.
@@ -92,28 +99,49 @@ class MascotaPerfilActivity : AppCompatActivity() {
         binding.especie.text = getString(Especies.nombre(m.especie))
         binding.raza.text = m.raza ?: vacio
         binding.nacimiento.text = m.fechaNacimiento?.comoFechaLegible() ?: vacio
+
+        // Una mascota inactiva ya no aparece en Cronograma ni en Cuidados: sus cuidados se consultan desde aquí (RF23).
+        binding.verTodos.setText(if (m.estaInactiva) R.string.ver_cuidados else R.string.ver_todos)
+        cargarProximosCuidados(m)
     }
 
-    private fun mostrarMenu(ancla: View) {
-        val m = mascota ?: return
-        val menu = PopupMenu(this, ancla)
-        menu.menu.add(0, ID_EDITAR, 0, R.string.mascota_menu_editar)
-        menu.menu.add(0, ID_ESTADO, 1, if (m.estaInactiva) R.string.mascota_menu_reactivar else R.string.mascota_menu_inactivar)
-        val eliminar = SpannableString(getString(R.string.mascota_menu_eliminar)).apply {
-            setSpan(ForegroundColorSpan(ContextCompat.getColor(this@MascotaPerfilActivity, R.color.petcare_error)), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-        menu.menu.add(0, ID_ELIMINAR, 2, eliminar)
-        menu.setOnMenuItemClickListener { opcion ->
-            when (opcion.itemId) {
-                ID_EDITAR -> startActivity(
-                    Intent(this, MascotaFormActivity::class.java).putExtra(MascotaFormActivity.EXTRA_ID, m.id),
-                )
-                ID_ESTADO -> confirmarCambioDeEstado(m)
-                ID_ELIMINAR -> confirmarEliminacion(m)
+    /** Los tres cuidados pendientes más próximos de la mascota, con los vencidos primero. */
+    private fun cargarProximosCuidados(m: MascotaRespuesta) {
+        lifecycleScope.launch {
+            when (val resultado = cuidados.listar(m.id, "pendientes")) {
+                is Resultado.Exito -> mostrarProximos(m, resultado.dato.cuidados.take(MAXIMO_PROXIMOS))
+                is Resultado.Fallo -> mostrarError(resultado.paraMostrar(this@MascotaPerfilActivity))
             }
-            true
         }
-        menu.show()
+    }
+
+    private fun mostrarProximos(m: MascotaRespuesta, proximos: List<CuidadoRespuesta>) {
+        binding.listaProximos.removeAllViews()
+        binding.sinCuidados.visibility = if (proximos.isEmpty()) View.VISIBLE else View.GONE
+        proximos.forEach { c ->
+            val fila = ItemCronogramaBinding.inflate(layoutInflater, binding.listaProximos, false)
+            fila.mostrarCuidado(c, m)
+            fila.tarjeta.setOnClickListener { abrirCuidadosDe(m.id) }
+            binding.listaProximos.addView(fila.root)
+        }
+    }
+
+    /** Opciones de la mascota: una hoja que sube desde abajo, como en el prototipo. */
+    private fun mostrarMenu() {
+        val m = mascota ?: return
+        mostrarHojaOpciones(
+            m.nombre,
+            listOf(
+                OpcionHoja(R.drawable.ic_editar, R.string.mascota_menu_editar) {
+                    startActivity(Intent(this, MascotaFormActivity::class.java).putExtra(MascotaFormActivity.EXTRA_ID, m.id))
+                },
+                OpcionHoja(
+                    if (m.estaInactiva) R.drawable.ic_campana else R.drawable.ic_campana_apagada,
+                    if (m.estaInactiva) R.string.mascota_menu_reactivar else R.string.mascota_menu_inactivar,
+                ) { confirmarCambioDeEstado(m) },
+                OpcionHoja(R.drawable.ic_eliminar, R.string.mascota_menu_eliminar, peligro = true) { confirmarEliminacion(m) },
+            ),
+        )
     }
 
     /** RF07 y RF08: pide confirmación; si se cancela, el estado no cambia. */
@@ -172,8 +200,6 @@ class MascotaPerfilActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ID = "mascota_id"
-        private const val ID_EDITAR = 1
-        private const val ID_ESTADO = 2
-        private const val ID_ELIMINAR = 3
+        private const val MAXIMO_PROXIMOS = 3
     }
 }

@@ -23,10 +23,8 @@ import com.petcare.app.common.respetarBarraDeEstado
 import com.petcare.app.cuidado.CuidadoRepository
 import com.petcare.app.cuidado.CuidadoRespuesta
 import com.petcare.app.cuidado.PropuestaActivity
-import com.petcare.app.cuidado.SeleccionCuidados
-import com.petcare.app.cuidado.comoFechaCorta
-import com.petcare.app.cuidado.diasVencido
-import com.petcare.app.cuidado.textoFrecuencia
+import com.petcare.app.cuidado.abrirCuidadosDe
+import com.petcare.app.cuidado.mostrarCuidado
 import com.petcare.app.databinding.FragmentCronogramaBinding
 import com.petcare.app.databinding.ItemChipMascotaBinding
 import com.petcare.app.databinding.ItemCronogramaBinding
@@ -268,22 +266,8 @@ class CronogramaFragment : Fragment() {
 
     private fun agregarFila(c: CuidadoRespuesta) {
         val fila = ItemCronogramaBinding.inflate(layoutInflater, binding.lista, false)
-        val mascota = activas.firstOrNull { it.id == c.mascotaId }
-        if (mascota != null) {
-            fila.fotoMascota.mostrarMascota(mascota)
-            fila.fotoMascota.backgroundTintList = ColorStateList.valueOf(color(Especies.color(mascota.especie)))
-        }
-        fila.nombre.text = c.nombre
-        fila.detalle.text = getString(R.string.cronograma_mascota_frecuencia, mascota?.nombre.orEmpty(), c.textoFrecuencia(requireContext()))
-
-        val vencido = c.diasVencido()
-        if (vencido > 0) {
-            fila.fecha.text = resources.getQuantityString(R.plurals.cuidado_vencio, vencido.toInt(), vencido.toInt())
-            fila.tarjeta.backgroundTintList = ColorStateList.valueOf(color(R.color.petcare_danger_100))
-        } else {
-            fila.fecha.text = c.fechaRecurrente.comoFechaCorta()
-        }
-        fila.tarjeta.setOnClickListener { irACuidados(c.mascotaId) }
+        fila.mostrarCuidado(c, activas.firstOrNull { it.id == c.mascotaId })
+        fila.tarjeta.setOnClickListener { requireContext().abrirCuidadosDe(c.mascotaId) }
         binding.lista.addView(fila.root)
     }
 
@@ -333,16 +317,6 @@ class CronogramaFragment : Fragment() {
                 startActivity(PropuestaActivity.intent(requireContext(), candidatas[posicion].id))
             }
             .show()
-    }
-
-    /** Tocar un cuidado lleva a la pestaña Cuidados, con esa mascota elegida. */
-    private fun irACuidados(mascotaId: Int) {
-        SeleccionCuidados.mascotaId = mascotaId
-        startActivity(
-            Intent(requireContext(), MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                .putExtra(MainActivity.EXTRA_SECCION, R.id.nav_cuidados),
-        )
     }
 
     private fun color(id: Int) = ContextCompat.getColor(requireContext(), id)

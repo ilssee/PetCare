@@ -105,10 +105,11 @@
     <string name="mascota_eliminada">Mascota eliminada correctamente</string>
 
     <!-- Perfil de la mascota -->
-    <string name="info_preventiva_titulo">Info preventiva</string>
-    <string name="info_preventiva_subtitulo">Qué cuidados recomendamos para %1$s y por qué</string>
+    <string name="info_preventiva_titulo">Información preventiva</string>
+    <string name="info_preventiva_subtitulo">¿Qué cuidados recomendamos para %1$s y por qué?</string>
     <string name="proximos_cuidados">Próximos cuidados</string>
     <string name="ver_todos">Ver todos</string>
+    <string name="ver_cuidados">Ver cuidados</string>
     <string name="sin_cuidados">No hay cuidados registrados para esta mascota</string>
 
     <!-- Foto de la mascota -->
@@ -158,6 +159,37 @@
     <string name="contrasena_actualizada">Contraseña actualizada correctamente</string>
     <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
     <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 32 caracteres</string>
+
+    <!-- Información preventiva y agregar una recomendación (RF24 y RF25) -->
+    <string name="info_aviso"><![CDATA[Estas recomendaciones son <b>referenciales</b>, según la especie de %1$s. Consulta con tu <b>médico veterinario</b> la frecuencia y las fechas que le corresponden.]]></string>
+    <string name="info_en_cronograma">En tu cronograma</string>
+    <string name="info_agregar">Agregar al cronograma</string>
+    <string name="info_error_cargar">No se pudieron cargar las recomendaciones</string>
+    <string name="recomendacion_agregada">Recomendación agregada al cronograma</string>
+    <string name="cuidado_configurar_titulo_simple">Configurar cuidado</string>
+
+    <!-- Completar un cuidado, historial y notas (RF16 a RF19) -->
+    <string name="aceptar">Aceptar</string>
+    <string name="completar_titulo">¿Cuándo se realizó “%1$s”?</string>
+    <string name="completar_fecha">Fecha de realización</string>
+    <string name="completar_hint_nota">Ej. Clínica Patitas, lote 4521</string>
+    <string name="fecha_base_titulo">¿Qué fecha deseas usar como base para calcular el próximo recordatorio?</string>
+    <string name="fecha_base_planificada">Fecha planificada</string>
+    <string name="fecha_base_realizacion">Fecha de realización</string>
+    <string name="fecha_base_detalle">%1$s · Próximo: %2$s</string>
+    <string name="actividad_registrada">Actividad registrada</string>
+    <string name="actividad_registrada_proxima">Actividad registrada · próxima fecha: %1$s</string>
+    <string name="actividad_nota_titulo">Nota de la actividad</string>
+    <string name="actividad_agregar_nota">Agregar nota</string>
+    <string name="actividad_editar_nota">Editar nota</string>
+    <string name="actividad_eliminar_nota">Eliminar nota</string>
+    <string name="actividad_anular">Anular actividad</string>
+    <string name="actividad_eliminar_nota_titulo">¿Eliminar la nota?</string>
+    <string name="actividad_eliminar_nota_mensaje">La nota se quitará de esta actividad.</string>
+    <string name="actividad_anular_titulo">¿Anular esta actividad?</string>
+    <string name="actividad_anular_mensaje">Se quitará del historial. Si es la última actividad registrada, la fecha del cuidado volverá a la que tenía antes.</string>
+    <string name="actividad_anular_boton">Anular</string>
+    <string name="actividad_opciones">Opciones de la actividad</string>
 
     <!-- Cronograma: cuidados de todas las mascotas (RF13) -->
     <plurals name="cronograma_titulo_con_cuidados">

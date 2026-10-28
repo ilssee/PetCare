@@ -63,3 +63,18 @@ fun CuidadoRespuesta.textoDuracion(contexto: Context): String = when (modoTermin
     "indefinido" -> contexto.getString(R.string.modo_indefinido)
     else -> contexto.getString(R.string.modo_una_vez)
 }
+
+/**
+ * Próxima fecha del cuidado si se calcula a partir de [base] (planificada o de realización).
+ * Es la misma cuenta que hace el servidor; sirve para mostrar el resultado antes de elegir.
+ */
+fun CuidadoRespuesta.proximaFechaDesde(base: LocalDate): LocalDate? {
+    val valor = frecuenciaValor ?: return null
+    return when (frecuenciaUnidad) {
+        "dias" -> base.plusDays(valor.toLong())
+        "semanas" -> base.plusWeeks(valor.toLong())
+        "meses" -> base.plusMonths(valor.toLong())
+        "anios" -> base.plusYears(valor.toLong())
+        else -> null
+    }
+}

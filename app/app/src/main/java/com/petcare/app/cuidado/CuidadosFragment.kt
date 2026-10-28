@@ -36,6 +36,7 @@ import com.petcare.app.mascota.comoFechaLegible
 import com.petcare.app.mascota.configurarSiNoHayMascotas
 import com.petcare.app.mascota.mostrarMascota
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 /**
  * Sección Cuidados (RF23): los cuidados de una mascota con su historial, filtrados por estado,
@@ -49,6 +50,7 @@ class CuidadosFragment : Fragment() {
     private val repositorio = CuidadoRepository()
 
     private var activas: List<MascotaRespuesta> = emptyList()
+    private var inactivaVisible = 0 // mascota inactiva pedida desde su perfil (0 = ninguna)
     private var mascotaId = 0
     private var filtro = TODOS
     private var lista: List<CuidadoRespuesta> = emptyList()
@@ -87,10 +89,15 @@ class CuidadosFragment : Fragment() {
                 return@launch
             }
             val todas = (resultado as Resultado.Exito).dato
-            activas = todas.filter { !it.estaInactiva }
+
+            // Una mascota inactiva solo aparece aquí cuando se llega desde su perfil ("Ver cuidados", RF23).
+            val pedida = SeleccionCuidados.mascotaId
+            SeleccionCuidados.mascotaId = 0
+            if (pedida != 0 && todas.any { it.id == pedida && it.estaInactiva }) inactivaVisible = pedida
+            activas = todas.filter { !it.estaInactiva || it.id == inactivaVisible }
 
             // Sin mascotas activas se muestra el aviso, igual que en Mascotas y Cronograma.
-            val sinMascotas = vista.vacio.configurarSiNoHayMascotas(todas) {
+            val sinMascotas = activas.isEmpty() && vista.vacio.configurarSiNoHayMascotas(todas) {
                 startActivity(Intent(requireContext(), MascotaFormActivity::class.java))
             }
             vista.vacio.root.visibility = if (sinMascotas) View.VISIBLE else View.GONE
@@ -98,12 +105,10 @@ class CuidadosFragment : Fragment() {
             vista.botonAgregar.visibility = if (sinMascotas) View.GONE else View.VISIBLE
             if (sinMascotas) return@launch
 
-            val pedida = SeleccionCuidados.mascotaId
-            SeleccionCuidados.mascotaId = 0
             mascotaId = when {
                 pedida != 0 && activas.any { it.id == pedida } -> pedida
                 activas.any { it.id == mascotaId } -> mascotaId
-                else -> activas.first().id
+                else -> (activas.firstOrNull { !it.estaInactiva } ?: activas.first()).id
             }
             dibujarSelector()
             cargarCuidados()
@@ -113,6 +118,9 @@ class CuidadosFragment : Fragment() {
     private fun dibujarSelector() {
         val contenedor = binding.selectorMascotas
         contenedor.removeAllViews()
+        // A una mascota inactiva no se le agregan cuidados: solo se consultan.
+        binding.botonAgregar.visibility =
+            if (activas.firstOrNull { it.id == mascotaId }?.estaInactiva == true) View.GONE else View.VISIBLE
         activas.forEach { mascota ->
             val item = ItemSelectorMascotaBinding.inflate(layoutInflater, contenedor, false)
             val elegida = mascota.id == mascotaId
@@ -263,7 +271,7 @@ class CuidadosFragment : Fragment() {
         t.cajaNota.visibility = if (c.nota.isNullOrBlank()) View.GONE else View.VISIBLE
         t.valorNota.text = c.nota.orEmpty()
 
-        t.botonCompletar.visibility = if (c.estaFinalizado) View.GONE else View.VISIBLE
+        t.botonCompletar.visibility = if (c.estaFinalizado || mascota.estaInactiva) View.GONE else View.VISIBLE
         t.avisoFinalizado.visibility = if (c.estaFinalizado) View.VISIBLE else View.GONE
 
         dibujarHistorial(t, c)
@@ -277,8 +285,7 @@ class CuidadosFragment : Fragment() {
             if (!conDetalles.remove(c.id)) conDetalles.add(c.id)
             aplicarEstadoDeTarjeta(t, c.id)
         }
-        // Marcar como completado y el historial de actividades llegan en el siguiente paso.
-        t.botonCompletar.setOnClickListener { avisar(getString(R.string.proximamente)) }
+        t.botonCompletar.setOnClickListener { iniciarCompletar(c) }
         t.botonOpciones.setOnClickListener { mostrarHojaDelCuidado(c) }
         return t.root
     }
@@ -289,13 +296,11 @@ class CuidadosFragment : Fragment() {
         c.actividades.forEach { actividad ->
             val fila = ItemActividadBinding.inflate(layoutInflater, t.historial, false)
             fila.fecha.text = actividad.fechaRealizacion.comoFechaLegible()
-            if (actividad.estado == "anulada") {
-                etiquetar(fila.estado, R.string.cuidado_actividad_anulada, R.color.petcare_border, R.color.petcare_text_muted)
-            } else {
-                etiquetar(fila.estado, R.string.cuidado_actividad_completada, R.color.petcare_brand_100, R.color.petcare_primary_dark)
-            }
+            // Las actividades anuladas no llegan: el historial solo muestra las completadas.
+            etiquetar(fila.estado, R.string.cuidado_actividad_completada, R.color.petcare_brand_100, R.color.petcare_primary_dark)
             fila.nota.visibility = if (actividad.nota.isNullOrBlank()) View.GONE else View.VISIBLE
             fila.nota.text = getString(R.string.cuidado_actividad_nota, actividad.nota.orEmpty())
+            fila.fila.setOnClickListener { mostrarHojaDeActividad(actividad) }
             t.historial.addView(fila.root)
         }
     }
@@ -328,7 +333,9 @@ class CuidadosFragment : Fragment() {
                 OpcionHoja(R.drawable.ic_editar, R.string.hoja_agregar_personalizado) {
                     startActivity(CuidadoFormActivity.intentNuevo(requireContext(), mascota.id))
                 },
-                OpcionHoja(R.drawable.ic_escudo, R.string.hoja_agregar_recomendacion) { abrirPropuesta(mascota) },
+                OpcionHoja(R.drawable.ic_escudo, R.string.hoja_agregar_recomendacion) {
+                    startActivity(InfoPreventivaActivity.intent(requireContext(), mascota.id))
+                },
             ),
         )
     }
@@ -362,6 +369,93 @@ class CuidadosFragment : Fragment() {
                     avisar(getString(R.string.cuidado_eliminado))
                     abiertos.remove(c.id)
                     conDetalles.remove(c.id)
+                    if (_binding != null) cargarCuidados()
+                }
+                is Resultado.Fallo -> avisar(resultado.paraMostrar(requireContext()))
+            }
+        }
+    }
+
+    // ---------- Completar un cuidado y el historial (RF16 a RF19) ----------
+
+    /**
+     * RF16: pregunta cuándo se realizó. RF17: si el cuidado se repite y la fecha difiere de la
+     * planificada, pregunta además qué fecha usar como base para calcular la próxima.
+     */
+    private fun iniciarCompletar(c: CuidadoRespuesta) {
+        val contexto = requireContext()
+        contexto.dialogoCompletar(c) { fecha, nota ->
+            val planificada = LocalDate.parse(c.fechaRecurrente)
+            if (c.modoTermino != "una_vez" && fecha != planificada) {
+                contexto.dialogoFechaBase(c, planificada, fecha) { base -> completar(c, fecha, nota, base) }
+            } else {
+                completar(c, fecha, nota, null)
+            }
+        }
+    }
+
+    private fun completar(c: CuidadoRespuesta, fecha: LocalDate, nota: String?, base: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            when (val resultado = repositorio.completar(c.id, CompletarPeticion(fecha.toString(), nota, base))) {
+                is Resultado.Exito -> {
+                    val cuidado = resultado.dato.cuidado
+                    avisar(
+                        if (cuidado.estaFinalizado) getString(R.string.actividad_registrada)
+                        else getString(R.string.actividad_registrada_proxima, cuidado.fechaRecurrente.comoFechaLegible()),
+                    )
+                    if (_binding != null) cargarCuidados()
+                }
+                is Resultado.Fallo -> avisar(resultado.paraMostrar(requireContext()))
+            }
+        }
+    }
+
+    /** Tocar una actividad del historial: agregar, editar o quitar su nota, o anularla. */
+    private fun mostrarHojaDeActividad(a: ActividadRespuesta) {
+        val tieneNota = !a.nota.isNullOrBlank()
+        val opciones = mutableListOf(
+            OpcionHoja(
+                R.drawable.ic_editar,
+                if (tieneNota) R.string.actividad_editar_nota else R.string.actividad_agregar_nota,
+            ) { editarNota(a) },
+        )
+        if (tieneNota) {
+            opciones += OpcionHoja(R.drawable.ic_eliminar, R.string.actividad_eliminar_nota, peligro = true) { confirmarEliminarNota(a) }
+        }
+        opciones += OpcionHoja(R.drawable.ic_eliminar, R.string.actividad_anular, peligro = true) { confirmarAnulacion(a) }
+        requireContext().mostrarHojaOpciones(a.fechaRealizacion.comoFechaLegible(), opciones)
+    }
+
+    private fun editarNota(a: ActividadRespuesta) {
+        requireContext().dialogoNota(a.nota) { nota -> ejecutar { repositorio.guardarNota(a.id, nota) } }
+    }
+
+    /** RF18: pide confirmación; si se cancela, la nota se mantiene. */
+    private fun confirmarEliminarNota(a: ActividadRespuesta) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.actividad_eliminar_nota_titulo)
+            .setMessage(R.string.actividad_eliminar_nota_mensaje)
+            .setNegativeButton(R.string.cancelar, null)
+            .setPositiveButton(R.string.actividad_eliminar_nota) { _, _ -> ejecutar { repositorio.eliminarNota(a.id) } }
+            .show()
+    }
+
+    /** RF19: pide confirmación; si se cancela, la actividad se mantiene en el historial. */
+    private fun confirmarAnulacion(a: ActividadRespuesta) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.actividad_anular_titulo)
+            .setMessage(R.string.actividad_anular_mensaje)
+            .setNegativeButton(R.string.cancelar, null)
+            .setPositiveButton(R.string.actividad_anular_boton) { _, _ -> ejecutar { repositorio.anular(a.id) } }
+            .show()
+    }
+
+    /** Ejecuta una acción sobre una actividad, avisa con el mensaje del servidor y recarga la lista. */
+    private fun ejecutar(accion: suspend () -> Resultado<GuardarCuidadoRespuesta>) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            when (val resultado = accion()) {
+                is Resultado.Exito -> {
+                    avisar(resultado.dato.mensaje)
                     if (_binding != null) cargarCuidados()
                 }
                 is Resultado.Fallo -> avisar(resultado.paraMostrar(requireContext()))

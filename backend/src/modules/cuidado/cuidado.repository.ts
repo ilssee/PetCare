@@ -122,6 +122,22 @@ export async function contarPorEstado(mascotaId: number): Promise<ConteoCuidados
   return { todos: pendientes + finalizados, pendientes, finalizados };
 }
 
+/** Cuántos cuidados tiene el usuario en total (de todas sus mascotas, activas o no), por estado. */
+export async function contarDeUsuario(usuarioId: number): Promise<ConteoCuidados> {
+  const [filas] = await pool.query<RowDataPacket[]>(
+    `SELECT c.estado, COUNT(*) AS total
+     FROM cuidado c
+     JOIN mascota m ON m.id = c.mascota_id
+     WHERE m.usuario_id = ? AND c.estado <> 'eliminado'
+     GROUP BY c.estado`,
+    [usuarioId],
+  );
+  const de = (estado: string) => Number(filas.find((f) => f.estado === estado)?.total ?? 0);
+  const pendientes = de('pendiente');
+  const finalizados = de('finalizado');
+  return { todos: pendientes + finalizados, pendientes, finalizados };
+}
+
 /** Un cuidado, solo si pertenece a una mascota del usuario. */
 export async function buscarPropio(id: number, usuarioId: number): Promise<CuidadoRespuesta | null> {
   const [filas] = await pool.query<RowDataPacket[]>(
@@ -133,18 +149,109 @@ export async function buscarPropio(id: number, usuarioId: number): Promise<Cuida
   return aCuidados(filas)[0] ?? null;
 }
 
-/** Historial de varios cuidados: de la actividad más reciente a la más antigua. */
+/**
+ * Historial de varios cuidados: de la actividad más reciente a la más antigua.
+ * Las actividades anuladas (RF19) ya no forman parte del historial.
+ */
 export async function listarActividades(cuidadoIds: number[]): Promise<ActividadRespuesta[]> {
   if (cuidadoIds.length === 0) return [];
   const [filas] = await pool.query<RowDataPacket[]>(
     `SELECT id, cuidado_id AS cuidadoId, fecha_planificada AS fechaPlanificada,
             fecha_realizacion AS fechaRealizacion, estado, nota
      FROM actividad
-     WHERE cuidado_id IN (?)
+     WHERE cuidado_id IN (?) AND estado = 'completada'
      ORDER BY fecha_realizacion DESC, id DESC`,
     [cuidadoIds],
   );
   return filas as ActividadRespuesta[];
+}
+
+/** Lo que cambia en el cuidado cuando se completa una actividad o se anula. */
+export interface CambiosCuidado {
+  fechaRecurrente: string;
+  totalRepeticiones: number | null;
+  estado: 'pendiente' | 'finalizado';
+}
+
+/** RF16: guarda la actividad y actualiza el cuidado en una sola transacción. */
+export async function registrarActividad(
+  cuidadoId: number,
+  actividad: { fechaPlanificada: string; fechaRealizacion: string; nota: string | null },
+  cambios: CambiosCuidado,
+): Promise<number> {
+  const conexion = await pool.getConnection();
+  try {
+    await conexion.beginTransaction();
+    const [resultado] = await conexion.query<ResultSetHeader>(
+      `INSERT INTO actividad (cuidado_id, fecha_planificada, fecha_realizacion, estado, nota)
+       VALUES (?, ?, ?, 'completada', ?)`,
+      [cuidadoId, actividad.fechaPlanificada, actividad.fechaRealizacion, actividad.nota],
+    );
+    await conexion.query(
+      'UPDATE cuidado SET fecha_recurrente = ?, total_repeticiones = ?, estado = ? WHERE id = ?',
+      [cambios.fechaRecurrente, cambios.totalRepeticiones, cambios.estado, cuidadoId],
+    );
+    await conexion.commit();
+    return resultado.insertId;
+  } catch (error) {
+    await conexion.rollback();
+    throw error;
+  } finally {
+    conexion.release();
+  }
+}
+
+export interface ActividadPropia extends ActividadRespuesta {
+  mascotaId: number;
+}
+
+/** Una actividad, solo si su cuidado pertenece a una mascota del usuario. */
+export async function buscarActividadPropia(id: number, usuarioId: number): Promise<ActividadPropia | null> {
+  const [filas] = await pool.query<RowDataPacket[]>(
+    `SELECT a.id, a.cuidado_id AS cuidadoId, a.fecha_planificada AS fechaPlanificada,
+            a.fecha_realizacion AS fechaRealizacion, a.estado, a.nota, c.mascota_id AS mascotaId
+     FROM actividad a
+     JOIN cuidado c ON c.id = a.cuidado_id
+     JOIN mascota m ON m.id = c.mascota_id
+     WHERE a.id = ? AND m.usuario_id = ?`,
+    [id, usuarioId],
+  );
+  return (filas[0] as ActividadPropia) ?? null;
+}
+
+/** Id de la última actividad completada del cuidado (la registrada más recientemente). */
+export async function ultimaActividadCompletada(cuidadoId: number): Promise<number | null> {
+  const [filas] = await pool.query<RowDataPacket[]>(
+    "SELECT MAX(id) AS id FROM actividad WHERE cuidado_id = ? AND estado = 'completada'",
+    [cuidadoId],
+  );
+  return filas[0]?.id ?? null;
+}
+
+/** RF18: agrega, modifica (texto) o elimina (null) la nota de una actividad. */
+export async function actualizarNota(id: number, nota: string | null): Promise<void> {
+  await pool.query('UPDATE actividad SET nota = ? WHERE id = ?', [nota, id]);
+}
+
+/** RF19: marca la actividad como anulada y, si corresponde, revierte el cuidado a su estado anterior. */
+export async function anularActividad(id: number, cuidadoId: number, revertir: CambiosCuidado | null): Promise<void> {
+  const conexion = await pool.getConnection();
+  try {
+    await conexion.beginTransaction();
+    await conexion.query("UPDATE actividad SET estado = 'anulada' WHERE id = ?", [id]);
+    if (revertir) {
+      await conexion.query(
+        'UPDATE cuidado SET fecha_recurrente = ?, total_repeticiones = ?, estado = ? WHERE id = ?',
+        [revertir.fechaRecurrente, revertir.totalRepeticiones, revertir.estado, cuidadoId],
+      );
+    }
+    await conexion.commit();
+  } catch (error) {
+    await conexion.rollback();
+    throw error;
+  } finally {
+    conexion.release();
+  }
 }
 
 export interface DatosEdicion {

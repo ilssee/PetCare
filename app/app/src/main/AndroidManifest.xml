@@ -52,6 +52,10 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".cuidado.InfoPreventivaActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".cuidado.CuidadoFormActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

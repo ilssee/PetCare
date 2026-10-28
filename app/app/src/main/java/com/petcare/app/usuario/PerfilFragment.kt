@@ -13,6 +13,7 @@ import com.petcare.app.R
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.SessionManager
 import com.petcare.app.common.respetarBarraDeEstado
+import com.petcare.app.cuidado.CuidadoRepository
 import com.petcare.app.databinding.FragmentPerfilBinding
 import com.petcare.app.mascota.MascotaRepository
 import kotlinx.coroutines.launch
@@ -24,6 +25,7 @@ class PerfilFragment : Fragment() {
     private val binding get() = _binding!!
     private val usuarios = UsuarioRepository()
     private val mascotas = MascotaRepository()
+    private val cuidados = CuidadoRepository()
 
     override fun onCreateView(inflater: LayoutInflater, contenedor: ViewGroup?, estado: Bundle?): View {
         _binding = FragmentPerfilBinding.inflate(inflater, contenedor, false)
@@ -43,7 +45,7 @@ class PerfilFragment : Fragment() {
         return binding.root
     }
 
-    // Se recarga al volver de editar el perfil o de registrar mascotas.
+    // Se recarga al volver de editar el perfil o de registrar mascotas y cuidados.
     override fun onResume() {
         super.onResume()
         viewLifecycleOwner.lifecycleScope.launch {
@@ -52,6 +54,7 @@ class PerfilFragment : Fragment() {
                 binding.textoCorreo.text = it.dato.correo
             }
             (mascotas.listar() as? Resultado.Exito)?.let { binding.statMascotas.text = it.dato.size.toString() }
+            (cuidados.conteo() as? Resultado.Exito)?.let { binding.statCuidados.text = it.dato.todos.toString() }
         }
     }
 

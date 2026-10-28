@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { idDeLaRuta, idDelCuidado } from '../../common/ruta';
+import { idDeLaActividad, idDeLaRuta, idDelCuidado } from '../../common/ruta';
 import * as servicio from './cuidado.service';
 
 /** Capa HTTP del módulo cuidado. */
@@ -10,6 +10,10 @@ export async function listar(req: Request, res: Response) {
 
 export async function listarCronograma(req: Request, res: Response) {
   res.json(await servicio.listarCronograma(res.locals.usuarioId, req.query.mascotaId, req.query.estado));
+}
+
+export async function contar(_req: Request, res: Response) {
+  res.json(await servicio.contar(res.locals.usuarioId));
 }
 
 export async function activarRecomendados(req: Request, res: Response) {
@@ -33,4 +37,20 @@ export async function editar(req: Request, res: Response) {
 export async function eliminar(req: Request, res: Response) {
   await servicio.eliminar(idDelCuidado(req), res.locals.usuarioId);
   res.status(204).send();
+}
+
+export async function completar(req: Request, res: Response) {
+  res.status(201).json(await servicio.completar(idDelCuidado(req), res.locals.usuarioId, req.body ?? {}));
+}
+
+export async function guardarNota(req: Request, res: Response) {
+  res.json(await servicio.guardarNota(idDeLaActividad(req), res.locals.usuarioId, req.body ?? {}));
+}
+
+export async function eliminarNota(req: Request, res: Response) {
+  res.json(await servicio.eliminarNota(idDeLaActividad(req), res.locals.usuarioId));
+}
+
+export async function anular(req: Request, res: Response) {
+  res.json(await servicio.anular(idDeLaActividad(req), res.locals.usuarioId));
 }

@@ -1,5 +1,5 @@
 import { HttpError } from '../../common/errors/http-error';
-import { esFechaReal, fechaDeHoy } from '../../common/fechas';
+import { esFechaReal, fechaDeHoy, sumarFrecuencia } from '../../common/fechas';
 import { textoOpcional } from '../../common/texto';
 import * as mascotas from '../mascota/mascota.service';
 import * as reglas from '../regla/regla.service';
@@ -179,6 +179,11 @@ export async function listarCronograma(
   return { cuidados: await conHistorial(cuidados) };
 }
 
+/** Total de cuidados del usuario (lo que muestra el contador del perfil). */
+export async function contar(usuarioId: number): Promise<ConteoCuidados> {
+  return repositorio.contarDeUsuario(usuarioId);
+}
+
 export async function obtener(id: number, usuarioId: number): Promise<CuidadoDetalle> {
   return (await conHistorial([await obtenerPropio(id, usuarioId)]))[0];
 }
@@ -277,4 +282,135 @@ export async function editar(
 export async function eliminar(id: number, usuarioId: number): Promise<void> {
   await obtenerPropio(id, usuarioId);
   await repositorio.eliminar(id);
+}
+
+/**
+ * Qué le pasa al cuidado al completarse una actividad (RF16), según su modo de término:
+ *  - una vez: queda finalizado.
+ *  - varias veces: baja el contador; al llegar a 0 queda finalizado.
+ *  - hasta una fecha: se calcula la siguiente; si pasa de la fecha límite queda finalizado.
+ *  - indefinido: siempre hay una siguiente.
+ * La siguiente fecha se calcula sumando la frecuencia a la fecha base elegida.
+ */
+function calcularCambios(cuidado: CuidadoRespuesta, base: string): repositorio.CambiosCuidado {
+  const finalizado: repositorio.CambiosCuidado = {
+    fechaRecurrente: cuidado.fechaRecurrente,
+    totalRepeticiones: cuidado.totalRepeticiones,
+    estado: 'finalizado',
+  };
+  if (cuidado.modoTermino === 'una_vez' || cuidado.frecuenciaValor === null || cuidado.frecuenciaUnidad === null) {
+    return finalizado;
+  }
+
+  const siguiente = sumarFrecuencia(base, cuidado.frecuenciaValor, cuidado.frecuenciaUnidad);
+
+  if (cuidado.modoTermino === 'varias_veces') {
+    const restantes = (cuidado.totalRepeticiones ?? 1) - 1;
+    if (restantes <= 0) return { ...finalizado, totalRepeticiones: 0 };
+    return { fechaRecurrente: siguiente, totalRepeticiones: restantes, estado: 'pendiente' };
+  }
+  if (cuidado.modoTermino === 'hasta_fecha' && cuidado.fechaLimite !== null && siguiente > cuidado.fechaLimite) {
+    return finalizado;
+  }
+  return { fechaRecurrente: siguiente, totalRepeticiones: cuidado.totalRepeticiones, estado: 'pendiente' };
+}
+
+/**
+ * RF16: marca el cuidado como completado, registrando la actividad con su fecha de realización.
+ * RF17: si el cuidado se repite y la fecha de realización difiere de la planificada, hay que indicar
+ * cuál usar como base del cálculo ('planificada' o 'realizacion').
+ */
+export async function completar(
+  id: number,
+  usuarioId: number,
+  entrada: Record<string, unknown>,
+): Promise<{ mensaje: string; cuidado: CuidadoDetalle }> {
+  if (estaVacio(entrada.fechaRealizacion)) throw new HttpError(400, CAMPO_OBLIGATORIO);
+  const fechaRealizacion = String(entrada.fechaRealizacion).trim();
+  if (!esFechaReal(fechaRealizacion)) {
+    throw new HttpError(400, 'La fecha de realización no es válida (formato AAAA-MM-DD)');
+  }
+  if (fechaRealizacion > fechaDeHoy()) throw new HttpError(400, 'La fecha de realización no puede ser futura');
+
+  const nota = textoOpcional(entrada.nota);
+  if (nota !== null && nota.length > MAXIMO_TEXTO) {
+    throw new HttpError(400, `La nota debe tener hasta ${MAXIMO_TEXTO} caracteres`);
+  }
+
+  const cuidado = await obtenerPropio(id, usuarioId);
+  if (cuidado.estado === 'finalizado') throw new HttpError(409, 'Este cuidado ya finalizó');
+
+  const planificada = cuidado.fechaRecurrente;
+  let base = planificada;
+  if (cuidado.modoTermino !== 'una_vez' && fechaRealizacion !== planificada) {
+    const eleccion = String(entrada.fechaBase ?? '').trim();
+    if (eleccion !== 'planificada' && eleccion !== 'realizacion') {
+      throw new HttpError(400, 'Seleccione la fecha base para calcular la próxima fecha');
+    }
+    base = eleccion === 'realizacion' ? fechaRealizacion : planificada;
+  }
+
+  await repositorio.registrarActividad(
+    id,
+    { fechaPlanificada: planificada, fechaRealizacion, nota },
+    calcularCambios(cuidado, base),
+  );
+  return { mensaje: 'Actividad registrada correctamente', cuidado: await obtener(id, usuarioId) };
+}
+
+/** Una actividad completada del usuario. Las anuladas ya no existen para el usuario. */
+async function obtenerActividadPropia(id: number, usuarioId: number) {
+  const actividad = await repositorio.buscarActividadPropia(id, usuarioId);
+  if (!actividad || actividad.estado !== 'completada') throw new HttpError(404, 'Actividad no encontrada');
+  return actividad;
+}
+
+/** RF18: agrega o modifica la nota de una actividad. */
+export async function guardarNota(
+  actividadId: number,
+  usuarioId: number,
+  entrada: Record<string, unknown>,
+): Promise<{ mensaje: string; cuidado: CuidadoDetalle }> {
+  const nota = textoOpcional(entrada.nota);
+  if (nota === null) throw new HttpError(400, CAMPO_OBLIGATORIO);
+  if (nota.length > MAXIMO_TEXTO) throw new HttpError(400, `La nota debe tener hasta ${MAXIMO_TEXTO} caracteres`);
+
+  const actividad = await obtenerActividadPropia(actividadId, usuarioId);
+  await repositorio.actualizarNota(actividad.id, nota);
+  return { mensaje: 'Nota guardada correctamente', cuidado: await obtener(actividad.cuidadoId, usuarioId) };
+}
+
+/** RF18: elimina la nota de una actividad. */
+export async function eliminarNota(
+  actividadId: number,
+  usuarioId: number,
+): Promise<{ mensaje: string; cuidado: CuidadoDetalle }> {
+  const actividad = await obtenerActividadPropia(actividadId, usuarioId);
+  await repositorio.actualizarNota(actividad.id, null);
+  return { mensaje: 'Nota eliminada correctamente', cuidado: await obtener(actividad.cuidadoId, usuarioId) };
+}
+
+/**
+ * RF19: anula una actividad completada por error. Sale del historial y, si era la última
+ * registrada, el cuidado vuelve a la fecha (y al contador) que tenía antes de completarla.
+ */
+export async function anular(
+  actividadId: number,
+  usuarioId: number,
+): Promise<{ mensaje: string; cuidado: CuidadoDetalle }> {
+  const actividad = await obtenerActividadPropia(actividadId, usuarioId);
+  const cuidado = await obtenerPropio(actividad.cuidadoId, usuarioId);
+
+  let revertir: repositorio.CambiosCuidado | null = null;
+  if ((await repositorio.ultimaActividadCompletada(cuidado.id)) === actividad.id) {
+    revertir = {
+      fechaRecurrente: actividad.fechaPlanificada,
+      totalRepeticiones:
+        cuidado.modoTermino === 'varias_veces' ? (cuidado.totalRepeticiones ?? 0) + 1 : cuidado.totalRepeticiones,
+      estado: 'pendiente',
+    };
+  }
+
+  await repositorio.anularActividad(actividad.id, cuidado.id, revertir);
+  return { mensaje: 'Actividad anulada correctamente', cuidado: await obtener(cuidado.id, usuarioId) };
 }
