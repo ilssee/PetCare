@@ -38,6 +38,15 @@ class FormularioCuidado(
     private var fechaInicio: LocalDate? = null
     private var fechaLimite: LocalDate? = null
 
+    /** Al editar, la fecha de inicio puede ser pasada (por ejemplo, un cuidado que ya venció). */
+    private var permitirFechaPasada = false
+
+    /** En un cuidado personalizado el usuario escribe el nombre y la descripción. */
+    private val esPersonalizado get() = vista.bloqueNombre.visibility == View.VISIBLE
+
+    val nombrePersonalizado: String get() = vista.campoNombre.text.toString().trim()
+    val descripcionPersonalizada: String get() = vista.campoDescripcion.text.toString().trim()
+
     private val botonesDeModo = mapOf(
         "una_vez" to vista.modoUnaVez,
         "varias_veces" to vista.modoVariasVeces,
@@ -63,10 +72,66 @@ class FormularioCuidado(
 
     /** Muestra un cuidado recomendado (nombre y descripción no se editan) con el formulario vacío. */
     fun cargarRecomendacion(recomendacion: RecomendacionRespuesta) {
-        vista.nombreCuidado.text = recomendacion.nombre
-        vista.descripcionCuidado.text = recomendacion.descripcion
-        vista.importanciaCuidado.text = recomendacion.importancia
+        mostrarTarjeta(recomendacion.nombre, recomendacion.descripcion, recomendacion.importancia)
+        permitirFechaPasada = false
         limpiar()
+    }
+
+    /** Formulario vacío para agregar un cuidado personalizado (RF12). */
+    fun cargarPersonalizado() {
+        mostrarCamposDeNombre()
+        permitirFechaPasada = false
+        limpiar()
+        vista.campoNombre.setText("")
+        vista.campoDescripcion.setText("")
+    }
+
+    /**
+     * Formulario con los datos de un cuidado existente (RF14). En uno recomendado el nombre y la
+     * descripción están bloqueados; en uno personalizado también se pueden editar.
+     */
+    fun cargarEdicion(cuidado: CuidadoRespuesta) {
+        if (cuidado.esRecomendado) {
+            mostrarTarjeta(cuidado.nombre, cuidado.descripcion, cuidado.importancia.orEmpty())
+        } else {
+            mostrarCamposDeNombre()
+        }
+        permitirFechaPasada = true
+        limpiar()
+
+        if (!cuidado.esRecomendado) {
+            vista.campoNombre.setText(cuidado.nombre)
+            vista.campoDescripcion.setText(cuidado.descripcion)
+        }
+        elegirModo(cuidado.modoTermino)
+        cuidado.frecuenciaUnidad?.let { elegirUnidad(it) }
+        cuidado.frecuenciaValor?.let { vista.campoFrecuencia.setText(it.toString()) }
+        cuidado.totalRepeticiones?.let { vista.campoVeces.setText(it.toString()) }
+        LocalDate.parse(cuidado.fechaRecurrente).let {
+            fechaInicio = it
+            fijarFecha(vista.campoInicio, it)
+        }
+        cuidado.fechaLimite?.let {
+            val limite = LocalDate.parse(it)
+            fechaLimite = limite
+            fijarFecha(vista.campoLimite, limite)
+        }
+        vista.interruptorAviso.isChecked = cuidado.avisoAnticipado
+        vista.campoNota.setText(cuidado.nota.orEmpty())
+        actualizarAproximado()
+    }
+
+    private fun mostrarTarjeta(nombre: String, descripcion: String, importancia: String) {
+        vista.bloqueNombre.visibility = View.GONE
+        vista.tarjetaRecomendado.visibility = View.VISIBLE
+        vista.nombreCuidado.text = nombre
+        vista.descripcionCuidado.text = descripcion
+        vista.importanciaCuidado.text = importancia
+    }
+
+    private fun mostrarCamposDeNombre() {
+        vista.tarjetaRecomendado.visibility = View.GONE
+        vista.bloqueNombre.visibility = View.VISIBLE
     }
 
     private fun limpiar() {
@@ -101,6 +166,11 @@ class FormularioCuidado(
         var correcto = true
         val modoElegido = modo
 
+        if (esPersonalizado && nombrePersonalizado.isEmpty()) {
+            mostrarError(vista.errorNombre, R.string.error_campo_obligatorio)
+            correcto = false
+        }
+
         if (modoElegido == null) {
             mostrarError(vista.errorModo, R.string.error_campo_obligatorio)
             correcto = false
@@ -122,7 +192,7 @@ class FormularioCuidado(
         if (inicio == null) {
             mostrarError(vista.errorInicio, R.string.error_campo_obligatorio)
             correcto = false
-        } else if (inicio.isBefore(LocalDate.now())) {
+        } else if (!permitirFechaPasada && inicio.isBefore(LocalDate.now())) {
             mostrarError(vista.errorInicio, R.string.error_inicio_pasada)
             correcto = false
         }
@@ -177,7 +247,8 @@ class FormularioCuidado(
     }
 
     private fun abrirCalendarioInicio() {
-        abrirCalendario(fechaInicio, LocalDate.now()) { fecha ->
+        val minimo = if (permitirFechaPasada) LocalDate.now().minusYears(10) else LocalDate.now()
+        abrirCalendario(fechaInicio, minimo) { fecha ->
             fechaInicio = fecha
             fijarFecha(vista.campoInicio, fecha)
             vista.errorInicio.visibility = View.GONE
@@ -260,7 +331,7 @@ class FormularioCuidado(
     }
 
     private fun ocultarErrores() {
-        listOf(vista.errorModo, vista.errorFrecuencia, vista.errorVeces, vista.errorLimite, vista.errorInicio)
+        listOf(vista.errorNombre, vista.errorModo, vista.errorFrecuencia, vista.errorVeces, vista.errorLimite, vista.errorInicio)
             .forEach { it.visibility = View.GONE }
     }
 

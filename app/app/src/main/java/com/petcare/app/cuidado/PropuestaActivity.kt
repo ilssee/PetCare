@@ -306,6 +306,7 @@ class PropuestaActivity : AppCompatActivity() {
 
     /** RF11: tras activar el cronograma se redirige a la pantalla de cuidados. */
     private fun irACuidados() {
+        SeleccionCuidados.mascotaId = mascotaId // la lista debe mostrar la mascota que se acaba de configurar
         startActivity(
             Intent(this, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)

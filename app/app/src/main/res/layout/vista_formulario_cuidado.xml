@@ -6,8 +6,86 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <!-- Cuidado personalizado: el usuario escribe el nombre y la descripción -->
+    <LinearLayout
+        android:id="@+id/bloqueNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/Etiqueta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/cuidado_etiqueta_nombre" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_campo"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <EditText
+                android:id="@+id/campoNombre"
+                style="@style/CampoTexto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/cuidado_hint_nombre"
+                android:importantForAutofill="no"
+                android:inputType="textCapSentences"
+                android:maxLength="150" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/errorNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/petcare_error"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <TextView
+            style="@style/Etiqueta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/cuidado_etiqueta_descripcion_opcional" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_campo"
+            android:minHeight="72dp"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <EditText
+                android:id="@+id/campoDescripcion"
+                style="@style/CampoTexto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:hint="@string/cuidado_hint_descripcion"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLength="1000"
+                android:minLines="2"
+                android:singleLine="false" />
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Cuidado recomendado: nombre y, desplegable, su descripción e importancia -->
     <LinearLayout
+        android:id="@+id/tarjetaRecomendado"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"

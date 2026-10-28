@@ -159,6 +159,74 @@
     <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
     <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 32 caracteres</string>
 
+    <!-- Cuidados: lista, tarjetas y acciones (RF12 a RF15 y RF23) -->
+    <string name="cuidados_buscar_hint">Buscar cuidado por nombre</string>
+    <string name="cuidados_boton_agregar">Cuidado</string>
+    <string name="cuidados_tab_todos">Todos</string>
+    <string name="cuidados_tab_pendientes">Pendientes</string>
+    <string name="cuidados_tab_finalizados">Finalizados</string>
+    <string name="cuidado_sin_realizar">Aún sin realizar</string>
+    <plurals name="cuidado_realizado">
+        <item quantity="one">Realizado %d vez</item>
+        <item quantity="other">Realizado %d veces</item>
+    </plurals>
+    <string name="cuidado_proxima">Próxima: %1$s</string>
+    <plurals name="cuidado_vencio">
+        <item quantity="one">Venció hace %d día</item>
+        <item quantity="other">Venció hace %d días</item>
+    </plurals>
+    <string name="cuidado_estado_pendiente">Pendiente</string>
+    <string name="cuidado_estado_finalizado">Finalizado</string>
+    <string name="cuidado_completar">Marcar como completado</string>
+    <string name="cuidado_finalizo">Este cuidado ya finalizó.</string>
+    <string name="cuidado_ver_detalles">Ver detalles del cuidado</string>
+    <string name="cuidado_ocultar_detalles">Ocultar detalles</string>
+    <string name="cuidado_proxima_fecha">Próxima fecha</string>
+    <string name="cuidado_duracion">Duración</string>
+    <string name="cuidado_activado">Activado</string>
+    <string name="cuidado_desactivado">Desactivado</string>
+    <string name="cuidado_historial">HISTORIAL</string>
+    <string name="cuidado_sin_historial">Aún no hay actividades en el historial</string>
+    <string name="cuidado_actividad_completada">Completada</string>
+    <string name="cuidado_actividad_anulada">Anulada</string>
+    <string name="cuidado_actividad_nota">Nota: %1$s</string>
+    <string name="cada_dia">Cada día</string>
+    <string name="cada_semana">Cada semana</string>
+    <string name="cada_mes">Cada mes</string>
+    <string name="cada_anio">Cada año</string>
+    <string name="cada_n">Cada %1$d %2$s</string>
+    <plurals name="cuidado_veces">
+        <item quantity="one">%d vez</item>
+        <item quantity="other">%d veces</item>
+    </plurals>
+    <string name="cuidado_hasta">Hasta %1$s</string>
+    <string name="cuidado_mas_opciones">Más opciones</string>
+
+    <string name="sin_pendientes_titulo">No hay cuidados pendientes</string>
+    <string name="sin_pendientes_mensaje">Todos los cuidados de %1$s ya terminaron.</string>
+    <string name="sin_finalizados_titulo">Aún no hay cuidados finalizados</string>
+    <string name="sin_finalizados_mensaje">Aquí verás los cuidados de %1$s que ya terminaron: los de una sola vez o los que cumplieron todas sus repeticiones.</string>
+    <string name="sin_resultados_titulo">Sin resultados</string>
+    <string name="sin_resultados_mensaje">No encontramos cuidados con ese nombre.</string>
+
+    <string name="hoja_agregar_titulo">Agregar cuidado</string>
+    <string name="hoja_agregar_personalizado">Agregar cuidado personalizado</string>
+    <string name="hoja_agregar_recomendacion">Agregar una recomendación</string>
+    <string name="hoja_editar">Editar cuidado</string>
+    <string name="hoja_eliminar">Eliminar cuidado</string>
+
+    <string name="cuidado_eliminar_titulo">Eliminar cuidado</string>
+    <string name="cuidado_eliminar_mensaje">¿Seguro que deseas eliminar este cuidado? Se eliminará también su historial y no se puede deshacer.</string>
+    <string name="cuidado_eliminado">Cuidado eliminado del cronograma</string>
+
+    <!-- Agregar o editar un cuidado -->
+    <string name="cuidado_personalizado_titulo">Cuidado personalizado</string>
+    <string name="cuidado_editar_titulo">Editar cuidado</string>
+    <string name="cuidado_etiqueta_nombre">Nombre del cuidado</string>
+    <string name="cuidado_hint_nombre">Ej. Control de pulgas</string>
+    <string name="cuidado_etiqueta_descripcion_opcional">Descripción (opcional)</string>
+    <string name="cuidado_hint_descripcion">Detalles del cuidado</string>
+
     <!-- Pantalla que sigue al registro de una mascota -->
     <string name="registrado_titulo_macho">¡%1$s fue registrado!</string>
     <string name="registrado_titulo_hembra">¡%1$s fue registrada!</string>

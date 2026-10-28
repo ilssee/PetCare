@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:minWidth="76dp"
+    android:orientation="vertical"
+    android:paddingStart="6dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="4dp">
+
+    <FrameLayout
+        android:id="@+id/anillo"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_anillo_mascota"
+        android:padding="4dp">
+
+        <ImageView
+            android:id="@+id/foto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_circulo_blanco"
+            android:importantForAccessibility="no"
+            android:padding="5dp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxWidth="80dp"
+        android:maxLines="1"
+        android:textColor="@color/petcare_text_muted"
+        android:textSize="12sp" />
+</LinearLayout>
