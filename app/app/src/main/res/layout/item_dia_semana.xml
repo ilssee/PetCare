@@ -15,6 +15,7 @@
         android:id="@+id/letra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:duplicateParentState="true"
         android:fontFamily="@font/poppins_semibold"
         android:textColor="@color/texto_dia_semana"
         android:textSize="13sp" />
@@ -24,7 +25,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:duplicateParentState="true"
         android:fontFamily="@font/poppins_bold"
-        android:textColor="@color/petcare_text"
+        android:textColor="@color/texto_numero_dia"
         android:textSize="17sp" />
+
+    <!-- Punto: el día tiene cuidados pendientes -->
+    <View
+        android:id="@+id/punto"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/bg_punto"
+        android:visibility="invisible" />
 </LinearLayout>

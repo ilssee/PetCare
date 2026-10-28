@@ -105,10 +105,11 @@
     <string name="mascota_eliminada">Mascota eliminada correctamente</string>
 
     <!-- Perfil de la mascota -->
-    <string name="info_preventiva_titulo">Info preventiva</string>
-    <string name="info_preventiva_subtitulo">Qué cuidados recomendamos para %1$s y por qué</string>
+    <string name="info_preventiva_titulo">Información preventiva</string>
+    <string name="info_preventiva_subtitulo">¿Qué cuidados recomendamos para %1$s y por qué?</string>
     <string name="proximos_cuidados">Próximos cuidados</string>
     <string name="ver_todos">Ver todos</string>
+    <string name="ver_cuidados">Ver cuidados</string>
     <string name="sin_cuidados">No hay cuidados registrados para esta mascota</string>
 
     <!-- Foto de la mascota -->
@@ -158,4 +159,194 @@
     <string name="contrasena_actualizada">Contraseña actualizada correctamente</string>
     <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
     <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 32 caracteres</string>
+
+    <!-- Información preventiva y agregar una recomendación (RF24 y RF25) -->
+    <string name="info_aviso"><![CDATA[Estas recomendaciones son <b>referenciales</b>, según la especie de %1$s. Consulta con tu <b>médico veterinario</b> la frecuencia y las fechas que le corresponden.]]></string>
+    <string name="info_en_cronograma">En tu cronograma</string>
+    <string name="info_agregar">Agregar al cronograma</string>
+    <string name="info_error_cargar">No se pudieron cargar las recomendaciones</string>
+    <string name="recomendacion_agregada">Recomendación agregada al cronograma</string>
+    <string name="cuidado_configurar_titulo_simple">Configurar cuidado</string>
+
+    <!-- Completar un cuidado, historial y notas (RF16 a RF19) -->
+    <string name="aceptar">Aceptar</string>
+    <string name="completar_titulo">¿Cuándo se realizó “%1$s”?</string>
+    <string name="completar_fecha">Fecha de realización</string>
+    <string name="completar_hint_nota">Ej. Clínica Patitas, lote 4521</string>
+    <string name="fecha_base_titulo">¿Qué fecha deseas usar como base para calcular el próximo recordatorio?</string>
+    <string name="fecha_base_planificada">Fecha planificada</string>
+    <string name="fecha_base_realizacion">Fecha de realización</string>
+    <string name="fecha_base_detalle">%1$s · Próximo: %2$s</string>
+    <string name="actividad_registrada">Actividad registrada</string>
+    <string name="actividad_registrada_proxima">Actividad registrada · próxima fecha: %1$s</string>
+    <string name="actividad_nota_titulo">Nota de la actividad</string>
+    <string name="actividad_agregar_nota">Agregar nota</string>
+    <string name="actividad_editar_nota">Editar nota</string>
+    <string name="actividad_eliminar_nota">Eliminar nota</string>
+    <string name="actividad_anular">Anular actividad</string>
+    <string name="actividad_eliminar_nota_titulo">¿Eliminar la nota?</string>
+    <string name="actividad_eliminar_nota_mensaje">La nota se quitará de esta actividad.</string>
+    <string name="actividad_anular_titulo">¿Anular esta actividad?</string>
+    <string name="actividad_anular_mensaje">Se quitará del historial. Si es la última actividad registrada, la fecha del cuidado volverá a la que tenía antes.</string>
+    <string name="actividad_anular_boton">Anular</string>
+    <string name="actividad_opciones">Opciones de la actividad</string>
+
+    <!-- Cronograma: cuidados de todas las mascotas (RF13) -->
+    <plurals name="cronograma_titulo_con_cuidados">
+        <item quantity="one">Tienes %d cuidado
+para esta semana</item>
+        <item quantity="other">Tienes %d cuidados
+para esta semana</item>
+    </plurals>
+    <string name="cronograma_siguiente">Siguiente cuidado</string>
+    <plurals name="cronograma_dias">
+        <item quantity="one">día</item>
+        <item quantity="other">días</item>
+    </plurals>
+    <string name="cronograma_vencidos">VENCIDOS</string>
+    <string name="cronograma_esta_semana">ESTA SEMANA</string>
+    <string name="cronograma_proxima_semana">PRÓXIMA SEMANA</string>
+    <string name="cronograma_mas_adelante">MÁS ADELANTE</string>
+    <string name="cronograma_mostrar_todo">Mostrar todo</string>
+    <string name="cronograma_mascota_frecuencia">%1$s · %2$s</string>
+    <string name="cronograma_dia_vacio_titulo">Sin cuidados este día</string>
+    <string name="cronograma_dia_vacio_mensaje">No hay cuidados programados para esta fecha.</string>
+
+    <!-- Cuidados: lista, tarjetas y acciones (RF12 a RF15 y RF23) -->
+    <string name="cuidados_buscar_hint">Buscar cuidado por nombre</string>
+    <string name="cuidados_boton_agregar">Cuidado</string>
+    <string name="cuidados_tab_todos">Todos</string>
+    <string name="cuidados_tab_pendientes">Pendientes</string>
+    <string name="cuidados_tab_finalizados">Finalizados</string>
+    <string name="cuidado_sin_realizar">Aún sin realizar</string>
+    <plurals name="cuidado_realizado">
+        <item quantity="one">Realizado %d vez</item>
+        <item quantity="other">Realizado %d veces</item>
+    </plurals>
+    <string name="cuidado_proxima">Próxima: %1$s</string>
+    <plurals name="cuidado_vencio">
+        <item quantity="one">Venció hace %d día</item>
+        <item quantity="other">Venció hace %d días</item>
+    </plurals>
+    <string name="cuidado_estado_pendiente">Pendiente</string>
+    <string name="cuidado_estado_finalizado">Finalizado</string>
+    <string name="cuidado_completar">Marcar como completado</string>
+    <string name="cuidado_finalizo">Este cuidado ya finalizó.</string>
+    <string name="cuidado_ver_detalles">Ver detalles del cuidado</string>
+    <string name="cuidado_ocultar_detalles">Ocultar detalles</string>
+    <string name="cuidado_proxima_fecha">Próxima fecha</string>
+    <string name="cuidado_duracion">Duración</string>
+    <string name="cuidado_activado">Activado</string>
+    <string name="cuidado_desactivado">Desactivado</string>
+    <string name="cuidado_historial">HISTORIAL</string>
+    <string name="cuidado_sin_historial">Aún no hay actividades en el historial</string>
+    <string name="cuidado_actividad_completada">Completada</string>
+    <string name="cuidado_actividad_anulada">Anulada</string>
+    <string name="cuidado_actividad_nota">Nota: %1$s</string>
+    <string name="cada_dia">Cada día</string>
+    <string name="cada_semana">Cada semana</string>
+    <string name="cada_mes">Cada mes</string>
+    <string name="cada_anio">Cada año</string>
+    <string name="cada_n">Cada %1$d %2$s</string>
+    <plurals name="cuidado_veces">
+        <item quantity="one">%d vez</item>
+        <item quantity="other">%d veces</item>
+    </plurals>
+    <string name="cuidado_hasta">Hasta %1$s</string>
+    <string name="cuidado_mas_opciones">Más opciones</string>
+
+    <string name="sin_pendientes_titulo">No hay cuidados pendientes</string>
+    <string name="sin_pendientes_mensaje">Todos los cuidados de %1$s ya terminaron.</string>
+    <string name="sin_finalizados_titulo">Aún no hay cuidados finalizados</string>
+    <string name="sin_finalizados_mensaje">Aquí verás los cuidados de %1$s que ya terminaron: los de una sola vez o los que cumplieron todas sus repeticiones.</string>
+    <string name="sin_resultados_titulo">Sin resultados</string>
+    <string name="sin_resultados_mensaje">No encontramos cuidados con ese nombre.</string>
+
+    <string name="hoja_agregar_titulo">Agregar cuidado</string>
+    <string name="hoja_agregar_personalizado">Agregar cuidado personalizado</string>
+    <string name="hoja_agregar_recomendacion">Agregar una recomendación</string>
+    <string name="hoja_editar">Editar cuidado</string>
+    <string name="hoja_eliminar">Eliminar cuidado</string>
+
+    <string name="cuidado_eliminar_titulo">Eliminar cuidado</string>
+    <string name="cuidado_eliminar_mensaje">¿Seguro que deseas eliminar este cuidado? Se eliminará también su historial y no se puede deshacer.</string>
+    <string name="cuidado_eliminado">Cuidado eliminado del cronograma</string>
+
+    <!-- Agregar o editar un cuidado -->
+    <string name="cuidado_personalizado_titulo">Cuidado personalizado</string>
+    <string name="cuidado_editar_titulo">Editar cuidado</string>
+    <string name="cuidado_etiqueta_nombre">Nombre del cuidado</string>
+    <string name="cuidado_hint_nombre">Ej. Control de pulgas</string>
+    <string name="cuidado_etiqueta_descripcion_opcional">Descripción (opcional)</string>
+    <string name="cuidado_hint_descripcion">Detalles del cuidado</string>
+
+    <!-- Pantalla que sigue al registro de una mascota -->
+    <string name="registrado_titulo_macho">¡%1$s fue registrado!</string>
+    <string name="registrado_titulo_hembra">¡%1$s fue registrada!</string>
+    <string name="registrado_mensaje">Estamos contentos de acompañarte en el cuidado de %1$s. Te sugerimos algunos cuidados para comenzar.</string>
+    <string name="registrado_tu_decides">Tú decides cuáles agregar.</string>
+    <string name="registrado_si_no_marcas">Si no marcas alguno, puedes sumarlo cuando quieras desde <b>Información preventiva</b>.</string>
+    <string name="registrado_aviso">Las frecuencias y fechas deben confirmarse con tu médico veterinario.</string>
+    <string name="registrado_ver_propuesta">Ver propuesta</string>
+
+    <!-- Propuesta de cronograma (RF09, RF10 y RF11) -->
+    <string name="propuesta_titulo">Propuesta de cronograma</string>
+    <string name="propuesta_para">Para %1$s</string>
+    <string name="propuesta_especie_sexo">%1$s · %2$s</string>
+    <string name="propuesta_importancia">Importancia</string>
+    <string name="propuesta_seleccionar_todos">Seleccionar todos (%1$d/%2$d)</string>
+    <string name="propuesta_expandir_todo">Expandir todo</string>
+    <string name="propuesta_contraer_todo">Contraer todo</string>
+    <string name="propuesta_confirmar">Confirmar cronograma (%1$d)</string>
+    <string name="propuesta_seleccionar_uno">Selecciona al menos un cuidado</string>
+    <string name="propuesta_ahora_no">Ahora no</string>
+    <string name="propuesta_todo_agregado_titulo">Todo agregado</string>
+    <string name="propuesta_todo_agregado_mensaje">Ya tienes todos los cuidados recomendados en el cronograma.</string>
+    <string name="propuesta_error_generar">El perfil fue guardado pero no se pudo generar la propuesta de cronograma</string>
+    <string name="propuesta_ninguno_configurado">No configuraste ningún cuidado. Elige de nuevo o toca «Ahora no».</string>
+    <string name="cronograma_activado">Cronograma activado correctamente</string>
+    <string name="reintentar">Reintentar</string>
+    <string name="revisa_campos">Revisa los campos marcados</string>
+    <string name="elegir_mascota_titulo">¿Para qué mascota?</string>
+
+    <!-- Formulario de un cuidado -->
+    <string name="cuidado_configurar_titulo">Configurar cuidado (%1$d/%2$d)</string>
+    <string name="cuidado_para">Para</string>
+    <string name="cuidado_recomendado">Cuidado recomendado</string>
+    <string name="cuidado_ver_mas">Ver más información</string>
+    <string name="cuidado_ocultar">Ocultar información</string>
+    <string name="cuidado_descripcion">Descripción</string>
+    <string name="cuidado_aviso_veterinario"><b>Consulta con tu médico veterinario</b> la frecuencia y las fechas que corresponden a tu mascota.</string>
+    <string name="cuidado_etiqueta_modo">Modo de término</string>
+    <string name="modo_una_vez">Una vez</string>
+    <string name="modo_una_vez_detalle">Se hace una sola vez</string>
+    <string name="modo_varias_veces">Varias veces</string>
+    <string name="modo_varias_veces_detalle">Un número de veces</string>
+    <string name="modo_hasta_fecha">Hasta una fecha</string>
+    <string name="modo_hasta_fecha_detalle">Se repite hasta el día que elijas</string>
+    <string name="modo_indefinido">Indefinido</string>
+    <string name="modo_indefinido_detalle">Se repite sin fecha final</string>
+    <string name="cuidado_etiqueta_frecuencia">Frecuencia</string>
+    <string name="unidad_dias">días</string>
+    <string name="unidad_semanas">semanas</string>
+    <string name="unidad_meses">meses</string>
+    <string name="unidad_anios">años</string>
+    <string name="cuidado_etiqueta_veces">Número de veces</string>
+    <string name="cuidado_hint_veces">Ej. 4</string>
+    <string name="cuidado_hint_frecuencia">Ej. 6</string>
+    <string name="cuidado_etiqueta_limite">Fecha límite</string>
+    <plurals name="cuidado_aproximado">
+        <item quantity="one">Se repetirá aproximadamente %d vez.</item>
+        <item quantity="other">Se repetirá aproximadamente %d veces.</item>
+    </plurals>
+    <string name="cuidado_etiqueta_inicio">Fecha de inicio</string>
+    <string name="cuidado_aviso_titulo">Aviso anticipado</string>
+    <string name="cuidado_aviso_detalle">Te avisamos el día anterior al vencimiento</string>
+    <string name="cuidado_etiqueta_nota">Nota personal (opcional)</string>
+    <string name="cuidado_hint_nota">Ej. Llevar libreta de vacunas</string>
+    <string name="cuidado_confirmar">Confirmar</string>
+    <string name="cuidado_omitir">Omitir este cuidado</string>
+    <string name="error_entero">Ingresa un número entero entre 1 y 999</string>
+    <string name="error_inicio_pasada">La fecha de inicio no puede ser una fecha pasada</string>
+    <string name="error_limite_posterior">La fecha límite debe ser posterior a la fecha de inicio</string>
 </resources>

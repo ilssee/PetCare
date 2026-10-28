@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Casilla de verificación: se marca con isSelected (la propuesta la controla a mano). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <size android:width="24dp" android:height="24dp" />
+                    <solid android:color="@color/petcare_primary" />
+                    <corners android:radius="7dp" />
+                </shape>
+            </item>
+            <item
+                android:bottom="4dp"
+                android:drawable="@drawable/ic_check_blanco"
+                android:left="4dp"
+                android:right="4dp"
+                android:top="4dp" />
+        </layer-list>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <size android:width="24dp" android:height="24dp" />
+            <solid android:color="@color/white" />
+            <corners android:radius="7dp" />
+            <stroke android:width="1.5dp" android:color="#C5D0D5" />
+        </shape>
+    </item>
+</selector>

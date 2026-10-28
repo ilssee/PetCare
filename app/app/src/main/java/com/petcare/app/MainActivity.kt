@@ -53,11 +53,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            binding.navegacion.selectedItemId = R.id.nav_mascotas
+            binding.navegacion.selectedItemId = intent.getIntExtra(EXTRA_SECCION, R.id.nav_mascotas)
+        }
+    }
+
+    // Otra pantalla puede pedir que se abra una sección concreta (por ejemplo Cuidados tras activar el cronograma).
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (::binding.isInitialized && intent.hasExtra(EXTRA_SECCION)) {
+            binding.navegacion.selectedItemId = intent.getIntExtra(EXTRA_SECCION, R.id.nav_mascotas)
         }
     }
 
     private fun mostrar(fragmento: Fragment) {
         supportFragmentManager.beginTransaction().replace(R.id.contenedor, fragmento).commit()
+    }
+
+    companion object {
+        /** Id de la opción de la barra inferior que debe quedar seleccionada (por ejemplo R.id.nav_cuidados). */
+        const val EXTRA_SECCION = "seccion"
     }
 }

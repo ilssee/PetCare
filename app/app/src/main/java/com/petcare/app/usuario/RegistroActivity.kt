@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
+import com.petcare.app.common.respetarBarrasYTeclado
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.databinding.ActivityRegistroBinding
@@ -25,11 +24,7 @@ class RegistroActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityRegistroBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.raiz) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(0, barras.top, 0, barras.bottom)
-            insets
-        }
+        binding.raiz.respetarBarrasYTeclado()
 
         binding.botonVolver.setOnClickListener { finish() }
         binding.enlaceLogin.setOnClickListener { finish() }

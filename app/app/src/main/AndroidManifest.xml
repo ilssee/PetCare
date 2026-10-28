@@ -43,6 +43,24 @@
             android:exported="false" />
 
         <activity
+            android:name=".mascota.MascotaRegistradaActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".cuidado.PropuestaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".cuidado.InfoPreventivaActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".cuidado.CuidadoFormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".usuario.EditarPerfilActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

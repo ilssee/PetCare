@@ -12,11 +12,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.petcare.app.R
+import com.petcare.app.common.respetarBarrasYTeclado
 import com.petcare.app.common.Imagenes
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
@@ -66,11 +65,7 @@ class MascotaFormActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMascotaFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.raiz) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(0, barras.top, 0, barras.bottom)
-            insets
-        }
+        binding.raiz.respetarBarrasYTeclado()
 
         mascotaId = intent.getIntExtra(EXTRA_ID, 0)
 
@@ -264,6 +259,10 @@ class MascotaFormActivity : AppCompatActivity() {
                         else -> R.string.mascota_registrada
                     }
                     Toast.makeText(this@MascotaFormActivity, mensaje, Toast.LENGTH_SHORT).show()
+                    // Una mascota nueva pasa por la pantalla de bienvenida, que ofrece su propuesta de cronograma (RF09).
+                    if (!editando) {
+                        startActivity(MascotaRegistradaActivity.intent(this@MascotaFormActivity, id))
+                    }
                     finish()
                 }
                 is Resultado.Fallo -> {
