@@ -1,4 +1,6 @@
 import { HttpError } from '../../common/errors/http-error';
+import { esFechaReal, fechaDeHoy } from '../../common/fechas';
+import { textoOpcional } from '../../common/texto';
 import * as fotos from './mascota.fotos';
 import * as repositorio from './mascota.repository';
 import { DatosMascota, EstadoMascota, MascotaRegistro, MascotaRespuesta } from './mascota.types';
@@ -7,23 +9,8 @@ import { DatosMascota, EstadoMascota, MascotaRegistro, MascotaRespuesta } from '
 
 const ESPECIES = ['perro', 'gato', 'conejo'];
 const SEXOS = ['macho', 'hembra'];
-const FORMATO_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
 const CAMPO_OBLIGATORIO = 'Este campo es obligatorio';
-
-function fechaDeHoy(): string {
-  const hoy = new Date();
-  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-  const dia = String(hoy.getDate()).padStart(2, '0');
-  return `${hoy.getFullYear()}-${mes}-${dia}`;
-}
-
-function esFechaReal(texto: string): boolean {
-  if (!FORMATO_FECHA.test(texto)) return false;
-  const [anio, mes, dia] = texto.split('-').map(Number);
-  const fecha = new Date(Date.UTC(anio, mes - 1, dia));
-  return fecha.getUTCFullYear() === anio && fecha.getUTCMonth() === mes - 1 && fecha.getUTCDate() === dia;
-}
 
 /** Edad calculada a partir de la fecha de nacimiento (dato derivado: no se guarda). */
 export function calcularEdadTexto(fechaNacimiento: string | null): string | null {
@@ -38,12 +25,6 @@ export function calcularEdadTexto(fechaNacimiento: string | null): string | null
   if (meses < 12) return `${meses} ${meses === 1 ? 'mes' : 'meses'}`;
   const anios = Math.floor(meses / 12);
   return `${anios} ${anios === 1 ? 'año' : 'años'}`;
-}
-
-/** Un texto opcional que llega vacío se guarda como null. */
-function textoOpcional(valor: unknown): string | null {
-  const texto = String(valor ?? '').trim();
-  return texto === '' ? null : texto;
 }
 
 function validarDatos(entrada: Record<string, unknown>): DatosMascota {

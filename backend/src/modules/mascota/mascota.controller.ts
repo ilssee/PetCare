@@ -1,14 +1,8 @@
 import { Request, Response } from 'express';
-import { HttpError } from '../../common/errors/http-error';
+import { idDeLaRuta } from '../../common/ruta';
 import * as servicio from './mascota.service';
 
 /** Capa HTTP del módulo mascota. El id del usuario lo deja la verificación de sesión. */
-
-function idDeLaRuta(req: Request): number {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) throw new HttpError(400, 'El id de la mascota no es válido');
-  return id;
-}
 
 export async function listar(_req: Request, res: Response) {
   res.json(await servicio.listar(res.locals.usuarioId));

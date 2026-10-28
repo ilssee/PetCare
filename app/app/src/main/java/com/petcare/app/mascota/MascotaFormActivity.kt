@@ -264,6 +264,10 @@ class MascotaFormActivity : AppCompatActivity() {
                         else -> R.string.mascota_registrada
                     }
                     Toast.makeText(this@MascotaFormActivity, mensaje, Toast.LENGTH_SHORT).show()
+                    // Una mascota nueva pasa por la pantalla de bienvenida, que ofrece su propuesta de cronograma (RF09).
+                    if (!editando) {
+                        startActivity(MascotaRegistradaActivity.intent(this@MascotaFormActivity, id))
+                    }
                     finish()
                 }
                 is Resultado.Fallo -> {

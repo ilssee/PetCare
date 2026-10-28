@@ -4,6 +4,8 @@ import { manejarErrores } from './common/middlewares/error-handler';
 import { carpetaUploads } from './config/uploads';
 import { usuarioRoutes } from './modules/usuario/usuario.routes';
 import { mascotaRoutes } from './modules/mascota/mascota.routes';
+import { reglaRoutes } from './modules/regla/regla.routes';
+import { cuidadoRoutes } from './modules/cuidado/cuidado.routes';
 
 /** Aplicación Express. Aquí se registran las rutas de cada módulo. */
 export const app = express();
@@ -32,6 +34,8 @@ app.use('/uploads', express.static(carpetaUploads));
 // Rutas de los módulos
 app.use('/usuarios', usuarioRoutes);
 app.use('/mascotas', mascotaRoutes);
+app.use('/mascotas', reglaRoutes); // /mascotas/:id/recomendaciones
+app.use('/mascotas', cuidadoRoutes); // /mascotas/:id/cuidados/...
 
 // Debe ir al final: atrapa los errores de todas las rutas anteriores.
 app.use(manejarErrores);

@@ -12,10 +12,14 @@
     <color name="petcare_border">#E3E9EC</color>
     <color name="petcare_error">#D6455D</color>
 
+    <!-- Tonos suaves del prototipo para avisos, cajas de información e íconos -->
+    <color name="petcare_brand_50">#EEF8F8</color>
+    <color name="petcare_brand_100">#D9EFF0</color>
+
     <!-- Colores por especie (tomados del prototipo) -->
-    <color name="especie_perro">#FCE6C8</color>
-    <color name="especie_gato">#E6E0F6</color>
-    <color name="especie_conejo">#FBDDE7</color>
+    <color name="especie_perro">#FCE8C8</color>
+    <color name="especie_gato">#E6E1F8</color>
+    <color name="especie_conejo">#FBDDE6</color>
     <color name="estado_activa_fondo">#DDF3E6</color>
     <color name="estado_activa_texto">#2F8F5B</color>
     <color name="estado_inactiva_fondo">#3A4349</color>
