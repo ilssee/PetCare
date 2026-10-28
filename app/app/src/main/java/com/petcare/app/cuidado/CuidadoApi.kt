@@ -33,6 +33,13 @@ interface CuidadoApi {
         @Body datos: CuidadoPeticion,
     ): Response<GuardarCuidadoRespuesta>
 
+    /** Cronograma: cuidados de todas las mascotas activas (o de una sola). estado: pendientes, finalizados o todos. */
+    @GET("cuidados")
+    suspend fun cronograma(
+        @Query("mascotaId") mascotaId: Int?,
+        @Query("estado") estado: String,
+    ): Response<CronogramaRespuesta>
+
     @GET("cuidados/{id}")
     suspend fun obtener(@Path("id") cuidadoId: Int): Response<CuidadoRespuesta>
 

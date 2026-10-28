@@ -22,6 +22,10 @@ class CuidadoRepository(private val api: CuidadoApi = ApiClient.crear(CuidadoApi
     suspend fun crearPersonalizado(mascotaId: Int, datos: CuidadoPeticion): Resultado<GuardarCuidadoRespuesta> =
         llamarApi { api.crearPersonalizado(mascotaId, datos) }
 
+    /** Los cuidados pendientes de todas las mascotas activas, o solo de [mascotaId]. */
+    suspend fun cronograma(mascotaId: Int?): Resultado<CronogramaRespuesta> =
+        llamarApi { api.cronograma(mascotaId, "pendientes") }
+
     suspend fun obtener(cuidadoId: Int): Resultado<CuidadoRespuesta> = llamarApi { api.obtener(cuidadoId) }
 
     suspend fun editar(cuidadoId: Int, datos: CuidadoPeticion): Resultado<GuardarCuidadoRespuesta> =

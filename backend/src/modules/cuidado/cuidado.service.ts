@@ -156,6 +156,29 @@ export async function listar(
   return { conteos, cuidados: await conHistorial(cuidados) };
 }
 
+/**
+ * RF13: cronograma del usuario. Muestra los cuidados de todas sus mascotas activas y permite
+ * filtrar por mascota y por estado (por defecto, los pendientes).
+ */
+export async function listarCronograma(
+  usuarioId: number,
+  mascotaId: unknown,
+  estado: unknown,
+): Promise<{ cuidados: CuidadoDetalle[] }> {
+  const filtro = (estaVacio(estado) ? 'pendientes' : String(estado).trim()) as FiltroEstado;
+  if (!FILTROS.includes(filtro)) throw new HttpError(400, 'El estado debe ser todos, pendientes o finalizados');
+
+  let idMascota: number | null = null;
+  if (!estaVacio(mascotaId)) {
+    idMascota = enteroEntre(mascotaId, 1, Number.MAX_SAFE_INTEGER);
+    if (idMascota === null) throw new HttpError(400, 'El id de la mascota no es válido');
+    await mascotas.obtener(idMascota, usuarioId); // 404 si no existe o es de otro usuario
+  }
+
+  const cuidados = await repositorio.listarDeUsuario(usuarioId, idMascota, filtro);
+  return { cuidados: await conHistorial(cuidados) };
+}
+
 export async function obtener(id: number, usuarioId: number): Promise<CuidadoDetalle> {
   return (await conHistorial([await obtenerPropio(id, usuarioId)]))[0];
 }

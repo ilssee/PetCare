@@ -159,6 +159,27 @@
     <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
     <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 32 caracteres</string>
 
+    <!-- Cronograma: cuidados de todas las mascotas (RF13) -->
+    <plurals name="cronograma_titulo_con_cuidados">
+        <item quantity="one">Tienes %d cuidado
+para esta semana</item>
+        <item quantity="other">Tienes %d cuidados
+para esta semana</item>
+    </plurals>
+    <string name="cronograma_siguiente">Siguiente cuidado</string>
+    <plurals name="cronograma_dias">
+        <item quantity="one">día</item>
+        <item quantity="other">días</item>
+    </plurals>
+    <string name="cronograma_vencidos">VENCIDOS</string>
+    <string name="cronograma_esta_semana">ESTA SEMANA</string>
+    <string name="cronograma_proxima_semana">PRÓXIMA SEMANA</string>
+    <string name="cronograma_mas_adelante">MÁS ADELANTE</string>
+    <string name="cronograma_mostrar_todo">Mostrar todo</string>
+    <string name="cronograma_mascota_frecuencia">%1$s · %2$s</string>
+    <string name="cronograma_dia_vacio_titulo">Sin cuidados este día</string>
+    <string name="cronograma_dia_vacio_mensaje">No hay cuidados programados para esta fecha.</string>
+
     <!-- Cuidados: lista, tarjetas y acciones (RF12 a RF15 y RF23) -->
     <string name="cuidados_buscar_hint">Buscar cuidado por nombre</string>
     <string name="cuidados_boton_agregar">Cuidado</string>

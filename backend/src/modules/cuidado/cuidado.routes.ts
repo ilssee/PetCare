@@ -13,6 +13,7 @@ cuidadoDeMascotaRoutes.post('/:id/cuidados/recomendados', exigirSesion, controla
 export const cuidadoRoutes = Router();
 
 cuidadoRoutes.use(exigirSesion);
+cuidadoRoutes.get('/', controlador.listarCronograma); // cronograma de todas las mascotas activas
 cuidadoRoutes.get('/:id', controlador.obtener);
 cuidadoRoutes.put('/:id', controlador.editar);
 cuidadoRoutes.delete('/:id', controlador.eliminar);

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Día de la semana: hoy (selected) en verde suave; el día elegido (activated) en verde sólido -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_activated="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/petcare_primary" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
     <item android:state_selected="true">
         <shape android:shape="rectangle">
             <solid android:color="@color/petcare_primary_soft" />

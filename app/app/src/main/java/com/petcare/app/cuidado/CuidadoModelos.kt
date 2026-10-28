@@ -108,3 +108,6 @@ data class ConteoCuidados(val todos: Int, val pendientes: Int, val finalizados: 
 data class ListaCuidadosRespuesta(val conteos: ConteoCuidados, val cuidados: List<CuidadoRespuesta>)
 
 data class GuardarCuidadoRespuesta(val mensaje: String, val cuidado: CuidadoRespuesta)
+
+/** Cuidados de todas las mascotas activas del usuario (cronograma). */
+data class CronogramaRespuesta(val cuidados: List<CuidadoRespuesta>)

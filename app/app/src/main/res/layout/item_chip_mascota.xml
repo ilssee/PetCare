@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/bg_chip_mascota"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:paddingEnd="16dp">
+
+    <ImageView
+        android:id="@+id/foto"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/bg_circulo_suave"
+        android:importantForAccessibility="no"
+        android:padding="3dp" />
+
+    <TextView
+        android:id="@+id/nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:textColor="@color/petcare_text"
+        android:textSize="14sp" />
+</LinearLayout>

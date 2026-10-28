@@ -8,6 +8,10 @@ export async function listar(req: Request, res: Response) {
   res.json(await servicio.listar(idDeLaRuta(req), res.locals.usuarioId, req.query.estado));
 }
 
+export async function listarCronograma(req: Request, res: Response) {
+  res.json(await servicio.listarCronograma(res.locals.usuarioId, req.query.mascotaId, req.query.estado));
+}
+
 export async function activarRecomendados(req: Request, res: Response) {
   const respuesta = await servicio.activarRecomendados(idDeLaRuta(req), res.locals.usuarioId, req.body ?? {});
   res.status(201).json(respuesta);

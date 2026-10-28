@@ -70,9 +70,38 @@ export async function listarPorIds(ids: number[]): Promise<CuidadoRespuesta[]> {
   return aCuidados(filas);
 }
 
+function estadosDe(filtro: FiltroEstado): string[] {
+  return filtro === 'pendientes' ? ['pendiente'] : filtro === 'finalizados' ? ['finalizado'] : ['pendiente', 'finalizado'];
+}
+
+/**
+ * RF13: cuidados de todas las mascotas ACTIVAS del usuario (o solo de una), por fecha más próxima.
+ * Los cuidados de una mascota inactiva no se muestran en el cronograma (RF07).
+ */
+export async function listarDeUsuario(
+  usuarioId: number,
+  mascotaId: number | null,
+  filtro: FiltroEstado,
+): Promise<CuidadoRespuesta[]> {
+  const parametros: unknown[] = [usuarioId, estadosDe(filtro)];
+  let filtroMascota = '';
+  if (mascotaId !== null) {
+    filtroMascota = 'AND c.mascota_id = ?';
+    parametros.push(mascotaId);
+  }
+  const [filas] = await pool.query<RowDataPacket[]>(
+    `${SELECT_CUIDADO}
+     JOIN mascota m ON m.id = c.mascota_id
+     WHERE m.usuario_id = ? AND m.estado = 'activa' AND c.estado IN (?) ${filtroMascota}
+     ORDER BY FIELD(c.estado, 'pendiente', 'finalizado'), c.fecha_recurrente, c.nombre`,
+    parametros,
+  );
+  return aCuidados(filas);
+}
+
 /** Cuidados de una mascota según el estado elegido. Pendientes primero, por fecha más próxima. */
 export async function listarPorMascota(mascotaId: number, filtro: FiltroEstado): Promise<CuidadoRespuesta[]> {
-  const estados = filtro === 'pendientes' ? ['pendiente'] : filtro === 'finalizados' ? ['finalizado'] : ['pendiente', 'finalizado'];
+  const estados = estadosDe(filtro);
   const [filas] = await pool.query<RowDataPacket[]>(
     `${SELECT_CUIDADO}
      WHERE c.mascota_id = ? AND c.estado IN (?)
