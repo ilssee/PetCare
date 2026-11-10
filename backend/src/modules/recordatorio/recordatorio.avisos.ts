@@ -7,8 +7,11 @@ import { Dia, diaDeAviso, diasEntre, diaDeLaSemana } from './recordatorio.dias';
 
 export type TipoAviso = 'anticipado' | 'pendiente';
 
-/** Lo que puede llevar una notificación: un recordatorio de cuidado o el aviso de nuevas recomendaciones (RF26). */
-export type TipoNotificacion = TipoAviso | 'recomendacion';
+/**
+ * Lo que puede llevar una notificación: un recordatorio de cuidado, el aviso de nuevas recomendaciones (RF26)
+ * o el aviso de una campaña o veterinaria nueva cerca del usuario (RF39 y RF40).
+ */
+export type TipoNotificacion = TipoAviso | 'recomendacion' | 'campana_cercana' | 'veterinaria_cercana';
 
 /** Un cuidado pendiente de una mascota activa, con lo necesario para decidir si se avisa. */
 export interface CuidadoPorAvisar {

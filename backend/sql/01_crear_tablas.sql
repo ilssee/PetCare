@@ -177,6 +177,7 @@ CREATE TABLE IF NOT EXISTS veterinaria (
   ubicacion_lat  DECIMAL(9,6) NOT NULL,
   ubicacion_long DECIMAL(9,6) NOT NULL,
   tipo           ENUM('municipal','privada') NOT NULL,
+  fecha_notificacion DATE NULL COMMENT 'Vacía hasta que se avisa a los usuarios cercanos (RF40)',
   PRIMARY KEY (organizador_id),
   CONSTRAINT fk_veterinaria_organizador FOREIGN KEY (organizador_id)
     REFERENCES organizador (id) ON DELETE CASCADE
@@ -259,6 +260,7 @@ CREATE TABLE IF NOT EXISTS campana (
   ubicacion_lat   DECIMAL(9,6) NOT NULL,
   ubicacion_long  DECIMAL(9,6) NOT NULL,
   modalidad_costo ENUM('gratuita','de_pago') NOT NULL,
+  fecha_notificacion DATE NULL COMMENT 'Vacía hasta que se avisa a los usuarios cercanos (RF39)',
   PRIMARY KEY (id),
   KEY ix_campana_organizador (organizador_id),
   KEY ix_campana_fechas (fecha_inicio, fecha_fin),
