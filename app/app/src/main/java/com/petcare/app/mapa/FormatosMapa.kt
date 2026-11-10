@@ -32,6 +32,11 @@ object FormatosMapa {
         LocalDate.parse(texto).format(DateTimeFormatter.ofPattern("d MMM", Locale("es", "PE"))).replace(".", "")
     }.getOrDefault(texto)
 
+    /** "4 oct 2026" a partir de "2026-10-04". */
+    fun fechaConAnio(texto: String): String = runCatching {
+        LocalDate.parse(texto).format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale("es", "PE"))).replace(".", "")
+    }.getOrDefault(texto)
+
     /** "4.7" para mostrar una calificación. */
     fun calificacion(promedio: Double): String = "%.1f".format(Locale.US, promedio)
 

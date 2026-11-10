@@ -11,6 +11,7 @@ import {
   listarVeterinarias,
   normalizar,
 } from '../../src/modules/mapa/mapa.logica';
+import { armarDetalleDeCampana } from '../../src/modules/mapa/mapa.campana';
 import { Ahora, CampanaRegistro, FiltrosCampanas, FiltrosVeterinarias, VeterinariaRegistro } from '../../src/modules/mapa/mapa.types';
 
 // Miércoles 4 de noviembre de 2026, 10:30 a. m.
@@ -54,6 +55,7 @@ function camp(parcial: Partial<CampanaRegistro> & { id: number; nombre: string }
     lng: -77.08,
     costo: 'gratuita',
     promedio: null,
+    totalResenas: 0,
     esDeVeterinaria: false,
     especies: ['perro'],
     servicios: [{ id: 1, nombre: 'Vacunación' }],
@@ -322,5 +324,32 @@ describe('búsqueda por nombre (RF29)', () => {
     const r = buscarPorNombre('a', vets, campanas, { ...o, origen: { lat: -12.0464, lng: -77.0428 } });
     const distancias = r.map((x) => x.distanciaKm!);
     assert.deepEqual([...distancias].sort((a, b) => a - b), distancias);
+  });
+});
+
+describe('detalle de una campaña (RF43)', () => {
+  it('una campaña de una entidad externa trae su descripción, dirección y el resumen del organizador', () => {
+    const c = camp({ id: 1, nombre: 'Feria', descripcion: 'Adopciones', promedio: 4.5, totalResenas: 12 });
+    const d = armarDetalleDeCampana(c, [], AHORA, null, 'Plaza Bolognesi, Breña');
+    assert.equal(d.descripcion, 'Adopciones');
+    assert.equal(d.direccion, 'Plaza Bolognesi, Breña');
+    assert.equal(d.veterinariaId, null);
+    assert.deepEqual(d.organizadorDetalle, { id: 100, nombre: 'Fundación Huellas Libres', promedio: 4.5, totalResenas: 12 });
+  });
+
+  it('una campaña de una veterinaria indica cuál es, para abrir su perfil', () => {
+    const v = vet({ id: 7, nombre: 'Clínica' });
+    const c = camp({ id: 2, nombre: 'Vacunación', organizadorId: 7, organizador: 'Clínica', esDeVeterinaria: true });
+    const d = armarDetalleDeCampana(c, [v], AHORA, null, null);
+    assert.equal(d.veterinariaId, 7);
+    assert.equal(d.direccion, null);
+    assert.equal(d.organizadorDetalle.promedio, null);
+  });
+
+  it('calcula el estado y la distancia como en el mapa', () => {
+    const c = camp({ id: 3, nombre: 'Campaña', fechaInicio: '2026-11-08', fechaFin: '2026-11-09' });
+    const d = armarDetalleDeCampana(c, [], AHORA, { lat: -12.06, lng: -77.08 }, null);
+    assert.equal(d.estado, 'proxima');
+    assert.equal(d.distanciaKm, 0);
   });
 });

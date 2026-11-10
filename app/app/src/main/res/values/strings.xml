@@ -269,6 +269,21 @@
     <string name="perfil_escribir_resena">Escribir una reseña</string>
     <string name="perfil_foto_contador">%1$d/%2$d</string>
     <string name="perfil_no_cargo">No se pudo cargar el perfil</string>
+
+    <!-- Detalle de una campaña (RF43) -->
+    <string name="campana_titulo">Campaña</string>
+    <string name="campana_organiza">Organiza</string>
+    <string name="campana_dirigida_a">DIRIGIDA A</string>
+    <string name="campana_servicios">SERVICIOS</string>
+    <string name="campana_cuando_donde">CUÁNDO Y DÓNDE</string>
+    <string name="campana_fechas">Fechas</string>
+    <string name="campana_fechas_del_al">Del %1$s al %2$s</string>
+    <string name="campana_horario_diario">Horario diario</string>
+    <string name="campana_mismo_horario">Mismo horario todos los días de la campaña</string>
+    <string name="campana_ubicacion">Ubicación</string>
+    <string name="campana_resenas_titulo">RESEÑAS DEL ORGANIZADOR</string>
+    <string name="campana_ver_resenas">Ver reseñas de %1$s</string>
+    <string name="campana_no_cargo">No es posible visualizar el detalle de la campaña</string>
     <string-array name="dias_abreviados">
         <item>Lun</item>
         <item>Mar</item>

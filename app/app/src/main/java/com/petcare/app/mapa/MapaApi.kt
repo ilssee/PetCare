@@ -40,6 +40,13 @@ interface MapaApi {
         @Query("lng") lng: Double?,
     ): Response<List<CampanaRespuesta>>
 
+    @GET("mapa/campanas/{id}")
+    suspend fun detalleCampana(
+        @Path("id") id: Int,
+        @Query("lat") lat: Double?,
+        @Query("lng") lng: Double?,
+    ): Response<DetalleCampanaRespuesta>
+
     @GET("mapa/buscar")
     suspend fun buscar(
         @Query("texto") texto: String,

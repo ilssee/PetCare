@@ -89,6 +89,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".mapa.CampanaDetalleActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".resena.ResenasActivity"
             android:exported="false" />
 

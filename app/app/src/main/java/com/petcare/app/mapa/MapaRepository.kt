@@ -49,6 +49,9 @@ class MapaRepository(private val api: MapaApi = ApiClient.crear(MapaApi::class.j
 
     suspend fun filtros(): Resultado<CatalogosRespuesta> = llamarApi { api.filtros() }
 
+    suspend fun detalleDeCampana(id: Int, lat: Double?, lng: Double?): Resultado<DetalleCampanaRespuesta> =
+        llamarApi { api.detalleCampana(id, lat, lng) }
+
     suspend fun perfilDeVeterinaria(id: Int, lat: Double?, lng: Double?): Resultado<PerfilVeterinariaRespuesta> =
         llamarApi { api.perfil(id, lat, lng) }
 }

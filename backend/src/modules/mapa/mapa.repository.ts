@@ -70,6 +70,7 @@ export async function cargarCampanasVigentes(hoy: string): Promise<CampanaRegist
             c.fecha_inicio, c.fecha_fin, c.hora_apertura, c.hora_cierre,
             c.ubicacion_lat AS lat, c.ubicacion_long AS lng, c.modalidad_costo AS costo,
             (SELECT AVG(r.calificacion) FROM resena r WHERE r.organizador_id = o.id) AS promedio,
+            (SELECT COUNT(*) FROM resena r WHERE r.organizador_id = o.id) AS totalResenas,
             EXISTS (SELECT 1 FROM veterinaria v WHERE v.organizador_id = o.id) AS esDeVeterinaria
      FROM campana c
      JOIN organizador o ON o.id = c.organizador_id
@@ -104,6 +105,7 @@ export async function cargarCampanasVigentes(hoy: string): Promise<CampanaRegist
     lng: Number(f.lng),
     costo: f.costo,
     promedio: aNumeroONulo(f.promedio),
+    totalResenas: Number(f.totalResenas),
     esDeVeterinaria: Boolean(f.esDeVeterinaria),
     especies: especiesDe.get(f.id) ?? [],
     servicios: serviciosDe.get(f.id) ?? [],
