@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".PetCareApp"
@@ -15,6 +16,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PetCare">
+
+        <!-- Avisos con la app abierta y renovación del token del celular (Firebase). -->
+        <service
+            android:name=".notificacion.PetCareMensajes"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Canal y color de los avisos que Android muestra con la app cerrada. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="recordatorios" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_huella" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/petcare_primary" />
 
         <activity
             android:name=".usuario.LoginActivity"
@@ -50,6 +71,10 @@
             android:name=".cuidado.PropuestaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".recordatorio.RecordatoriosActivity"
+            android:exported="false" />
 
         <activity
             android:name=".cuidado.InfoPreventivaActivity"

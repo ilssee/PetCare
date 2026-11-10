@@ -54,9 +54,15 @@ fun String.comoUrlFoto(): String = BuildConfig.API_BASE_URL + "uploads/" + this
 fun ImageView.mostrarMascota(mascota: MascotaRespuesta) {
     val ilustracion = Especies.ilustracion(mascota.especie)
     val foto = mascota.foto
+    // Se recuerda el relleno original: la ilustración lo necesita, la foto no (debe ocupar todo el círculo).
+    val relleno = (getTag() as? IntArray) ?: intArrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom).also { setTag(it) }
     if (foto.isNullOrEmpty()) {
+        setPadding(relleno[0], relleno[1], relleno[2], relleno[3])
+        scaleType = ImageView.ScaleType.FIT_CENTER
         setImageResource(ilustracion)
     } else {
+        setPadding(0, 0, 0, 0)
+        scaleType = ImageView.ScaleType.CENTER_CROP
         load(foto.comoUrlFoto()) {
             transformations(CircleCropTransformation())
             placeholder(ilustracion)

@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { env } from '../../config/env';
 import { HttpError } from '../../common/errors/http-error';
+import { huellaDeContrasena } from '../../common/sesion';
+import * as dispositivos from '../dispositivo/dispositivo.repository';
 import * as repositorio from './usuario.repository';
 import { DatosLogin, DatosRegistro, UsuarioPublico } from './usuario.types';
 
@@ -25,8 +27,8 @@ function validarRegistro(datos: Partial<DatosRegistro>): DatosRegistro {
   if (!FORMATO_CORREO.test(correo) || correo.length > 255) {
     throw new HttpError(400, 'El correo no tiene un formato válido');
   }
-  if (contrasena.length < 8 || contrasena.length > 32) {
-    throw new HttpError(400, 'La contraseña debe tener entre 8 y 32 caracteres');
+  if (contrasena.length < 8 || contrasena.length > 64) {
+    throw new HttpError(400, 'La contraseña debe tener entre 8 y 64 caracteres');
   }
   return { nombre, correo, contrasena };
 }
@@ -57,7 +59,8 @@ export async function iniciarSesion(datos: Partial<DatosLogin>) {
     throw new HttpError(401, 'Correo o contraseña incorrectos');
   }
 
-  const token = jwt.sign({ id: usuario.id }, env.jwt.secreto, { expiresIn: env.jwt.expiraSegundos });
+  // Sin vencimiento (ERS: la sesión dura hasta cerrar sesión o cambiar la contraseña).
+  const token = jwt.sign({ id: usuario.id, h: huellaDeContrasena(usuario.contrasena) }, env.jwt.secreto);
   return {
     token,
     usuario: { id: usuario.id, nombre: usuario.nombre, correo: usuario.correo },
@@ -113,8 +116,8 @@ export async function cambiarContrasena(
   const nueva = datos.contrasenaNueva ?? '';
 
   if (actual === '' || nueva === '') throw new HttpError(400, CAMPO_OBLIGATORIO);
-  if (nueva.length < 8 || nueva.length > 32) {
-    throw new HttpError(400, 'La contraseña debe tener entre 8 y 32 caracteres');
+  if (nueva.length < 8 || nueva.length > 64) {
+    throw new HttpError(400, 'La contraseña debe tener entre 8 y 64 caracteres');
   }
 
   const hashGuardado = await repositorio.obtenerHash(id);
@@ -125,5 +128,8 @@ export async function cambiarContrasena(
     throw new HttpError(400, 'La nueva contraseña debe ser distinta de la actual');
   }
 
+  // Con la contraseña nueva las sesiones anteriores dejan de ser válidas (ver common/sesion.ts), así que
+  // también se retiran los celulares para que no sigan recibiendo notificaciones sin sesión.
   await repositorio.cambiarContrasena(id, await bcrypt.hash(nueva, COSTO_CIFRADO));
+  await dispositivos.quitarTodosDeUsuario(id);
 }

@@ -158,7 +158,45 @@
     <string name="perfil_actualizado">Perfil actualizado correctamente</string>
     <string name="contrasena_actualizada">Contraseña actualizada correctamente</string>
     <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
-    <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 32 caracteres</string>
+    <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 64 caracteres</string>
+
+    <!-- Recordatorios: días de aviso (RF20) -->
+    <string name="notificacion_canal">Recordatorios de cuidados</string>
+    <string name="notificacion_canal_descripcion">Avisos de los cuidados próximos y pendientes de tus mascotas</string>
+    <string name="recordatorios_titulo">Recordatorios</string>
+    <string name="recordatorios_pregunta">¿Qué días prefieres que te avisemos?</string>
+    <string name="recordatorios_subtitulo">Solo para cuidados con aviso anticipado.</string>
+    <string name="recordatorios_aviso_todos"><![CDATA[Te avisaremos <b>el día antes</b> de cada vencimiento, a las <b>8:00 a. m.</b>]]></string>
+    <string name="recordatorios_aviso_dias"><![CDATA[Te avisaremos solo los <b>%1$s</b>, a las <b>8:00 a. m.</b>]]></string>
+    <string name="recordatorios_ejemplo">Ejemplo: si un cuidado vence el miércoles, te avisaremos el %1$s.</string>
+    <string name="recordatorios_guardar">Guardar configuración</string>
+    <string-array name="dias_cortos">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+    <string-array name="dias_plural">
+        <item>lunes</item>
+        <item>martes</item>
+        <item>miércoles</item>
+        <item>jueves</item>
+        <item>viernes</item>
+        <item>sábados</item>
+        <item>domingos</item>
+    </string-array>
+    <string-array name="dias_singular">
+        <item>lunes</item>
+        <item>martes</item>
+        <item>miércoles</item>
+        <item>jueves</item>
+        <item>viernes</item>
+        <item>sábado</item>
+        <item>domingo</item>
+    </string-array>
 
     <!-- Información preventiva y agregar una recomendación (RF24 y RF25) -->
     <string name="info_aviso"><![CDATA[Estas recomendaciones son <b>referenciales</b>, según la especie de %1$s. Consulta con tu <b>médico veterinario</b> la frecuencia y las fechas que le corresponden.]]></string>
@@ -183,12 +221,12 @@
     <string name="actividad_agregar_nota">Agregar nota</string>
     <string name="actividad_editar_nota">Editar nota</string>
     <string name="actividad_eliminar_nota">Eliminar nota</string>
-    <string name="actividad_anular">Anular actividad</string>
+    <string name="actividad_anular">Eliminar actividad</string>
     <string name="actividad_eliminar_nota_titulo">¿Eliminar la nota?</string>
     <string name="actividad_eliminar_nota_mensaje">La nota se quitará de esta actividad.</string>
-    <string name="actividad_anular_titulo">¿Anular esta actividad?</string>
+    <string name="actividad_anular_titulo">¿Eliminar esta actividad?</string>
     <string name="actividad_anular_mensaje">Se quitará del historial. Si es la última actividad registrada, la fecha del cuidado volverá a la que tenía antes.</string>
-    <string name="actividad_anular_boton">Anular</string>
+    <string name="actividad_anular_boton">Eliminar</string>
     <string name="actividad_opciones">Opciones de la actividad</string>
 
     <!-- Cronograma: cuidados de todas las mascotas (RF13) -->

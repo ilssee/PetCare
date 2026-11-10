@@ -1,5 +1,6 @@
 package com.petcare.app.usuario
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -9,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
 import com.petcare.app.common.respetarBarrasYTeclado
 import com.petcare.app.common.Resultado
+import com.petcare.app.common.SessionManager
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.databinding.ActivityCambiarContrasenaBinding
 import kotlinx.coroutines.launch
@@ -52,7 +54,7 @@ class CambiarContrasenaActivity : AppCompatActivity() {
             binding.errorNueva.setText(R.string.error_campo_obligatorio)
             binding.errorNueva.visibility = View.VISIBLE
             hayErrores = true
-        } else if (nueva.length < 8 || nueva.length > 32) {
+        } else if (nueva.length < 8 || nueva.length > 64) {
             binding.errorNueva.setText(R.string.error_contrasena_largo)
             binding.errorNueva.visibility = View.VISIBLE
             hayErrores = true
@@ -73,7 +75,12 @@ class CambiarContrasenaActivity : AppCompatActivity() {
             when (val resultado = repositorio.cambiarContrasena(actual, nueva)) {
                 is Resultado.Exito -> {
                     Toast.makeText(this@CambiarContrasenaActivity, R.string.contrasena_actualizada, Toast.LENGTH_SHORT).show()
-                    finish()
+                    // ERS: al cambiar la contraseña se cierra la sesión; hay que ingresar de nuevo.
+                    SessionManager.cerrar()
+                    startActivity(
+                        Intent(this@CambiarContrasenaActivity, LoginActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                    )
                 }
                 is Resultado.Fallo -> {
                     binding.textoError.text = resultado.paraMostrar(this@CambiarContrasenaActivity)

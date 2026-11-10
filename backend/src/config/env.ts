@@ -14,7 +14,14 @@ export const env = {
   },
   jwt: {
     secreto: process.env.JWT_SECRET ?? '',
-    expiraSegundos: Number(process.env.JWT_EXPIRA_SEGUNDOS ?? 604800), // 7 días
+  },
+  firebase: {
+    // Clave de cuenta de servicio de Firebase (archivo secreto; no se sube a GitHub).
+    clave: process.env.FIREBASE_CLAVE ?? './firebase-clave.json',
+  },
+  recordatorios: {
+    // Pon RECORDATORIOS_ACTIVOS=false para que el servidor no programe los avisos de las 8:00 a. m.
+    activos: process.env.RECORDATORIOS_ACTIVOS !== 'false',
   },
 };
 
