@@ -15,8 +15,11 @@ import com.petcare.app.common.SessionManager
 import com.petcare.app.common.respetarBarraDeEstado
 import com.petcare.app.cuidado.CuidadoRepository
 import com.petcare.app.databinding.FragmentPerfilBinding
+import com.petcare.app.recordatorio.RecordatoriosActivity
 import com.petcare.app.mascota.MascotaRepository
+import com.petcare.app.notificacion.Notificaciones
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** Sección Perfil: datos del usuario, accesos a editar el perfil y cierre de sesión (con confirmación). */
 class PerfilFragment : Fragment() {
@@ -35,12 +38,13 @@ class PerfilFragment : Fragment() {
         binding.filaEditar.setOnClickListener {
             startActivity(Intent(requireContext(), EditarPerfilActivity::class.java))
         }
-        // Recordatorios y avisos de cercanía pertenecen a módulos que aún no están construidos.
-        val proximamente = View.OnClickListener {
+        binding.filaRecordatorios.setOnClickListener {
+            startActivity(Intent(requireContext(), RecordatoriosActivity::class.java))
+        }
+        // Los avisos de cercanía llegan con el módulo de geolocalización.
+        binding.filaAvisos.setOnClickListener {
             Toast.makeText(requireContext(), R.string.proximamente, Toast.LENGTH_SHORT).show()
         }
-        binding.filaRecordatorios.setOnClickListener(proximamente)
-        binding.filaAvisos.setOnClickListener(proximamente)
         binding.filaCerrarSesion.setOnClickListener { confirmarCierreDeSesion() }
         return binding.root
     }
@@ -71,11 +75,16 @@ class PerfilFragment : Fragment() {
             .setMessage(R.string.cerrar_sesion_mensaje)
             .setNegativeButton(R.string.cancelar, null)
             .setPositiveButton(R.string.inicio_cerrar_sesion) { _, _ ->
-                SessionManager.cerrar()
-                startActivity(
-                    Intent(requireContext(), LoginActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                )
+                // Primero se retira este celular de la cuenta (necesita la sesión); luego se cierra.
+                val contexto = requireContext().applicationContext
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withTimeoutOrNull(3_000) { Notificaciones.darDeBaja() }
+                    SessionManager.cerrar()
+                    startActivity(
+                        Intent(contexto, LoginActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                    )
+                }
             }
             .show()
     }

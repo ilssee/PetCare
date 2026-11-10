@@ -412,5 +412,5 @@ export async function anular(
   }
 
   await repositorio.anularActividad(actividad.id, cuidado.id, revertir);
-  return { mensaje: 'Actividad anulada correctamente', cuidado: await obtener(cuidado.id, usuarioId) };
+  return { mensaje: 'Actividad eliminada correctamente', cuidado: await obtener(cuidado.id, usuarioId) };
 }

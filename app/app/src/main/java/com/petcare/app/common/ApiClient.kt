@@ -10,6 +10,12 @@ import retrofit2.converter.gson.GsonConverterFactory
  * Si hay una sesión iniciada, agrega el token a cada petición. Cada módulo pide aquí su interfaz con crear(...).
  */
 object ApiClient {
+    /**
+     * Se ejecuta cuando el servidor rechaza la sesión (por ejemplo, porque el usuario cambió su contraseña
+     * desde otro dispositivo). La app la usa para volver al inicio de sesión.
+     */
+    var alInvalidarseSesion: (() -> Unit)? = null
+
     private val cliente: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor { cadena ->
@@ -19,7 +25,13 @@ object ApiClient {
                 } else {
                     cadena.request().newBuilder().header("Authorization", "Bearer $token").build()
                 }
-                cadena.proceed(peticion)
+                val respuesta = cadena.proceed(peticion)
+                // 401 con una sesión iniciada: la sesión ya no es válida. Se cierra una sola vez.
+                if (respuesta.code == 401 && !token.isNullOrEmpty() && SessionManager.token == token) {
+                    SessionManager.cerrar()
+                    alInvalidarseSesion?.invoke()
+                }
+                respuesta
             }
             .build()
     }

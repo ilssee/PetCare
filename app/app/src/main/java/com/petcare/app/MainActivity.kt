@@ -1,25 +1,34 @@
 package com.petcare.app
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.petcare.app.common.PlaceholderFragment
 import com.petcare.app.common.SessionManager
 import com.petcare.app.databinding.ActivityMainBinding
 import com.petcare.app.cronograma.CronogramaFragment
 import com.petcare.app.cuidado.CuidadosFragment
 import com.petcare.app.mascota.MascotasFragment
+import com.petcare.app.notificacion.Notificaciones
 import com.petcare.app.usuario.LoginActivity
 import com.petcare.app.usuario.PerfilFragment
+import kotlinx.coroutines.launch
 
 /** Pantalla principal: contiene la barra de navegación inferior y muestra una sección a la vez. */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    // Android 13+ pide permiso para mostrar notificaciones. Se acepte o no, se registra el celular.
+    private val permisoNotificaciones =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { registrarDispositivo() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +63,17 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             binding.navegacion.selectedItemId = intent.getIntExtra(EXTRA_SECCION, R.id.nav_mascotas)
+            activarNotificaciones()
         }
+    }
+
+    private fun activarNotificaciones() {
+        if (Notificaciones.tienePermiso(this)) registrarDispositivo()
+        else permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    private fun registrarDispositivo() {
+        lifecycleScope.launch { Notificaciones.registrarDispositivo() }
     }
 
     // Otra pantalla puede pedir que se abra una sección concreta (por ejemplo Cuidados tras activar el cronograma).

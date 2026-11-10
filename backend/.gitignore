@@ -1,2 +1,6 @@
 # Fotos que suben los usuarios (archivos de usuarios, no van al repositorio)
 uploads/
+
+# Claves de Firebase (secretas: nunca se suben a GitHub)
+firebase-clave.json
+*firebase-adminsdk*.json
