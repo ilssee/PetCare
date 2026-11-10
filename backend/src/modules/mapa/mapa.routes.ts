@@ -14,7 +14,8 @@ import * as controlador from './mapa.controller';
  * GET /mapa/veterinarias/:id   perfil completo de una veterinaria (RF41); acepta lat y lng
  * GET /mapa/campanas      estado=proxima,activa  especie  servicio  costo=gratuita,de_pago
  *                         disponibleAhora=true  ordenar=inicio|fin|distancia|calificacion
- * GET /mapa/buscar        texto=...   (veterinarias, entidades organizadoras y campañas por nombre)
+ * GET /mapa/campanas/:id  detalle de una campaña (RF43) con el resumen de su organizador; acepta lat y lng
+ * GET /mapa/buscar       texto=...   (veterinarias, entidades organizadoras y campañas por nombre)
  * GET /mapa/filtros       especies y servicios disponibles para armar los filtros
  *
  * Dentro de un mismo filtro basta cumplir una opción (perro o gato); entre filtros distintos se deben cumplir todos.
@@ -26,5 +27,6 @@ mapaRoutes.use(exigirSesion);
 mapaRoutes.get('/veterinarias', controlador.veterinarias);
 mapaRoutes.get('/veterinarias/:id', controlador.perfilDeVeterinaria);
 mapaRoutes.get('/campanas', controlador.campanas);
+mapaRoutes.get('/campanas/:id', controlador.detalleDeCampana);
 mapaRoutes.get('/buscar', controlador.buscar);
 mapaRoutes.get('/filtros', controlador.filtros);

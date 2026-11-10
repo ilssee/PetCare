@@ -42,7 +42,8 @@ export interface PerfilVeterinaria extends VeterinariaMapa {
   telefonos: string[];
   redes: string[];
   fotos: string[]; // rutas de las imágenes guardadas en el servidor
-  campanas: CampanaMapa[];
+  /** Campañas de la veterinaria; con la descripción y la dirección para desplegarlas en el perfil (RF43). */
+  campanas: (CampanaMapa & { descripcion: string; direccion: string | null })[];
   resenas: { promedio: number | null; total: number; recientes: ResenaVista[] };
 }
 
@@ -98,8 +99,13 @@ async function extras(id: number) {
     'SELECT direccion FROM veterinaria WHERE organizador_id = ?',
     [id],
   );
+  const [direccionesCampanas] = await pool.query<RowDataPacket[]>(
+    'SELECT id, direccion FROM campana WHERE organizador_id = ?',
+    [id],
+  );
   return {
     direccion: (direccion[0]?.direccion as string | null | undefined) ?? null,
+    direccionesCampanas: new Map(direccionesCampanas.map((f) => [f.id as number, (f.direccion as string | null) ?? null])),
     telefonos: telefonos.map((f) => f.telefono as string),
     redes: redes.map((f) => f.enlace as string),
     fotos: fotos.map((f) => f.ruta as string),
@@ -145,7 +151,11 @@ export async function perfilDeVeterinaria(
     telefonos: detalle.telefonos,
     redes: detalle.redes,
     fotos: detalle.fotos,
-    campanas: propias.map((c) => vistaDeCampana(c, veterinarias, ahora, origen)),
+    campanas: propias.map((c) => ({
+      ...vistaDeCampana(c, veterinarias, ahora, origen),
+      descripcion: c.descripcion,
+      direccion: detalle.direccionesCampanas.get(c.id) ?? null,
+    })),
     resenas: { promedio: reseñas.promedio, total: reseñas.total, recientes: reseñas.resenas },
   };
 }

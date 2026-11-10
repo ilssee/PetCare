@@ -45,6 +45,7 @@ export interface CampanaRegistro {
   lng: number;
   costo: CostoCampana;
   promedio: number | null; // promedio de calificación del organizador
+  totalResenas: number; // total de reseñas del organizador
   esDeVeterinaria: boolean; // el organizador es una veterinaria
   especies: string[];
   servicios: Servicio[];
@@ -120,7 +121,8 @@ export interface CampanaMapa {
   horaApertura: string;
   horaCierre: string;
   costo: CostoCampana;
-  promedio: number | null;
+  promedio: number | null; // promedio de calificación del organizador
+  totalResenas: number; // total de reseñas del organizador
   distanciaKm: number | null;
   disponibleAhora: boolean;
   especies: string[];

@@ -39,19 +39,18 @@ import com.petcare.app.databinding.HojaOrdenMapaBinding
 import com.petcare.app.databinding.ItemOpcionOrdenBinding
 import com.petcare.app.databinding.ItemResultadoMapaBinding
 import com.petcare.app.mascota.Especies
+import com.petcare.app.resena.ResenasCambiaron
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
-import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.CopyrightOverlay
-import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import java.io.File
 import java.time.LocalDate
@@ -106,6 +105,7 @@ class MapaFragment : Fragment() {
         binding.encabezado.respetarBarraDeEstado()
         pintarCategorias()
         cargarCatalogos()
+        ResenasCambiaron.consumir() // el mapa recién creado ya carga datos nuevos
         recargar()
         // La ubicación se pide al abrir el mapa: sirve para mostrar el punto azul y calcular distancias.
         pedirUbicacion { obtenida -> if (obtenida) recargar() }
@@ -132,20 +132,6 @@ class MapaFragment : Fragment() {
             controller.setZoom(12.5)
             controller.setCenter(GeoPoint(-12.0464, -77.0428)) // Lima, mientras llegan los datos
             overlays.add(CopyrightOverlay(requireContext()))
-            // Tocar un lugar vacío del mapa cierra la tarjeta del elemento elegido.
-            overlays.add(
-                0,
-                MapEventsOverlay(
-                    object : MapEventsReceiver {
-                        override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                            cerrarTarjeta()
-                            return false
-                        }
-
-                        override fun longPressHelper(p: GeoPoint?) = false
-                    },
-                ),
-            )
         }
     }
 
@@ -178,7 +164,6 @@ class MapaFragment : Fragment() {
 
         binding.botonLeyenda.setOnClickListener { binding.leyenda.isVisible = !binding.leyenda.isVisible }
         binding.botonUbicacion.setOnClickListener { irAMiUbicacion() }
-        binding.tarjetaCerrar.setOnClickListener { cerrarTarjeta() }
         binding.botonOrdenar.setOnClickListener { elegirOrden() }
         binding.botonFiltros.setOnClickListener { abrirFiltros() }
         binding.asa.setOnClickListener { alternarTamanoDelPanel() }
@@ -204,7 +189,6 @@ class MapaFragment : Fragment() {
             binding.campoBusqueda.text?.clear()
         }
         pintarCategorias()
-        cerrarTarjeta()
         ajustarVista = true
         recargar()
     }
@@ -213,7 +197,6 @@ class MapaFragment : Fragment() {
         textoBusqueda = texto
         if (texto.isNotEmpty()) categoria = null
         pintarCategorias()
-        cerrarTarjeta()
         ajustarVista = true
         recargar()
     }
@@ -413,21 +396,25 @@ class MapaFragment : Fragment() {
     }
 
     private fun seleccionar(elemento: ElementoMapa) {
-        // Una veterinaria abre su perfil (RF41). Las campañas siguen con la tarjeta de datos hasta que exista su detalle.
-        if (elemento is ElementoMapa.Veterinaria) {
-            cerrarTarjeta()
-            startActivity(PerfilVeterinariaActivity.intent(requireContext(), elemento.id, ubicacion?.latitude, ubicacion?.longitude))
-            return
+        val contexto = requireContext()
+        val lat = ubicacion?.latitude
+        val lng = ubicacion?.longitude
+        when (elemento) {
+            // Una veterinaria abre su perfil (RF41).
+            is ElementoMapa.Veterinaria -> startActivity(PerfilVeterinariaActivity.intent(contexto, elemento.id, lat, lng))
+            // Una campaña de una veterinaria se ve dentro del perfil de esa veterinaria, desplegada; la de una entidad
+            // externa abre su propia pantalla con el resumen de su organizador (RF43).
+            is ElementoMapa.Campana -> {
+                val veterinariaId = elemento.datos.veterinariaId
+                startActivity(
+                    if (veterinariaId != null) {
+                        PerfilVeterinariaActivity.intent(contexto, veterinariaId, lat, lng, campanaId = elemento.id)
+                    } else {
+                        CampanaDetalleActivity.intent(contexto, elemento.id, lat, lng)
+                    },
+                )
+            }
         }
-        binding.mapa.controller.animateTo(GeoPoint(elemento.lat, elemento.lng))
-        binding.tarjetaTitulo.text = elemento.nombre
-        binding.tarjetaEtiquetas.text = textoEtiquetas(elemento)
-        binding.tarjetaDetalle.text = detalleCompleto(elemento).joinToString("\n")
-        binding.tarjeta.isVisible = true
-    }
-
-    private fun cerrarTarjeta() {
-        _binding?.tarjeta?.isVisible = false
     }
 
     // ---------------------------------------------------------------------
@@ -443,17 +430,6 @@ class MapaFragment : Fragment() {
 
     private fun nombreDeClase(elemento: ElementoMapa) =
         getString(if (elemento is ElementoMapa.Veterinaria) R.string.mapa_etiqueta_veterinaria else R.string.mapa_etiqueta_campana)
-
-    private fun textoEtiquetas(elemento: ElementoMapa): String {
-        val partes = mutableListOf(nombreDeClase(elemento), nombreDeEtiqueta(elemento))
-        when (elemento) {
-            is ElementoMapa.Veterinaria ->
-                partes += getString(if (elemento.datos.abiertaAhora) R.string.mapa_abierta_ahora else R.string.mapa_cerrada_ahora)
-            is ElementoMapa.Campana ->
-                partes += getString(if (elemento.datos.costo == "gratuita") R.string.mapa_costo_gratuita else R.string.mapa_costo_de_pago)
-        }
-        return partes.joinToString(" · ")
-    }
 
     private fun textoDistancia(elemento: ElementoMapa) =
         elemento.distanciaKm?.let { "%.1f km".format(Locale.US, it) } ?: getString(R.string.mapa_sin_distancia)
@@ -483,29 +459,6 @@ class MapaFragment : Fragment() {
         val fechas = if (c.fechaInicio == c.fechaFin) fechaCorta(c.fechaInicio) else "${fechaCorta(c.fechaInicio)} – ${fechaCorta(c.fechaFin)}"
         val costo = getString(if (c.costo == "gratuita") R.string.mapa_costo_gratuita else R.string.mapa_costo_de_pago)
         return "$fechas · $costo"
-    }
-
-    /** Todas las líneas de información, para la tarjeta que se abre al tocar un marcador. */
-    private fun detalleCompleto(elemento: ElementoMapa): List<String> {
-        val lineas = mutableListOf<String>()
-        when (elemento) {
-            is ElementoMapa.Veterinaria -> {
-                val v = elemento.datos
-                lineas += "${textoDistancia(elemento)} · ${textoHorarioHoy(v.horarioHoy)}"
-                lineas += "★ " + textoCalificacion(v.promedio, v.totalResenas)
-                if (v.especies.isNotEmpty()) lineas += v.especies.joinToString(", ") { getString(Especies.nombre(it)) }
-                if (v.servicios.isNotEmpty()) lineas += v.servicios.joinToString(", ") { it.nombre }
-                if (v.campanasAqui.isNotEmpty()) lineas += textoCampanasAqui(v.campanasAqui.size)
-            }
-            is ElementoMapa.Campana -> {
-                val c = elemento.datos
-                lineas += "${c.organizador} · ${textoDistancia(elemento)}"
-                lineas += textoFechasCampana(c)
-                lineas += getString(R.string.mapa_horario_campana_hora, c.horaApertura.take(5), c.horaCierre.take(5))
-                if (c.servicios.isNotEmpty()) lineas += c.servicios.joinToString(", ") { it.nombre }
-            }
-        }
-        return lineas
     }
 
     private fun textoCampanasAqui(cantidad: Int) =
@@ -646,7 +599,6 @@ class MapaFragment : Fragment() {
             conteo?.cancel()
             if (esVeterinarias) filtrosVeterinarias = FiltrosVeterinarias() else filtrosCampanas = FiltrosCampanas()
             dialogo.dismiss()
-            cerrarTarjeta()
             ajustarVista = true
             recargar()
         }
@@ -658,7 +610,6 @@ class MapaFragment : Fragment() {
                 filtrosCampanas = FiltrosCampanas(borrador.estados.toSet(), borrador.especies.toSet(), borrador.servicios.toSet(), borrador.costos.toSet(), borrador.ahora)
             }
             dialogo.dismiss()
-            cerrarTarjeta()
             ajustarVista = true
             recargar()
         }
@@ -853,6 +804,8 @@ class MapaFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         _binding?.mapa?.onResume()
+        // Si el usuario guardó, editó o eliminó una reseña, las calificaciones se actualizan al volver al mapa.
+        if (ResenasCambiaron.consumir() && _binding != null) recargar()
     }
 
     override fun onPause() {
@@ -928,7 +881,10 @@ class MapaFragment : Fragment() {
                     v.detalle.text = "${c.organizador} · ${textoDistancia(elemento)}"
                     v.detalle2.isVisible = true
                     v.detalle2.text = textoFechasCampana(c)
-                    v.filaEstrellas.isVisible = false
+                    // Calificación del organizador (RF35): es el criterio de "Ordenar por calificación".
+                    v.filaEstrellas.isVisible = true
+                    pintarEstrellas(v.estrellas, c.promedio)
+                    v.textoCalificacion.text = textoCalificacion(c.promedio, c.totalResenas)
                     v.filaCampanas.isVisible = false
                 }
             }

@@ -42,7 +42,9 @@ data class CampanaRespuesta(
     val horaCierre: String,
     /** "gratuita" o "de_pago" */
     val costo: String,
+    /** Calificación promedio y total de reseñas del organizador. */
     val promedio: Double?,
+    val totalResenas: Int,
     val distanciaKm: Double?,
     val disponibleAhora: Boolean,
     val especies: List<String>,
@@ -50,6 +52,33 @@ data class CampanaRespuesta(
     val veterinariaId: Int?,
     /** La campaña está en la misma ubicación de su veterinaria: se muestra junto a ella. */
     val enUbicacionDeVeterinaria: Boolean,
+    /** Solo llegan dentro del perfil de una veterinaria, para desplegar la campaña (RF43). */
+    val descripcion: String? = null,
+    val direccion: String? = null,
+)
+
+/** Quien organiza la campaña, para el resumen del detalle y para abrir sus reseñas. */
+data class OrganizadorResumen(val id: Int, val nombre: String, val promedio: Double?, val totalResenas: Int)
+
+/** Detalle de una campaña (RF43), con el resumen de su organizador. */
+data class DetalleCampanaRespuesta(
+    val id: Int,
+    val nombre: String,
+    val organizador: String,
+    /** "proxima" o "activa" */
+    val estado: String,
+    val fechaInicio: String,
+    val fechaFin: String,
+    val horaApertura: String,
+    val horaCierre: String,
+    /** "gratuita" o "de_pago" */
+    val costo: String,
+    val descripcion: String,
+    val direccion: String?,
+    val especies: List<String>,
+    val servicios: List<ServicioRespuesta>,
+    val veterinariaId: Int?,
+    val organizadorDetalle: OrganizadorResumen,
 )
 
 /** Resultado de buscar por nombre: "clase" es "veterinaria" o "campana"; solo viene lleno uno de los dos grupos. */
@@ -149,6 +178,7 @@ fun ResultadoBusquedaRespuesta.comoElemento(): ElementoMapa =
                 horaCierre = horaCierre.orEmpty(),
                 costo = costo ?: "gratuita",
                 promedio = promedio,
+                totalResenas = totalResenas ?: 0,
                 distanciaKm = distanciaKm,
                 disponibleAhora = disponibleAhora ?: false,
                 especies = especies.orEmpty(),

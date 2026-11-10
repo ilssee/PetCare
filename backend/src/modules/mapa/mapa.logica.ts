@@ -165,6 +165,7 @@ export function vistaDeCampana(
     horaCierre: c.horaCierre,
     costo: c.costo,
     promedio: c.promedio,
+    totalResenas: c.totalResenas,
     distanciaKm: origen ? redondearKm(distanciaKm(origen, c)) : null,
     disponibleAhora: campanaDisponibleAhora(c, ahora),
     especies: c.especies,

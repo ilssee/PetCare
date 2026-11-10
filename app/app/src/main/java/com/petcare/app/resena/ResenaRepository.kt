@@ -14,10 +14,16 @@ class ResenaRepository(private val api: ResenaApi = ApiClient.crear(ResenaApi::c
         llamarApi { api.listar(organizadorId, orden) }
 
     suspend fun crear(organizadorId: Int, calificacion: Int, comentario: String?): Resultado<ResenaRespuesta> =
-        llamarApi { api.crear(organizadorId, ResenaPeticion(calificacion, comentario)) }
+        llamarApi { api.crear(organizadorId, ResenaPeticion(calificacion, comentario)) }.avisandoSiSeGuardo()
 
     suspend fun editar(id: Int, calificacion: Int, comentario: String?): Resultado<ResenaRespuesta> =
-        llamarApi { api.editar(id, ResenaPeticion(calificacion, comentario)) }
+        llamarApi { api.editar(id, ResenaPeticion(calificacion, comentario)) }.avisandoSiSeGuardo()
 
-    suspend fun eliminar(id: Int): Resultado<Unit> = llamarApiSinContenido { api.eliminar(id) }
+    suspend fun eliminar(id: Int): Resultado<Unit> = llamarApiSinContenido { api.eliminar(id) }.avisandoSiSeGuardo()
+
+    /** Si el cambio se guardó, el mapa debe actualizar las calificaciones cuando se vuelva a él. */
+    private fun <T> Resultado<T>.avisandoSiSeGuardo(): Resultado<T> {
+        if (this is Resultado.Exito) ResenasCambiaron.marcar()
+        return this
+    }
 }

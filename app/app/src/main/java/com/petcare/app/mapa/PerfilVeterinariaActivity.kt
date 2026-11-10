@@ -38,7 +38,7 @@ import java.net.URI
 
 /**
  * Perfil de una veterinaria (RF41), con las pestañas Servicios, Contacto, Reseñas y Campañas. Se abre al tocar
- * una veterinaria en el mapa o en el listado. Las campañas se muestran como lista; su detalle es de otra pantalla.
+ * una veterinaria en el mapa o en el listado. Cada campaña de la veterinaria se despliega con su detalle (RF43).
  */
 class PerfilVeterinariaActivity : AppCompatActivity() {
 
@@ -48,6 +48,11 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
     private var perfil: PerfilVeterinariaRespuesta? = null
     private var pestana = Pestana.SERVICIOS
     private var fotoActual = 0
+
+    // Campañas desplegadas. Si se llegó desde una campaña (RF43), se abre en la pestaña Campañas con esa campaña a la vista.
+    private val campanasAbiertas = mutableSetOf<Int>()
+    private var campanaResaltada = 0
+    private var tarjetaResaltada: View? = null
 
     private enum class Pestana { SERVICIOS, CONTACTO, RESENAS, CAMPANAS }
 
@@ -67,6 +72,14 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         binding.pestanaCampanas.setOnClickListener { elegirPestana(Pestana.CAMPANAS) }
         binding.fotoAnterior.setOnClickListener { cambiarFoto(-1) }
         binding.fotoSiguiente.setOnClickListener { cambiarFoto(1) }
+
+        if (savedInstanceState == null) {
+            campanaResaltada = intent.getIntExtra(EXTRA_CAMPANA, 0)
+            if (campanaResaltada != 0) {
+                campanasAbiertas.add(campanaResaltada)
+                pestana = Pestana.CAMPANAS
+            }
+        }
     }
 
     // Al volver de escribir, editar o eliminar una reseña, el perfil se actualiza solo.
@@ -129,8 +142,18 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         pintarServicios(p)
         pintarContacto(p)
         pintarResenas(p)
+        tarjetaResaltada = null
         pintarCampanas(p)
         elegirPestana(pestana)
+
+        // Solo la primera vez: lleva el desplazamiento hasta la campaña elegida.
+        val destino = tarjetaResaltada
+        if (destino != null && campanaResaltada != 0) {
+            campanaResaltada = 0
+            binding.desplazamiento.post {
+                binding.desplazamiento.smoothScrollTo(0, distanciaDesde(binding.contenido, destino))
+            }
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -486,13 +509,14 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         cont.removeAllViews()
         for (campana in p.campanas) {
             val tarjeta = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
+                orientation = LinearLayout.VERTICAL
                 setBackgroundResource(R.drawable.bg_tarjeta_borde)
                 setPadding(dp(14), dp(14), dp(14), dp(14))
                 layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                     .apply { topMargin = dp(14) }
             }
-            tarjeta.addView(
+            val encabezado = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            encabezado.addView(
                 ImageView(this).apply {
                     setImageResource(R.drawable.ic_mapa_campana)
                     setBackgroundResource(R.drawable.bg_icono_resultado)
@@ -534,9 +558,43 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
                 "${FormatosMapa.fechaCorta(campana.fechaInicio)} – ${FormatosMapa.fechaCorta(campana.fechaFin)}"
             }
             columna.addView(textoSimple(fechas, tamano = 13f))
-            tarjeta.addView(columna)
+            encabezado.addView(columna)
+
+            // Al tocar la tarjeta se despliega el detalle de la campaña (RF43) y se vuelve a plegar al tocarla otra vez.
+            val flecha = ImageView(this).apply {
+                setImageResource(R.drawable.ic_desplegar)
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                layoutParams = LinearLayout.LayoutParams(dp(24), dp(24)).apply { marginStart = dp(8) }
+            }
+            encabezado.addView(flecha)
+            tarjeta.addView(encabezado)
+
+            val detalle = CuerpoCampana.crear(this, campana.comoCuerpo()).apply { isVisible = false }
+            tarjeta.addView(detalle)
+
+            fun mostrarDetalle(abierto: Boolean) {
+                detalle.isVisible = abierto
+                flecha.rotation = if (abierto) 180f else 0f
+            }
+            mostrarDetalle(campana.id in campanasAbiertas)
+            tarjeta.setOnClickListener {
+                if (!campanasAbiertas.remove(campana.id)) campanasAbiertas.add(campana.id)
+                mostrarDetalle(campana.id in campanasAbiertas)
+            }
             cont.addView(tarjeta)
+            if (campana.id == campanaResaltada) tarjetaResaltada = tarjeta
         }
+    }
+
+    /** Distancia desde la parte de arriba de [ancestro] hasta [vista], para llevar el desplazamiento hasta ella. */
+    private fun distanciaDesde(ancestro: View, vista: View): Int {
+        var total = 0
+        var actual: View? = vista
+        while (actual != null && actual !== ancestro) {
+            total += actual.top
+            actual = actual.parent as? View
+        }
+        return total
     }
 
     private fun etiqueta(@StringRes texto: Int, @ColorRes fondo: Int, @ColorRes letra: Int, separacion: Int = 0) =
@@ -620,11 +678,16 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         private const val EXTRA_ID = "id"
         private const val EXTRA_LAT = "lat"
         private const val EXTRA_LNG = "lng"
+        private const val EXTRA_CAMPANA = "campana"
 
-        /** [lat] y [lng] son la ubicación del usuario, si se conoce: con ellas el perfil muestra la distancia. */
-        fun intent(contexto: Context, id: Int, lat: Double?, lng: Double?): Intent =
+        /**
+         * [lat] y [lng] son la ubicación del usuario, si se conoce: con ellas el perfil muestra la distancia.
+         * Con [campanaId] se abre en la pestaña Campañas, con esa campaña desplegada (RF43).
+         */
+        fun intent(contexto: Context, id: Int, lat: Double?, lng: Double?, campanaId: Int? = null): Intent =
             Intent(contexto, PerfilVeterinariaActivity::class.java).apply {
                 putExtra(EXTRA_ID, id)
+                if (campanaId != null) putExtra(EXTRA_CAMPANA, campanaId)
                 if (lat != null && lng != null) {
                     putExtra(EXTRA_LAT, lat)
                     putExtra(EXTRA_LNG, lng)
