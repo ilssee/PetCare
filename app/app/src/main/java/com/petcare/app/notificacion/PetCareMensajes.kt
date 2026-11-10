@@ -29,11 +29,13 @@ class PetCareMensajes : FirebaseMessagingService() {
         val aviso = mensaje.notification ?: return
         if (!SessionManager.haySesion || !Notificaciones.tienePermiso(this)) return
 
-        val abrirCuidados = Intent(this, MainActivity::class.java)
-            .putExtra(MainActivity.EXTRA_SECCION, R.id.nav_cuidados)
+        // Los avisos de lugares cercanos abren el mapa; los demás, los cuidados.
+        val seccion = if (mensaje.data["seccion"] == "mapa") R.id.nav_mapa else R.id.nav_cuidados
+        val abrirSeccion = Intent(this, MainActivity::class.java)
+            .putExtra(MainActivity.EXTRA_SECCION, seccion)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendiente = PendingIntent.getActivity(
-            this, 0, abrirCuidados, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            this, seccion, abrirSeccion, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val notificacion = NotificationCompat.Builder(this, Notificaciones.CANAL_RECORDATORIOS)
             .setSmallIcon(R.drawable.ic_huella)

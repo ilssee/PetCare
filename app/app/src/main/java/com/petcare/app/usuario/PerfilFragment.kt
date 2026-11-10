@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.petcare.app.R
+import com.petcare.app.cercania.CercaniaActivity
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.SessionManager
 import com.petcare.app.common.respetarBarraDeEstado
@@ -41,9 +42,8 @@ class PerfilFragment : Fragment() {
         binding.filaRecordatorios.setOnClickListener {
             startActivity(Intent(requireContext(), RecordatoriosActivity::class.java))
         }
-        // Los avisos de cercanía llegan con el módulo de geolocalización.
         binding.filaAvisos.setOnClickListener {
-            Toast.makeText(requireContext(), R.string.proximamente, Toast.LENGTH_SHORT).show()
+            startActivity(Intent(requireContext(), CercaniaActivity::class.java))
         }
         binding.filaCerrarSesion.setOnClickListener { confirmarCierreDeSesion() }
         return binding.root

@@ -9,6 +9,11 @@ const TOKEN_INVALIDO = ['messaging/registration-token-not-registered', 'messagin
 /** Canal de notificaciones de Android donde la app muestra los recordatorios. */
 export const CANAL_RECORDATORIOS = 'recordatorios';
 
+/** Los avisos de lugares cercanos abren el mapa; los demás abren los cuidados. */
+function seccionDe(tipo: Notificacion['tipo']): string {
+  return tipo === 'campana_cercana' || tipo === 'veterinaria_cercana' ? 'mapa' : 'cuidados';
+}
+
 /** Entrega los avisos como notificaciones push a todos los celulares del usuario, usando Firebase. */
 export class EnviadorFirebase implements Enviador {
   constructor(private readonly mensajeria: Messaging) {}
@@ -24,7 +29,8 @@ export class EnviadorFirebase implements Enviador {
     const respuesta = await this.mensajeria.sendEachForMulticast({
       tokens,
       notification: { title: aviso.titulo, body: aviso.cuerpo },
-      data: { tipo: aviso.tipo, cuidadoId: String(aviso.cuidadoId), seccion: 'cuidados' },
+      // La sección dice qué pestaña abre la app al tocar el aviso.
+      data: { tipo: aviso.tipo, cuidadoId: String(aviso.cuidadoId), seccion: seccionDe(aviso.tipo) },
       android: { priority: 'high', notification: { channelId: CANAL_RECORDATORIOS } },
     });
 

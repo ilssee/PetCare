@@ -28,4 +28,22 @@
     <color name="hint_gris">#757575</color>
     <color name="petcare_primary_soft">#E0F1F2</color>
     <color name="petcare_texto_suave">#7F8C94</color>
+
+    <!-- Marcadores del mapa (tomados del prototipo) -->
+    <color name="mapa_privada">#4F9EDF</color>
+    <color name="mapa_municipal">#F29CA6</color>
+    <color name="mapa_activa">#2E9E5B</color>
+    <color name="mapa_proxima">#E39A2D</color>
+    <color name="mapa_ubicacion">#3B82F6</color>
+
+    <!-- Etiquetas del listado del mapa: fondo y texto -->
+    <color name="etiqueta_privada_fondo">#DCEBFA</color>
+    <color name="etiqueta_privada_texto">#1F6FAE</color>
+    <color name="etiqueta_municipal_fondo">#FBE0E4</color>
+    <color name="etiqueta_municipal_texto">#C2505D</color>
+    <color name="etiqueta_activa_fondo">#DDF3E5</color>
+    <color name="etiqueta_activa_texto">#2E9E5B</color>
+    <color name="etiqueta_proxima_fondo">#FCEED2</color>
+    <color name="etiqueta_proxima_texto">#B7761A</color>
+    <color name="etiqueta_clase_fondo">#3A4349</color>
 </resources>

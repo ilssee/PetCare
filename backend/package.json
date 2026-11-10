@@ -10,6 +10,7 @@
     "test": "node --import tsx --test tests/unit/*.test.ts",
     "recordatorios:ahora": "tsx src/scripts/enviar-recordatorios.ts",
     "recomendaciones:ahora": "tsx src/scripts/enviar-recomendaciones.ts",
+    "cercania:ahora": "tsx src/scripts/avisar-cercania.ts",
     "notificacion:probar": "tsx src/scripts/probar-notificacion.ts"
   },
   "license": "ISC",

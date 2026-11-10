@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Ubicación del usuario: se usa para mostrarla en el mapa y calcular distancias. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".PetCareApp"
@@ -75,6 +78,24 @@
         <activity
             android:name=".recordatorio.RecordatoriosActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".cercania.CercaniaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".mapa.PerfilVeterinariaActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".resena.ResenasActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".resena.EscribirResenaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".cuidado.InfoPreventivaActivity"

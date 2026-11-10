@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo de las categorías del mapa: blanco sin elegir, verde azulado claro al elegir -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/petcare_brand_100" android:state_checked="true" />
+    <item android:color="@color/white" />
+</selector>

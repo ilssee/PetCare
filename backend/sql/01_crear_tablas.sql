@@ -176,7 +176,9 @@ CREATE TABLE IF NOT EXISTS veterinaria (
   organizador_id INT UNSIGNED NOT NULL,
   ubicacion_lat  DECIMAL(9,6) NOT NULL,
   ubicacion_long DECIMAL(9,6) NOT NULL,
+  direccion      VARCHAR(200) NULL COMMENT 'Dirección escrita, por ejemplo: Av. Los Olivos 123, Lima',
   tipo           ENUM('municipal','privada') NOT NULL,
+  fecha_notificacion DATE NULL COMMENT 'Vacía hasta que se avisa a los usuarios cercanos (RF40)',
   PRIMARY KEY (organizador_id),
   CONSTRAINT fk_veterinaria_organizador FOREIGN KEY (organizador_id)
     REFERENCES organizador (id) ON DELETE CASCADE
@@ -258,7 +260,9 @@ CREATE TABLE IF NOT EXISTS campana (
   hora_cierre     TIME NOT NULL,
   ubicacion_lat   DECIMAL(9,6) NOT NULL,
   ubicacion_long  DECIMAL(9,6) NOT NULL,
+  direccion       VARCHAR(200) NULL COMMENT 'Dirección escrita del lugar de la campaña',
   modalidad_costo ENUM('gratuita','de_pago') NOT NULL,
+  fecha_notificacion DATE NULL COMMENT 'Vacía hasta que se avisa a los usuarios cercanos (RF39)',
   PRIMARY KEY (id),
   KEY ix_campana_organizador (organizador_id),
   KEY ix_campana_fechas (fecha_inicio, fecha_fin),

@@ -41,6 +41,75 @@
     <string name="nav_mascotas">Mascotas</string>
     <string name="nav_perfil">Perfil</string>
     <string name="proximamente">Próximamente</string>
+
+    <!-- Mapa -->
+    <string name="mapa_buscar_hint">Buscar veterinaria o campaña</string>
+    <string name="mapa_categoria_veterinarias">Veterinarias</string>
+    <string name="mapa_categoria_campanas">Campañas</string>
+    <string name="mapa_titulo_resultados">Resultados (%1$d)</string>
+    <string name="mapa_titulo_veterinarias">Veterinarias (%1$d)</string>
+    <string name="mapa_titulo_campanas">Campañas (%1$d)</string>
+    <string name="mapa_ordenar">Ordenar</string>
+    <string name="mapa_filtros">Filtros</string>
+    <string name="mapa_filtros_con_cantidad">Filtros (%1$d)</string>
+    <string name="mapa_filtros_titulo">Filtros</string>
+    <string name="mapa_filtros_limpiar">Limpiar</string>
+    <string name="mapa_filtros_aplicar">Aplicar</string>
+    <string name="mapa_filtro_tipo">Tipo</string>
+    <string name="mapa_filtro_especie">Especie</string>
+    <string name="mapa_filtro_servicio">Servicio</string>
+    <string name="mapa_filtro_estado">Estado</string>
+    <string name="mapa_filtro_costo">Costo</string>
+    <string name="mapa_filtro_disponibilidad">Disponibilidad</string>
+    <string name="mapa_abierto_ahora">Abierto ahora</string>
+    <string name="mapa_activa_abierta_ahora">Activa y abierta ahora</string>
+    <string name="mapa_especie_perro">Perros</string>
+    <string name="mapa_especie_gato">Gatos</string>
+    <string name="mapa_especie_conejo">Conejos</string>
+    <string name="mapa_ver_resultado">Ver 1 resultado</string>
+    <string name="mapa_ver_resultados">Ver %1$d resultados</string>
+    <string name="mapa_hoy_horario">Hoy · %1$s</string>
+    <string name="mapa_hoy_cerrado">Hoy cerrado</string>
+    <string name="mapa_24_horas">24 horas</string>
+    <string name="mapa_sin_distancia">— km</string>
+    <string name="mapa_horario_campana_hora">Horario: %1$s a %2$s</string>
+    <string name="mapa_una_campana">1 campaña</string>
+    <string name="mapa_varias_campanas">%1$d campañas</string>
+    <string name="mapa_tipo_municipal">Municipal</string>
+    <string name="mapa_tipo_privada">Privada</string>
+    <string name="mapa_estado_activa">Activa</string>
+    <string name="mapa_estado_proxima">Próxima</string>
+    <string name="mapa_costo_gratuita">Gratuita</string>
+    <string name="mapa_costo_de_pago">De pago</string>
+    <string name="mapa_etiqueta_veterinaria">Veterinaria</string>
+    <string name="mapa_etiqueta_campana">Campaña</string>
+    <string name="mapa_orden_titulo">Ordenar por</string>
+    <string name="mapa_orden_distancia">Más cercanas</string>
+    <string name="mapa_orden_calificacion">Mejor calificadas</string>
+    <string name="mapa_orden_inicio">Fecha de inicio</string>
+    <string name="mapa_orden_fin">Fecha de fin</string>
+    <string name="mapa_sin_resultados_busqueda">No se encontraron resultados para tu búsqueda</string>
+    <string name="mapa_sin_veterinarias">No se encontraron veterinarias con los filtros seleccionados</string>
+    <string name="mapa_sin_campanas">No se encontraron campañas con los filtros seleccionados</string>
+    <string name="mapa_sin_disponibles">No hay resultados disponibles en este momento</string>
+    <string name="mapa_activa_ubicacion">Activa tu ubicación para ordenar por distancia</string>
+    <string name="mapa_ubicacion_no_disponible">No se pudo obtener tu ubicación. Revisa que el GPS esté activado.</string>
+    <string name="mapa_abierta_ahora">Abierta ahora</string>
+    <string name="mapa_cerrada_ahora">Cerrada ahora</string>
+    <string name="mapa_distancia">a %1$s km</string>
+    <string name="mapa_sin_resenas">Sin reseñas</string>
+    <string name="mapa_campana_aqui">%1$d campaña aquí</string>
+    <string name="mapa_campanas_aqui">%1$d campañas aquí</string>
+    <string name="mapa_leyenda_privada">Veterinaria privada</string>
+    <string name="mapa_leyenda_municipal">Veterinaria municipal</string>
+    <string name="mapa_leyenda_activa">Campaña activa</string>
+    <string name="mapa_leyenda_proxima">Campaña próxima</string>
+    <string name="mapa_leyenda_ubicacion">Tu ubicación</string>
+    <string name="mapa_descripcion_ubicacion">Ir a mi ubicación</string>
+    <string name="mapa_descripcion_leyenda">Mostrar la leyenda del mapa</string>
+    <string name="mapa_descripcion_limpiar">Borrar la búsqueda</string>
+    <string name="mapa_descripcion_cerrar">Cerrar</string>
+    <string name="mapa_horario_campana">%1$s a %2$s · %3$s a %4$s</string>
     <string name="cancelar">Cancelar</string>
 
     <!-- Mascotas -->
@@ -148,6 +217,89 @@
     <string name="perfil_recordatorios_sub">Días en que prefieres que te avisemos</string>
     <string name="perfil_avisos">Avisos cerca de ti</string>
     <string name="perfil_avisos_sub">Campañas y veterinarias nuevas en tu zona</string>
+
+    <!-- Avisos cerca de ti (RF37 a RF40) -->
+    <string name="cercania_titulo">Avisos cerca de ti</string>
+    <string name="cercania_descripcion">Te avisaremos cuando haya campañas o veterinarias nuevas cerca de ti.</string>
+    <string name="cercania_ubicacion_referencia">UBICACIÓN DE REFERENCIA</string>
+    <string name="cercania_buscar_hint">Buscar una dirección</string>
+    <string name="cercania_usar_mi_ubicacion">Usar mi ubicación actual</string>
+    <string name="cercania_indicacion_mapa">Busca una dirección o toca el mapa</string>
+    <string name="cercania_distancia">¿HASTA QUÉ DISTANCIA?</string>
+    <string name="cercania_distancia_valor">%1$d km</string>
+    <string name="cercania_marca_1">1 km</string>
+    <string name="cercania_marca_5">5 km</string>
+    <string name="cercania_marca_10">10 km</string>
+    <string name="cercania_que_avisar">¿QUÉ QUIERES QUE TE AVISEMOS?</string>
+    <string name="cercania_nuevas_campanas">Nuevas campañas</string>
+    <string name="cercania_nuevas_veterinarias">Nuevas veterinarias</string>
+    <string name="cercania_guardar">Guardar configuración</string>
+    <string name="cercania_guardada">Configuración guardada</string>
+    <string name="cercania_sin_ubicacion">Configura tu ubicación y radio de interés para activar esta notificación</string>
+    <string name="cercania_permiso_ubicacion">Se requiere el permiso de ubicación para usar esta opción</string>
+    <string name="cercania_ubicacion_no_disponible">No se pudo obtener tu ubicación. Revisa que el GPS esté activado.</string>
+    <string name="cercania_mi_ubicacion">Mi ubicación actual</string>
+    <string name="cercania_ubicacion_elegida">Ubicación elegida en el mapa</string>
+
+    <!-- Perfil de la veterinaria (RF41) -->
+    <string name="mapa_cerrado">Cerrado</string>
+    <string name="perfil_titulo">Veterinaria</string>
+    <string name="perfil_pestana_servicios">Servicios</string>
+    <string name="perfil_pestana_contacto">Contacto</string>
+    <string name="perfil_pestana_resenas">Reseñas</string>
+    <string name="perfil_pestana_campanas">Campañas</string>
+    <string name="perfil_abierto">Abierto</string>
+    <string name="perfil_cerrado">Cerrado</string>
+    <string name="perfil_especies_titulo">ESPECIES QUE ATIENDE</string>
+    <string name="perfil_servicios_titulo">SERVICIOS QUE OFRECE</string>
+    <string name="perfil_un_servicio">1 servicio</string>
+    <string name="perfil_varios_servicios">%1$d servicios</string>
+    <string name="perfil_sin_servicios">Esta veterinaria todavía no registró sus servicios</string>
+    <string name="perfil_horario_titulo">HORARIO DE ATENCIÓN</string>
+    <string name="perfil_dias_y_horas">Días y horas</string>
+    <string name="perfil_hoy">Hoy</string>
+    <string name="perfil_contacto_titulo">TELÉFONOS Y REDES</string>
+    <string name="perfil_telefonos">Teléfonos</string>
+    <string name="perfil_redes">Redes sociales</string>
+    <string name="perfil_red_web">Web: %1$s</string>
+    <string name="perfil_una_resena">1 reseña</string>
+    <string name="perfil_varias_resenas">%1$d reseñas</string>
+    <string name="perfil_sin_resenas">Aún no hay reseñas</string>
+    <string name="perfil_ver_todas">Ver todas las reseñas</string>
+    <string name="perfil_escribir_resena">Escribir una reseña</string>
+    <string name="perfil_foto_contador">%1$d/%2$d</string>
+    <string name="perfil_no_cargo">No se pudo cargar el perfil</string>
+    <string-array name="dias_abreviados">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+
+    <!-- Reseñas (RF44 a RF46) -->
+    <string name="resenas_titulo">Reseñas</string>
+    <string name="resenas_recientes">Más recientes</string>
+    <string name="resenas_calificadas">Mejor calificadas</string>
+    <string name="resenas_editar">Editar</string>
+    <string name="resenas_eliminar">Eliminar</string>
+    <string name="resenas_eliminar_titulo">¿Eliminar tu reseña?</string>
+    <string name="resenas_eliminar_mensaje">Se quitará de la lista y no se puede deshacer.</string>
+    <string name="resenas_escribir_titulo">Escribir reseña</string>
+    <string name="resenas_editar_titulo">Editar reseña</string>
+    <string name="resenas_tu_calificacion">Tu calificación (1 a 5)</string>
+    <string name="resenas_tu_comentario">Tu comentario (opcional)</string>
+    <string name="resenas_comentario_hint">Cuéntanos cómo fue tu experiencia</string>
+    <string name="resenas_enviar">Enviar reseña</string>
+    <string name="resenas_guardar_cambios">Guardar cambios</string>
+    <string name="resenas_sin_calificacion">Selecciona una calificación para enviar tu reseña</string>
+    <string name="resenas_enviada">Reseña enviada</string>
+    <string name="resenas_actualizada">Reseña actualizada</string>
+    <string name="resenas_eliminada">Reseña eliminada</string>
+    <string name="resenas_no_se_pudo">La operación no pudo realizarse</string>
+    <string name="resenas_descripcion_estrella">Calificar con %1$d estrellas</string>
     <string name="perfil_cerrar_sesion">Cerrar sesión</string>
     <string name="perfil_cambiar_contrasena">Cambiar contraseña</string>
     <string name="boton_guardar">Guardar</string>
