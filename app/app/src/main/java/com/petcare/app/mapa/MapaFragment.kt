@@ -413,6 +413,12 @@ class MapaFragment : Fragment() {
     }
 
     private fun seleccionar(elemento: ElementoMapa) {
+        // Una veterinaria abre su perfil (RF41). Las campañas siguen con la tarjeta de datos hasta que exista su detalle.
+        if (elemento is ElementoMapa.Veterinaria) {
+            cerrarTarjeta()
+            startActivity(PerfilVeterinariaActivity.intent(requireContext(), elemento.id, ubicacion?.latitude, ubicacion?.longitude))
+            return
+        }
         binding.mapa.controller.animateTo(GeoPoint(elemento.lat, elemento.lng))
         binding.tarjetaTitulo.text = elemento.nombre
         binding.tarjetaEtiquetas.text = textoEtiquetas(elemento)

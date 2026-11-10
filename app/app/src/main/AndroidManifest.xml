@@ -85,6 +85,19 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".mapa.PerfilVeterinariaActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".resena.ResenasActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".resena.EscribirResenaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".cuidado.InfoPreventivaActivity"
             android:exported="false" />
 

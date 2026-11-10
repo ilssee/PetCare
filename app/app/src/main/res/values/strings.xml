@@ -240,6 +240,66 @@
     <string name="cercania_ubicacion_no_disponible">No se pudo obtener tu ubicación. Revisa que el GPS esté activado.</string>
     <string name="cercania_mi_ubicacion">Mi ubicación actual</string>
     <string name="cercania_ubicacion_elegida">Ubicación elegida en el mapa</string>
+
+    <!-- Perfil de la veterinaria (RF41) -->
+    <string name="mapa_cerrado">Cerrado</string>
+    <string name="perfil_titulo">Veterinaria</string>
+    <string name="perfil_pestana_servicios">Servicios</string>
+    <string name="perfil_pestana_contacto">Contacto</string>
+    <string name="perfil_pestana_resenas">Reseñas</string>
+    <string name="perfil_pestana_campanas">Campañas</string>
+    <string name="perfil_abierto">Abierto</string>
+    <string name="perfil_cerrado">Cerrado</string>
+    <string name="perfil_especies_titulo">ESPECIES QUE ATIENDE</string>
+    <string name="perfil_servicios_titulo">SERVICIOS QUE OFRECE</string>
+    <string name="perfil_un_servicio">1 servicio</string>
+    <string name="perfil_varios_servicios">%1$d servicios</string>
+    <string name="perfil_sin_servicios">Esta veterinaria todavía no registró sus servicios</string>
+    <string name="perfil_horario_titulo">HORARIO DE ATENCIÓN</string>
+    <string name="perfil_dias_y_horas">Días y horas</string>
+    <string name="perfil_hoy">Hoy</string>
+    <string name="perfil_contacto_titulo">TELÉFONOS Y REDES</string>
+    <string name="perfil_telefonos">Teléfonos</string>
+    <string name="perfil_redes">Redes sociales</string>
+    <string name="perfil_red_web">Web: %1$s</string>
+    <string name="perfil_una_resena">1 reseña</string>
+    <string name="perfil_varias_resenas">%1$d reseñas</string>
+    <string name="perfil_sin_resenas">Aún no hay reseñas</string>
+    <string name="perfil_ver_todas">Ver todas las reseñas</string>
+    <string name="perfil_escribir_resena">Escribir una reseña</string>
+    <string name="perfil_foto_contador">%1$d/%2$d</string>
+    <string name="perfil_no_cargo">No se pudo cargar el perfil</string>
+    <string-array name="dias_abreviados">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+
+    <!-- Reseñas (RF44 a RF46) -->
+    <string name="resenas_titulo">Reseñas</string>
+    <string name="resenas_recientes">Más recientes</string>
+    <string name="resenas_calificadas">Mejor calificadas</string>
+    <string name="resenas_editar">Editar</string>
+    <string name="resenas_eliminar">Eliminar</string>
+    <string name="resenas_eliminar_titulo">¿Eliminar tu reseña?</string>
+    <string name="resenas_eliminar_mensaje">Se quitará de la lista y no se puede deshacer.</string>
+    <string name="resenas_escribir_titulo">Escribir reseña</string>
+    <string name="resenas_editar_titulo">Editar reseña</string>
+    <string name="resenas_tu_calificacion">Tu calificación (1 a 5)</string>
+    <string name="resenas_tu_comentario">Tu comentario (opcional)</string>
+    <string name="resenas_comentario_hint">Cuéntanos cómo fue tu experiencia</string>
+    <string name="resenas_enviar">Enviar reseña</string>
+    <string name="resenas_guardar_cambios">Guardar cambios</string>
+    <string name="resenas_sin_calificacion">Selecciona una calificación para enviar tu reseña</string>
+    <string name="resenas_enviada">Reseña enviada</string>
+    <string name="resenas_actualizada">Reseña actualizada</string>
+    <string name="resenas_eliminada">Reseña eliminada</string>
+    <string name="resenas_no_se_pudo">La operación no pudo realizarse</string>
+    <string name="resenas_descripcion_estrella">Calificar con %1$d estrellas</string>
     <string name="perfil_cerrar_sesion">Cerrar sesión</string>
     <string name="perfil_cambiar_contrasena">Cambiar contraseña</string>
     <string name="boton_guardar">Guardar</string>

@@ -10,6 +10,7 @@ import { recordatorioRoutes } from './modules/recordatorio/recordatorio.routes';
 import { dispositivoRoutes } from './modules/dispositivo/dispositivo.routes';
 import { mapaRoutes } from './modules/mapa/mapa.routes';
 import { cercaniaRoutes } from './modules/cercania/cercania.routes';
+import { resenaRoutes } from './modules/resena/resena.routes';
 
 /** Aplicación Express. Aquí se registran las rutas de cada módulo. */
 export const app = express();
@@ -46,6 +47,7 @@ app.use('/recordatorios', recordatorioRoutes); // /recordatorios (días de aviso
 app.use('/dispositivos', dispositivoRoutes); // /dispositivos (celulares para las notificaciones)
 app.use('/mapa', mapaRoutes); // /mapa/veterinarias, /mapa/campanas, /mapa/buscar, /mapa/filtros
 app.use('/cercania', cercaniaRoutes); // /cercania (ubicación de referencia, radio y avisos)
+app.use('/resenas', resenaRoutes); // /resenas (consultar, escribir, editar y eliminar reseñas)
 
 // Debe ir al final: atrapa los errores de todas las rutas anteriores.
 app.use(manejarErrores);

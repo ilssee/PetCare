@@ -1,10 +1,17 @@
 import { Request, Response } from 'express';
+import { HttpError } from '../../common/errors/http-error';
 import * as servicio from './mapa.service';
 
 /** Capa HTTP del módulo mapa. */
 
 export async function veterinarias(req: Request, res: Response) {
   res.json(await servicio.veterinarias(req.query));
+}
+
+export async function perfilDeVeterinaria(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) throw new HttpError(400, 'El id de la veterinaria no es válido');
+  res.json(await servicio.perfil(id, res.locals.usuarioId, req.query));
 }
 
 export async function campanas(req: Request, res: Response) {

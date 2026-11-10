@@ -11,6 +11,7 @@ import * as controlador from './mapa.controller';
  *
  * GET /mapa/veterinarias  tipo=municipal,privada  especie=perro,gato  servicio=1,2
  *                         disponibleAhora=true  ordenar=distancia|calificacion|nombre
+ * GET /mapa/veterinarias/:id   perfil completo de una veterinaria (RF41); acepta lat y lng
  * GET /mapa/campanas      estado=proxima,activa  especie  servicio  costo=gratuita,de_pago
  *                         disponibleAhora=true  ordenar=inicio|fin|distancia|calificacion
  * GET /mapa/buscar        texto=...   (veterinarias, entidades organizadoras y campañas por nombre)
@@ -23,6 +24,7 @@ export const mapaRoutes = Router();
 mapaRoutes.use(exigirSesion);
 
 mapaRoutes.get('/veterinarias', controlador.veterinarias);
+mapaRoutes.get('/veterinarias/:id', controlador.perfilDeVeterinaria);
 mapaRoutes.get('/campanas', controlador.campanas);
 mapaRoutes.get('/buscar', controlador.buscar);
 mapaRoutes.get('/filtros', controlador.filtros);

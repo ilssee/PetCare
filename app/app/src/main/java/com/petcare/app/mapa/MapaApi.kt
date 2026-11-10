@@ -2,6 +2,7 @@ package com.petcare.app.mapa
 
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -19,6 +20,13 @@ interface MapaApi {
         @Query("lat") lat: Double?,
         @Query("lng") lng: Double?,
     ): Response<List<VeterinariaRespuesta>>
+
+    @GET("mapa/veterinarias/{id}")
+    suspend fun perfil(
+        @Path("id") id: Int,
+        @Query("lat") lat: Double?,
+        @Query("lng") lng: Double?,
+    ): Response<PerfilVeterinariaRespuesta>
 
     @GET("mapa/campanas")
     suspend fun campanas(

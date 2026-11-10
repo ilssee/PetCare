@@ -1,5 +1,6 @@
 import { HttpError } from '../../common/errors/http-error';
 import { ahoraEnLima, buscarPorNombre, listarCampanas, listarVeterinarias } from './mapa.logica';
+import { perfilDeVeterinaria } from './mapa.perfil';
 import * as repositorio from './mapa.repository';
 import {
   Area,
@@ -153,4 +154,9 @@ export async function buscar(c: Consulta): Promise<ResultadoBusqueda[]> {
 /** Opciones para los filtros de la app: especies y servicios agrupados por categoría. */
 export async function filtros() {
   return repositorio.cargarCatalogos();
+}
+
+/** RF41: el perfil completo de una veterinaria. Con lat y lng en la URL se calcula la distancia. */
+export async function perfil(id: number, usuarioId: number, c: Consulta) {
+  return perfilDeVeterinaria(id, usuarioId, leerOrigen(c));
 }

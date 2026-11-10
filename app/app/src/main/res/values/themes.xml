@@ -143,4 +143,15 @@
         <item name="android:textColor">@color/petcare_texto_suave</item>
         <item name="android:textSize">11sp</item>
     </style>
+
+    <!-- Perfil de la veterinaria: una pestaña de la barra Servicios, Contacto, Reseñas, Campañas -->
+    <style name="PestanaPerfil">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textColor">@color/petcare_text_muted</item>
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>
