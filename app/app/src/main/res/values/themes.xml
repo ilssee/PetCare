@@ -86,4 +86,61 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
     </style>
+
+    <!-- Mapa: botones pequeños del listado (Ordenar y Filtros) -->
+    <style name="PildoraMapa">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_chip_filtro</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:textColor">@color/petcare_primary_dark</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- Mapa: leyenda de colores -->
+    <style name="FilaLeyenda">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+    </style>
+
+    <style name="PuntoLeyenda">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:background">@drawable/bg_punto_leyenda</item>
+    </style>
+
+    <style name="TextoLeyenda">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:textColor">@color/petcare_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Avisos cerca de ti: títulos de sección en mayúsculas pequeñas -->
+    <style name="EtiquetaSeccionCercania">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textColor">@color/petcare_text_muted</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="MarcaDistancia">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/petcare_texto_suave</item>
+        <item name="android:textSize">11sp</item>
+    </style>
 </resources>

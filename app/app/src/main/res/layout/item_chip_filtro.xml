@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Opción de un filtro del mapa: se marca y se desmarca (el color lo cambia el código) -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_chip_opcion"
+    android:clickable="true"
+    android:focusable="true"
+    android:fontFamily="@font/poppins_regular"
+    android:paddingStart="16dp"
+    android:paddingTop="9dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="9dp"
+    android:textColor="@color/petcare_text"
+    android:textSize="14sp" />

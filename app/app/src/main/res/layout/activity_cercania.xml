@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/raiz"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/botonVolver"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_boton_volver"
+            android:contentDescription="@string/descripcion_volver"
+            android:padding="10dp"
+            android:src="@drawable/ic_volver" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/cercania_titulo"
+            android:textColor="@color/petcare_text"
+            android:textSize="19sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/petcare_border" />
+
+    <ScrollView
+        android:id="@+id/desplazamiento"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cercania_descripcion"
+                android:textColor="@color/petcare_text_muted"
+                android:textSize="14sp" />
+
+            <TextView
+                style="@style/EtiquetaSeccionCercania"
+                android:text="@string/cercania_ubicacion_referencia" />
+
+            <!-- Buscador de direcciones -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_campo"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_buscar" />
+
+                <EditText
+                    android:id="@+id/campoDireccion"
+                    style="@style/CampoTexto"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/poppins_regular"
+                    android:hint="@string/cercania_buscar_hint"
+                    android:imeOptions="actionSearch"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLength="120"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- Direcciones sugeridas mientras se escribe -->
+            <LinearLayout
+                android:id="@+id/sugerencias"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_tarjeta_borde"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/botonUbicacionActual"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_pildora_ordenar"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="16dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_objetivo"
+                    android:tint="@color/petcare_primary_dark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="@string/cercania_usar_mi_ubicacion"
+                    android:textColor="@color/petcare_primary_dark"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Mapa pequeño con el marcador y el círculo del radio -->
+            <FrameLayout
+                android:id="@+id/contenedorMapa"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_mapa_cercania"
+                android:clipToOutline="true">
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/mapa"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/indicacionMapa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_etiqueta_pildora"
+                    android:fontFamily="@font/poppins_regular"
+                    android:paddingStart="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:text="@string/cercania_indicacion_mapa"
+                    android:textColor="@color/petcare_text_muted"
+                    android:textSize="12sp" />
+            </FrameLayout>
+
+            <!-- Radio de interés -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/EtiquetaSeccionCercania"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/cercania_distancia" />
+
+                <TextView
+                    android:id="@+id/textoDistancia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textColor="@color/petcare_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <SeekBar
+                android:id="@+id/barraDistancia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-8dp"
+                android:layout_marginEnd="-8dp"
+                android:max="9"
+                android:progress="2"
+                android:progressBackgroundTint="@color/petcare_border"
+                android:progressTint="@color/petcare_primary"
+                android:thumbTint="@color/petcare_primary" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/MarcaDistancia"
+                    android:layout_gravity="start"
+                    android:text="@string/cercania_marca_1" />
+
+                <TextView
+                    style="@style/MarcaDistancia"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/cercania_marca_5" />
+
+                <TextView
+                    style="@style/MarcaDistancia"
+                    android:layout_gravity="end"
+                    android:text="@string/cercania_marca_10" />
+            </FrameLayout>
+
+            <TextView
+                style="@style/EtiquetaSeccionCercania"
+                android:text="@string/cercania_que_avisar" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_campo"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="@string/cercania_nuevas_campanas"
+                    android:textColor="@color/petcare_text"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/interruptorCampanas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_campo"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="@string/cercania_nuevas_veterinarias"
+                    android:textColor="@color/petcare_text"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/interruptorVeterinarias"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textoError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/petcare_error"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/botonGuardar"
+            style="@style/BotonPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/cercania_guardar" />
+    </LinearLayout>
+</LinearLayout>

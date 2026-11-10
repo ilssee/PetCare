@@ -10,11 +10,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.petcare.app.common.PlaceholderFragment
 import com.petcare.app.common.SessionManager
 import com.petcare.app.databinding.ActivityMainBinding
 import com.petcare.app.cronograma.CronogramaFragment
 import com.petcare.app.cuidado.CuidadosFragment
+import com.petcare.app.mapa.MapaFragment
 import com.petcare.app.mascota.MascotasFragment
 import com.petcare.app.notificacion.Notificaciones
 import com.petcare.app.usuario.LoginActivity
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
                 when (opcion.itemId) {
                     R.id.nav_cronograma -> CronogramaFragment()
                     R.id.nav_cuidados -> CuidadosFragment()
-                    R.id.nav_mapa -> PlaceholderFragment.nuevo(getString(R.string.nav_mapa))
+                    R.id.nav_mapa -> MapaFragment()
                     R.id.nav_perfil -> PerfilFragment()
                     else -> MascotasFragment()
                 },
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            binding.navegacion.selectedItemId = intent.getIntExtra(EXTRA_SECCION, R.id.nav_mascotas)
+            binding.navegacion.selectedItemId = seccionPedida(intent)
             activarNotificaciones()
         }
     }
@@ -81,7 +81,21 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         if (::binding.isInitialized && intent.hasExtra(EXTRA_SECCION)) {
-            binding.navegacion.selectedItemId = intent.getIntExtra(EXTRA_SECCION, R.id.nav_mascotas)
+            binding.navegacion.selectedItemId = seccionPedida(intent)
+        }
+    }
+
+    /**
+     * Sección que debe abrirse. Las pantallas de la app envían el id de la opción (un número). Los avisos
+     * push que se tocan con la app cerrada traen el nombre de la sección como texto ("mapa" o "cuidados").
+     */
+    private fun seccionPedida(intent: Intent): Int {
+        val id = intent.getIntExtra(EXTRA_SECCION, 0)
+        if (id != 0) return id
+        return when (intent.getStringExtra(EXTRA_SECCION)) {
+            "mapa" -> R.id.nav_mapa
+            "cuidados" -> R.id.nav_cuidados
+            else -> R.id.nav_mascotas
         }
     }
 

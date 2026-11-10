@@ -66,6 +66,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
     implementation(libs.coroutines.play.services)
+    implementation(libs.osmdroid) // mapa de OpenStreetMap, sin clave ni cuenta
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
