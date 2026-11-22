@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.petcare.app.R
 import com.petcare.app.databinding.ItemMascotaBinding
 
 /** Muestra cada mascota como una tarjeta del color de su especie. */
@@ -34,6 +35,9 @@ class MascotaAdapter(
         b.edad.visibility = if (mascota.edadTexto == null) View.GONE else View.VISIBLE
         b.sexo.text = mascota.sexo.conPrimeraMayuscula()
         b.inactiva.visibility = if (mascota.estaInactiva) View.VISIBLE else View.GONE
+        b.cuidados.text = b.root.resources.getQuantityString(
+            R.plurals.mascota_total_cuidados, mascota.totalCuidados, mascota.totalCuidados,
+        )
         b.ilustracion.mostrarMascota(mascota)
         b.tarjeta.setOnClickListener { alTocar(mascota) }
     }

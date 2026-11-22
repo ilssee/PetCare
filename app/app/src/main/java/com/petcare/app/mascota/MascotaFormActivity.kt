@@ -16,6 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.petcare.app.R
 import com.petcare.app.common.respetarBarrasYTeclado
+import com.petcare.app.common.confirmarAlRetroceder
+import com.petcare.app.common.salirConfirmando
 import com.petcare.app.common.Imagenes
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
@@ -41,6 +43,9 @@ class MascotaFormActivity : AppCompatActivity() {
     private var fotoNueva: ByteArray? = null
     private var fotoActual: String? = null
     private var quitarFotoActual = false
+
+    // Estado del formulario al abrirlo (o al terminar de cargar la mascota), para saber si hay cambios sin guardar.
+    private var estadoInicial: List<Any?>? = null
 
     // Selector de fotos de Android: no necesita pedir permisos al usuario.
     private val elegirFoto = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -69,7 +74,8 @@ class MascotaFormActivity : AppCompatActivity() {
 
         mascotaId = intent.getIntExtra(EXTRA_ID, 0)
 
-        binding.botonVolver.setOnClickListener { finish() }
+        binding.botonVolver.setOnClickListener { salirConfirmando(::hayCambiosSinGuardar) }
+        confirmarAlRetroceder(::hayCambiosSinGuardar)
         binding.tarjetaPerro.setOnClickListener { elegirEspecie("perro") }
         binding.tarjetaGato.setOnClickListener { elegirEspecie("gato") }
         binding.tarjetaConejo.setOnClickListener { elegirEspecie("conejo") }
@@ -99,7 +105,26 @@ class MascotaFormActivity : AppCompatActivity() {
                 it.alpha = 0.6f
             }
             cargarMascota()
+        } else {
+            estadoInicial = estado()
         }
+    }
+
+    private fun estado(): List<Any?> = listOf(
+        binding.campoNombre.text.toString().trim(),
+        binding.campoRaza.text.toString().trim(),
+        binding.campoPeso.text.toString().trim(),
+        especie,
+        sexo,
+        fechaNacimiento,
+        fotoNueva != null,
+        quitarFotoActual,
+    )
+
+    /** Al editar, solo cuenta una vez cargada la mascota: antes no hay nada que perder. */
+    private fun hayCambiosSinGuardar(): Boolean {
+        val inicial = estadoInicial ?: return false
+        return estado() != inicial
     }
 
     private fun cargarMascota() {
@@ -115,6 +140,7 @@ class MascotaFormActivity : AppCompatActivity() {
                     binding.campoPeso.setText(m.peso?.comoPeso() ?: "")
                     fotoActual = m.foto
                     actualizarFoto()
+                    estadoInicial = estado()
                 }
                 is Resultado.Fallo -> mostrarError(resultado.paraMostrar(this@MascotaFormActivity))
             }

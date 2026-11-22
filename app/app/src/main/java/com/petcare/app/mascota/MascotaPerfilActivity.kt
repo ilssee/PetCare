@@ -105,7 +105,7 @@ class MascotaPerfilActivity : AppCompatActivity() {
         cargarProximosCuidados(m)
     }
 
-    /** Los tres cuidados pendientes más próximos de la mascota, con los vencidos primero. */
+    /** Los dos cuidados pendientes más próximos de la mascota, con los vencidos primero. */
     private fun cargarProximosCuidados(m: MascotaRespuesta) {
         lifecycleScope.launch {
             when (val resultado = cuidados.listar(m.id, "pendientes")) {
@@ -200,6 +200,6 @@ class MascotaPerfilActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ID = "mascota_id"
-        private const val MAXIMO_PROXIMOS = 3
+        private const val MAXIMO_PROXIMOS = 2
     }
 }

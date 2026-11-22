@@ -2,12 +2,14 @@ package com.petcare.app.cuidado
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.petcare.app.MainActivity
@@ -51,6 +53,7 @@ class PropuestaActivity : AppCompatActivity() {
 
     // Paso 2: los cuidados elegidos, cuál se está configurando y los ya configurados.
     private var configurando = false
+    private var enError = false
     private var seleccion: List<RecomendacionRespuesta> = emptyList()
     private var paso = 0
     private val configurados = mutableListOf<CuidadoElegido>()
@@ -73,7 +76,13 @@ class PropuestaActivity : AppCompatActivity() {
             }
         })
         binding.botonVolver.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        binding.botonPrincipal.setOnClickListener { if (configurando) confirmarPaso() else comenzarConfiguracion() }
+        binding.botonPrincipal.setOnClickListener {
+            when {
+                enError -> reintentarCarga()
+                configurando -> confirmarPaso()
+                else -> comenzarConfiguracion()
+            }
+        }
         binding.botonSecundario.setOnClickListener { if (configurando) avanzar() else finish() }
         binding.seleccionarTodos.setOnClickListener { alternarSeleccionDeTodos() }
         binding.expandirTodo.setOnClickListener { alternarExpansionDeTodos() }
@@ -104,6 +113,8 @@ class PropuestaActivity : AppCompatActivity() {
 
     private fun mostrarLista() {
         configurando = false
+        enError = false
+        binding.vistaError.root.visibility = View.GONE
         binding.tituloPantalla.setText(R.string.propuesta_titulo)
         binding.seccionFormulario.visibility = View.GONE
         binding.seccionLista.visibility = View.VISIBLE
@@ -310,9 +321,34 @@ class PropuestaActivity : AppCompatActivity() {
         finish()
     }
 
+    /** Aviso centrado con "Reintentar" (vuelve a pedir la propuesta) y "Ahora no" (cierra la pantalla). */
     private fun mostrarError(mensaje: String) {
-        binding.textoError.text = mensaje
-        binding.textoError.visibility = View.VISIBLE
+        enError = true
+        configurando = false
+        binding.seccionLista.visibility = View.INVISIBLE
+        binding.vistaError.configurar(R.drawable.ic_info, R.string.propuesta_error_titulo, R.string.propuesta_error_generar) {}
+        binding.vistaError.mensaje.text = mensaje
+        binding.vistaError.boton.visibility = View.GONE
+        // Es un error: ícono y título en rojo; el mensaje queda en gris suave
+        val rojo = ContextCompat.getColor(this, R.color.petcare_error)
+        binding.vistaError.icono.imageTintList = ColorStateList.valueOf(rojo)
+        binding.vistaError.titulo.setTextColor(rojo)
+        binding.vistaError.root.visibility = View.VISIBLE
+
+        binding.pie.visibility = View.VISIBLE
+        binding.botonPrincipal.isEnabled = true
+        binding.botonPrincipal.alpha = 1f
+        binding.botonPrincipal.setText(R.string.reintentar)
+        binding.botonSecundario.setText(R.string.propuesta_ahora_no)
+        binding.botonSecundario.isEnabled = true
+        binding.botonSecundario.visibility = View.VISIBLE
+    }
+
+    private fun reintentarCarga() {
+        enError = false
+        binding.vistaError.root.visibility = View.GONE
+        binding.pie.visibility = View.GONE
+        cargar()
     }
 
     companion object {

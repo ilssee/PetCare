@@ -106,6 +106,14 @@
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- Aviso de notificaciones apagadas: se muestra solo cuando hace falta -->
+        <include
+            android:id="@+id/avisoNotificaciones"
+            layout="@layout/vista_aviso_notificaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" />
     </LinearLayout>
 
     <!-- Hoja blanca -->

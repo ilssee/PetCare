@@ -167,6 +167,21 @@ export async function listarActividades(cuidadoIds: number[]): Promise<Actividad
 }
 
 /** Lo que cambia en el cuidado cuando se completa una actividad o se anula. */
+/**
+ * RF08: al reactivar una mascota, sus cuidados con frecuencia que ya vencieron pasan a la fecha de
+ * reactivación. Los que aún no vencieron y los de una sola vez conservan su fecha. Un cuidado cuyo
+ * límite ya pasó tampoco se mueve, porque la nueva fecha quedaría fuera de su plazo.
+ */
+export async function reprogramarVencidosAlReactivar(mascotaId: number, hoy: string): Promise<number> {
+  const [resultado] = await pool.query<ResultSetHeader>(
+    `UPDATE cuidado SET fecha_recurrente = ?
+     WHERE mascota_id = ? AND estado = 'pendiente' AND modo_termino <> 'una_vez'
+       AND fecha_recurrente < ? AND (fecha_limite IS NULL OR fecha_limite >= ?)`,
+    [hoy, mascotaId, hoy, hoy],
+  );
+  return resultado.affectedRows;
+}
+
 export interface CambiosCuidado {
   fechaRecurrente: string;
   totalRepeticiones: number | null;

@@ -27,8 +27,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.chip.ChipGroup
 import com.petcare.app.R
+import com.petcare.app.common.CuadriculaDeOpciones
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.UbicacionActual
 import com.petcare.app.common.paraMostrar
@@ -631,14 +631,14 @@ class MapaFragment : Fragment() {
         setPadding(0, dp(16), 0, dp(8))
     }
 
-    /** Un opción del filtro: se ve en blanco y, al elegirla, en verde azulado claro con borde. */
+    /** Una opción del filtro, igual que en Cuidados: borde gris fino y, al elegirla, borde verde azulado grueso. */
     private fun <T> crearOpcion(padre: ViewGroup, etiqueta: String, elegidas: MutableSet<T>, clave: T, alCambiar: () -> Unit): TextView {
         val opcion = layoutInflater.inflate(R.layout.item_chip_filtro, padre, false) as TextView
         opcion.text = etiqueta
         fun pintar() {
             val activa = clave in elegidas
             opcion.setBackgroundResource(if (activa) R.drawable.bg_chip_opcion_activo else R.drawable.bg_chip_opcion)
-            opcion.setTextColor(color(if (activa) R.color.petcare_primary_dark else R.color.petcare_text))
+            opcion.setTextColor(color(if (activa) R.color.petcare_text else R.color.petcare_text_muted))
         }
         pintar()
         opcion.setOnClickListener {
@@ -649,12 +649,7 @@ class MapaFragment : Fragment() {
         return opcion
     }
 
-    private fun grupoDeOpciones() = ChipGroup(requireContext()).apply {
-        chipSpacingHorizontal = dp(8)
-        chipSpacingVertical = dp(8)
-    }
-
-    /** Un título y sus opciones en la hoja de filtros. */
+    /** Un título y sus opciones en la hoja de filtros: hasta tres por fila, repartidas en todo el ancho. */
     private fun <T> agregarSeccion(
         hoja: HojaFiltrosMapaBinding,
         @StringRes titulo: Int,
@@ -663,10 +658,9 @@ class MapaFragment : Fragment() {
         alCambiar: () -> Unit,
     ) {
         if (opciones.isEmpty()) return
-        val grupo = grupoDeOpciones()
-        for ((clave, etiqueta) in opciones) grupo.addView(crearOpcion(grupo, etiqueta, elegidas, clave, alCambiar))
+        val vistas = opciones.map { (clave, etiqueta) -> crearOpcion(hoja.secciones, etiqueta, elegidas, clave, alCambiar) }
         hoja.secciones.addView(encabezadoDeSeccion(titulo))
-        hoja.secciones.addView(grupo)
+        hoja.secciones.addView(CuadriculaDeOpciones.crear(requireContext(), vistas, columnas = minOf(opciones.size, 3), separacion = dp(10)))
     }
 
     /** Los servicios van en una caja con sus tres categorías, que se abren y se cierran. */
@@ -716,20 +710,21 @@ class MapaFragment : Fragment() {
             cabecera.addView(contador)
             cabecera.addView(flecha)
 
-            val grupo = grupoDeOpciones().apply {
-                visibility = View.GONE
-                setPadding(0, 0, 0, dp(14))
-            }
             fun actualizarContador() {
                 val cantidad = lista.count { it.id in elegidos }
                 contador.isVisible = cantidad > 0
                 contador.text = cantidad.toString()
             }
-            for (servicio in lista) {
-                grupo.addView(crearOpcion(grupo, servicio.nombre, elegidos, servicio.id) {
+            val opciones = lista.map { servicio ->
+                crearOpcion(hoja.secciones, servicio.nombre, elegidos, servicio.id) {
                     actualizarContador()
                     alCambiar()
-                })
+                }
+            }
+            // Dos columnas iguales; si queda una sola al final, ocupa toda la fila.
+            val grupo = CuadriculaDeOpciones.crear(requireContext(), opciones, columnas = 2, separacion = dp(10)).apply {
+                visibility = View.GONE
+                setPadding(0, 0, 0, dp(14))
             }
             actualizarContador()
             cabecera.setOnClickListener {

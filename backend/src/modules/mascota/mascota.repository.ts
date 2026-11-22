@@ -6,7 +6,9 @@ import { DatosMascota, EstadoMascota, MascotaRegistro } from './mascota.types';
 
 const SELECT_MASCOTA = `
   SELECT m.id, m.nombre, e.nombre AS especie, m.raza, m.fecha_nacimiento AS fechaNacimiento,
-         m.sexo, m.peso, m.foto, m.estado
+         m.sexo, m.peso, m.foto, m.estado,
+         (SELECT COUNT(*) FROM cuidado c
+           WHERE c.mascota_id = m.id AND c.estado <> 'eliminado') AS totalCuidados
   FROM mascota m
   JOIN especie e ON e.id = m.especie_id`;
 

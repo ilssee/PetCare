@@ -12,6 +12,7 @@ export interface MascotaRegistro {
   peso: number | null; // kilogramos
   foto: string | null;
   estado: EstadoMascota;
+  totalCuidados: number; // todos sus cuidados (pendientes y finalizados), sin contar sus actividades
 }
 
 /** Mascota que se devuelve a la app: incluye la edad calculada (dato derivado, no se guarda). */

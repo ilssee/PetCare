@@ -121,16 +121,16 @@
     <string name="especie_conejo">Conejo</string>
     <string name="etiqueta_especie">Especie</string>
     <string name="etiqueta_raza">Raza</string>
-    <string name="hint_raza">Siamés</string>
+    <string name="hint_raza">Ej. Siamés</string>
     <string name="etiqueta_nombre_mascota">Nombre</string>
-    <string name="hint_nombre_mascota">Coco</string>
+    <string name="hint_nombre_mascota">Ej. Coco</string>
     <string name="etiqueta_nacimiento">Fecha de nacimiento</string>
     <string name="hint_fecha">dd/mm/aaaa</string>
     <string name="etiqueta_sexo">Sexo</string>
     <string name="sexo_macho">Macho</string>
     <string name="sexo_hembra">Hembra</string>
     <string name="etiqueta_peso">Peso (kg)</string>
-    <string name="hint_peso">12.5</string>
+    <string name="hint_peso">Ej. 12.5</string>
     <string name="mascota_nueva_titulo">Nueva mascota</string>
     <string name="mascota_editar_titulo">Editar mascota</string>
     <string name="mascota_registrar">Registrar mascota</string>
@@ -199,8 +199,8 @@
     <string name="descripcion_buscar">Buscar</string>
 
     <!-- Mascotas existentes, pero ninguna activa -->
-    <string name="sin_activas_titulo">Sin mascotas activas</string>
-    <string name="sin_activas_mensaje">Reactiva una mascota o agrega otra para gestionar sus cuidados.</string>
+    <string name="sin_activas_titulo">Aún no hay mascotas activas</string>
+    <string name="sin_activas_mensaje">Reactiva una mascota o agrega una nueva para empezar a gestionar sus cuidados.</string>
 
     <!-- Con mascotas, pero sin ningún cuidado registrado -->
     <string name="sin_cuidados_titulo">Aún no hay cuidados registrados</string>
@@ -212,7 +212,7 @@
     <string name="perfil_stat_cuidados">cuidados</string>
     <string name="perfil_stat_resenas">reseñas</string>
     <string name="perfil_editar">Editar perfil</string>
-    <string name="perfil_editar_sub">Nombre y correo</string>
+    <string name="perfil_editar_sub">Nombre, correo y contraseña</string>
     <string name="perfil_recordatorios">Recordatorios</string>
     <string name="perfil_recordatorios_sub">Días en que prefieres que te avisemos</string>
     <string name="perfil_avisos">Avisos cerca de ti</string>
@@ -271,6 +271,7 @@
     <string name="perfil_no_cargo">No se pudo cargar el perfil</string>
 
     <!-- Detalle de una campaña (RF43) -->
+    <string name="perfil_sin_campanas_estado">No hay campañas en este estado</string>
     <string name="campana_titulo">Campaña</string>
     <string name="campana_organiza">Organiza</string>
     <string name="campana_dirigida_a">DIRIGIDA A</string>
@@ -284,6 +285,11 @@
     <string name="campana_resenas_titulo">RESEÑAS DEL ORGANIZADOR</string>
     <string name="campana_ver_resenas">Ver reseñas de %1$s</string>
     <string name="campana_no_cargo">No es posible visualizar el detalle de la campaña</string>
+    <string name="campana_sin_direccion">Ubicación en el mapa</string>
+
+    <!-- Cómo llegar y enlaces (RF41) -->
+    <string name="como_llegar">Cómo llegar</string>
+    <string name="enlace_sin_aplicacion">No hay una aplicación para abrir este enlace</string>
     <string-array name="dias_abreviados">
         <item>Lun</item>
         <item>Mar</item>
@@ -323,6 +329,10 @@
     <string name="etiqueta_contrasena_nueva">Nueva contraseña</string>
     <string name="etiqueta_contrasena_repetir">Repetir nueva contraseña</string>
     <string name="perfil_actualizado">Perfil actualizado correctamente</string>
+    <string name="descartar_cambios_titulo">¿Descartar cambios?</string>
+    <string name="descartar_cambios_mensaje">Tienes cambios sin guardar. Si sales, se perderán.</string>
+    <string name="descartar_cambios_seguir">Seguir editando</string>
+    <string name="descartar_cambios_descartar">Descartar</string>
     <string name="contrasena_actualizada">Contraseña actualizada correctamente</string>
     <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
     <string name="error_contrasena_largo">La contraseña debe tener entre 8 y 64 caracteres</string>
@@ -412,7 +422,7 @@ para esta semana</item>
     <string name="cronograma_esta_semana">ESTA SEMANA</string>
     <string name="cronograma_proxima_semana">PRÓXIMA SEMANA</string>
     <string name="cronograma_mas_adelante">MÁS ADELANTE</string>
-    <string name="cronograma_mostrar_todo">Mostrar todo</string>
+    <string name="cronograma_mostrar_todo">Ver todos los días</string>
     <string name="cronograma_mascota_frecuencia">%1$s · %2$s</string>
     <string name="cronograma_dia_vacio_titulo">Sin cuidados este día</string>
     <string name="cronograma_dia_vacio_mensaje">No hay cuidados programados para esta fecha.</string>
@@ -444,6 +454,20 @@ para esta semana</item>
     <string name="cuidado_activado">Activado</string>
     <string name="cuidado_desactivado">Desactivado</string>
     <string name="cuidado_historial">HISTORIAL</string>
+    <string name="cuidado_historial_cantidad">HISTORIAL (%1$d)</string>
+    <string name="cuidado_historial_ver_todas">Ver todas (%1$d)</string>
+    <string name="cuidado_historial_ver_menos">Ver menos</string>
+    <!-- Detalles del cuidado: duración y aviso escritos como frases -->
+    <plurals name="cuidado_repite_veces">
+        <item quantity="one">Se repite %d vez</item>
+        <item quantity="other">Se repite %d veces</item>
+    </plurals>
+    <string name="cuidado_nota_titulo">Nota personal</string>
+    <string name="cuidado_repite_hasta">Se repite hasta el %1$s</string>
+    <string name="cuidado_repite_indefinido">Se repite sin fecha final</string>
+    <string name="cuidado_repite_una_vez">Se hace una sola vez</string>
+    <string name="cuidado_aviso_frase_activado">Te avisaremos antes de la fecha</string>
+    <string name="cuidado_aviso_frase_desactivado">Sin aviso anticipado</string>
     <string name="cuidado_sin_historial">Aún no hay actividades en el historial</string>
     <string name="cuidado_actividad_completada">Completada</string>
     <string name="cuidado_actividad_anulada">Anulada</string>
@@ -453,6 +477,11 @@ para esta semana</item>
     <string name="cada_mes">Cada mes</string>
     <string name="cada_anio">Cada año</string>
     <string name="cada_n">Cada %1$d %2$s</string>
+    <!-- Lista de mascotas: cantidad de cuidados de cada una -->
+    <plurals name="mascota_total_cuidados">
+        <item quantity="one">%d cuidado</item>
+        <item quantity="other">%d cuidados</item>
+    </plurals>
     <plurals name="cuidado_veces">
         <item quantity="one">%d vez</item>
         <item quantity="other">%d veces</item>
@@ -483,7 +512,7 @@ para esta semana</item>
     <string name="cuidado_etiqueta_nombre">Nombre del cuidado</string>
     <string name="cuidado_hint_nombre">Ej. Control de pulgas</string>
     <string name="cuidado_etiqueta_descripcion_opcional">Descripción (opcional)</string>
-    <string name="cuidado_hint_descripcion">Detalles del cuidado</string>
+    <string name="cuidado_hint_descripcion">Ej. Se aplica una vez al mes</string>
 
     <!-- Pantalla que sigue al registro de una mascota -->
     <string name="registrado_titulo_macho">¡%1$s fue registrado!</string>
@@ -505,7 +534,11 @@ para esta semana</item>
     <string name="propuesta_confirmar">Confirmar cronograma (%1$d)</string>
     <string name="propuesta_seleccionar_uno">Selecciona al menos un cuidado</string>
     <string name="propuesta_ahora_no">Ahora no</string>
-    <string name="propuesta_todo_agregado_titulo">Todo agregado</string>
+    <string name="propuesta_error_titulo">No se pudo generar la propuesta</string>
+    <string name="cuidado_aviso_permiso">Para recibir el aviso anticipado, permite las notificaciones de PetCare.</string>
+    <string name="cuidado_aviso_abrir_ajustes">Abrir ajustes</string>
+    <string name="notificaciones_apagadas">Las notificaciones están desactivadas: <b>no recibirás tus recordatorios.</b></string>
+    <string name="notificaciones_activar">Activar</string>    <string name="propuesta_todo_agregado_titulo">Todo agregado</string>
     <string name="propuesta_todo_agregado_mensaje">Ya tienes todos los cuidados recomendados en el cronograma.</string>
     <string name="propuesta_error_generar">El perfil fue guardado pero no se pudo generar la propuesta de cronograma</string>
     <string name="propuesta_ninguno_configurado">No configuraste ningún cuidado. Elige de nuevo o toca «Ahora no».</string>
@@ -546,7 +579,7 @@ para esta semana</item>
     </plurals>
     <string name="cuidado_etiqueta_inicio">Fecha de inicio</string>
     <string name="cuidado_aviso_titulo">Aviso anticipado</string>
-    <string name="cuidado_aviso_detalle">Te avisamos el día anterior al vencimiento</string>
+    <string name="cuidado_aviso_detalle">Te avisaremos antes de la fecha</string>
     <string name="cuidado_etiqueta_nota">Nota personal (opcional)</string>
     <string name="cuidado_hint_nota">Ej. Llevar libreta de vacunas</string>
     <string name="cuidado_confirmar">Confirmar</string>

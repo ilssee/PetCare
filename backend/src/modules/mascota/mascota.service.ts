@@ -1,6 +1,7 @@
 import { HttpError } from '../../common/errors/http-error';
 import { esFechaReal, fechaDeHoy } from '../../common/fechas';
 import { textoOpcional } from '../../common/texto';
+import * as cuidados from '../cuidado/cuidado.repository';
 import * as fotos from './mascota.fotos';
 import * as repositorio from './mascota.repository';
 import { DatosMascota, EstadoMascota, MascotaRegistro, MascotaRespuesta } from './mascota.types';
@@ -111,8 +112,12 @@ export async function cambiarEstado(
   usuarioId: number,
   estado: EstadoMascota,
 ): Promise<MascotaRespuesta> {
-  await obtenerPropia(id, usuarioId);
+  const mascota = await obtenerPropia(id, usuarioId);
   await repositorio.cambiarEstado(id, usuarioId, estado);
+  // RF08: al reactivar, los cuidados con frecuencia ya vencidos pasan a la fecha de reactivación.
+  if (estado === 'activa' && mascota.estado === 'inactiva') {
+    await cuidados.reprogramarVencidosAlReactivar(id, fechaDeHoy());
+  }
   return obtener(id, usuarioId);
 }
 

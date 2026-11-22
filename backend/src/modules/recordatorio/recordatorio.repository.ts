@@ -55,9 +55,11 @@ export async function guardarDias(usuarioId: number, dias: Dia[]): Promise<void>
 export async function cuidadosParaAvisar(hoy: string): Promise<CuidadoPorAvisar[]> {
   const [filas] = await pool.query<RowDataPacket[]>(
     `SELECT m.usuario_id AS usuarioId, c.id AS cuidadoId, c.nombre AS cuidado, m.nombre AS mascota,
-            c.fecha_recurrente AS fechaRecurrente, c.aviso_anticipado AS avisoAnticipado
+            c.fecha_recurrente AS fechaRecurrente, c.aviso_anticipado AS avisoAnticipado,
+            e.nombre AS especie
      FROM cuidado c
      JOIN mascota m ON m.id = c.mascota_id
+     JOIN especie e ON e.id = m.especie_id
      WHERE c.estado = 'pendiente' AND m.estado = 'activa'
        AND c.fecha_recurrente <= DATE_ADD(?, INTERVAL 7 DAY)
      ORDER BY m.usuario_id, c.fecha_recurrente, c.id`,

@@ -45,6 +45,30 @@ describe('a quién se avisa (RF39 y RF40)', () => {
     assert.match(aviso.cuerpo, /^Huellitas Pet Salud, a 2\.4 km de tu ubicación\.$/);
   });
 
+  it('el aviso lleva la variante del lugar para pintar el ícono como en el mapa', () => {
+    const [deCampana] = avisosDeLugar({ ...campanaCerca, variante: 'proxima' }, [usuario()]);
+    assert.equal(deCampana.variante, 'proxima');
+    const [deVeterinaria] = avisosDeLugar({ ...veterinariaCerca, variante: 'municipal' }, [usuario()]);
+    assert.equal(deVeterinaria.variante, 'municipal');
+    const [sinVariante] = avisosDeLugar(veterinariaCerca, [usuario()]);
+    assert.equal(sinVariante.variante, undefined);
+  });
+
+  it('el aviso dice qué pantalla abrir al tocarlo', () => {
+    // Veterinaria nueva: su perfil.
+    const [deVeterinaria] = avisosDeLugar(veterinariaCerca, [usuario()]);
+    assert.equal(deVeterinaria.lugarId, 20);
+    assert.equal(deVeterinaria.veterinariaId, 20);
+    // Campaña de una veterinaria: el perfil de esa veterinaria, con la campaña.
+    const [deVeterinariaConCampana] = avisosDeLugar({ ...campanaCerca, veterinariaId: 2 }, [usuario()]);
+    assert.equal(deVeterinariaConCampana.lugarId, 10);
+    assert.equal(deVeterinariaConCampana.veterinariaId, 2);
+    // Campaña de una entidad externa: solo la campaña (sin perfil de veterinaria).
+    const [externa] = avisosDeLugar(campanaCerca, [usuario()]);
+    assert.equal(externa.lugarId, 10);
+    assert.equal(externa.veterinariaId, undefined);
+  });
+
   it('no avisa si el lugar queda fuera del radio', () => {
     assert.deepEqual(avisosDeLugar(campanaLejos, [usuario()]), []);
   });

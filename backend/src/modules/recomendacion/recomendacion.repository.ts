@@ -17,9 +17,11 @@ export async function reglasSinNotificar(): Promise<number[]> {
 export async function coincidencias(reglasIds: number[]): Promise<Coincidencia[]> {
   if (reglasIds.length === 0) return [];
   const [filas] = await pool.query<RowDataPacket[]>(
-    `SELECT m.usuario_id AS usuarioId, m.id AS mascotaId, m.nombre AS mascota, r.id AS reglaId
+    `SELECT m.usuario_id AS usuarioId, m.id AS mascotaId, m.nombre AS mascota, r.id AS reglaId,
+            e.nombre AS especie
      FROM regla r
      JOIN mascota m ON m.especie_id = r.especie_id
+     JOIN especie e ON e.id = m.especie_id
      WHERE r.id IN (?)
        AND m.estado = 'activa'
        AND (r.sexo_aplicable IS NULL OR r.sexo_aplicable = m.sexo)

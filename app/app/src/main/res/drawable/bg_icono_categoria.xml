@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cuadro del ícono de una categoría de servicios: más rectangular y de celeste suave -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/petcare_primary_soft" />
+    <corners android:radius="8dp" />
+</shape>

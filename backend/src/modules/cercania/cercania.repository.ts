@@ -61,11 +61,13 @@ export async function usuariosConAvisos(): Promise<UsuarioCercano[]> {
 /** Campañas que aún no terminaron y todavía no se avisaron. */
 export async function campanasSinAvisar(hoy: string): Promise<LugarNuevo[]> {
   const [filas] = await pool.query<RowDataPacket[]>(
-    `SELECT c.id, c.nombre, o.nombre AS organizador, c.ubicacion_lat AS lat, c.ubicacion_long AS lng
+    `SELECT c.id, c.nombre, o.nombre AS organizador, c.ubicacion_lat AS lat, c.ubicacion_long AS lng,
+            IF(c.fecha_inicio > ?, 'proxima', 'activa') AS estado, v.organizador_id AS veterinariaId
      FROM campana c
      JOIN organizador o ON o.id = c.organizador_id
+     LEFT JOIN veterinaria v ON v.organizador_id = c.organizador_id
      WHERE c.fecha_notificacion IS NULL AND c.fecha_fin >= ?`,
-    [hoy],
+    [hoy, hoy],
   );
   return filas.map((f) => ({
     tipo: 'campana' as const,
@@ -74,12 +76,15 @@ export async function campanasSinAvisar(hoy: string): Promise<LugarNuevo[]> {
     organizador: f.organizador,
     lat: Number(f.lat),
     lng: Number(f.lng),
+    variante: f.estado as string,
+    // Campaña de una veterinaria: el aviso abre su perfil. De una entidad externa: el detalle de la campaña.
+    ...(f.veterinariaId ? { veterinariaId: Number(f.veterinariaId) } : {}),
   }));
 }
 
 export async function veterinariasSinAvisar(): Promise<LugarNuevo[]> {
   const [filas] = await pool.query<RowDataPacket[]>(
-    `SELECT v.organizador_id AS id, o.nombre, v.ubicacion_lat AS lat, v.ubicacion_long AS lng
+    `SELECT v.organizador_id AS id, o.nombre, v.ubicacion_lat AS lat, v.ubicacion_long AS lng, v.tipo
      FROM veterinaria v
      JOIN organizador o ON o.id = v.organizador_id
      WHERE v.fecha_notificacion IS NULL`,
@@ -91,6 +96,7 @@ export async function veterinariasSinAvisar(): Promise<LugarNuevo[]> {
     organizador: f.nombre,
     lat: Number(f.lat),
     lng: Number(f.lng),
+    variante: f.tipo as string,
   }));
 }
 

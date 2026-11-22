@@ -32,6 +32,9 @@ export function avisosDeLugar(lugar: LugarNuevo, usuarios: UsuarioCercano[]): No
             tipo: 'campana_cercana',
             titulo: 'Nueva campaña cerca de ti',
             cuerpo: `${lugar.nombre} (${lugar.organizador}), ${distancia}.`,
+            ...(lugar.variante ? { variante: lugar.variante } : {}),
+            lugarId: lugar.id,
+            ...(lugar.veterinariaId ? { veterinariaId: lugar.veterinariaId } : {}),
           }
         : {
             usuarioId: usuario.usuarioId,
@@ -39,6 +42,9 @@ export function avisosDeLugar(lugar: LugarNuevo, usuarios: UsuarioCercano[]): No
             tipo: 'veterinaria_cercana',
             titulo: 'Nueva veterinaria cerca de ti',
             cuerpo: `${lugar.nombre}, ${distancia}.`,
+            ...(lugar.variante ? { variante: lugar.variante } : {}),
+            lugarId: lugar.id,
+            veterinariaId: lugar.id,
           },
     );
   }

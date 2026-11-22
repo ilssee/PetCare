@@ -16,16 +16,22 @@ test('RF26: sin coincidencias no hay avisos', () => {
 test('RF26: una recomendación nueva se avisa en singular', () => {
   const [unico] = agruparAvisos([c(10, 'Luna', 29)]);
   assert.equal(unico.aviso.titulo, 'Nuevas recomendaciones para Luna');
-  assert.equal(unico.aviso.cuerpo, 'Hay 1 nueva recomendación preventiva disponible para Luna.');
+  assert.equal(unico.aviso.cuerpo, 'Tenemos 1 nuevo cuidado preventivo para recomendarte.');
   assert.equal(unico.aviso.tipo, 'recomendacion');
   assert.equal(unico.aviso.cuidadoId, 0);
   assert.deepEqual(unico.reglasIds, [29]);
 });
 
+test('RF26: el aviso lleva la mascota y sus recomendaciones nuevas, para abrirlas al tocarlo', () => {
+  const [aviso] = agruparAvisos([c(10, 'Luna', 29), c(10, 'Luna', 30)]);
+  assert.equal(aviso.aviso.mascotaId, 10);
+  assert.deepEqual(aviso.aviso.reglasIds, [29, 30]);
+});
+
 test('RF26: varias recomendaciones de la misma mascota se juntan en un solo aviso', () => {
   const avisos = agruparAvisos([c(10, 'Luna', 29), c(10, 'Luna', 30), c(10, 'Luna', 31)]);
   assert.equal(avisos.length, 1);
-  assert.equal(avisos[0].aviso.cuerpo, 'Hay 3 nuevas recomendaciones preventivas disponibles para Luna.');
+  assert.equal(avisos[0].aviso.cuerpo, 'Tenemos 3 nuevos cuidados preventivos para recomendarte.');
   assert.deepEqual(avisos[0].reglasIds, [29, 30, 31]);
 });
 

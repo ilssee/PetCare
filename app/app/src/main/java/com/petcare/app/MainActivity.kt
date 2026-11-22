@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.common.SessionManager
+import com.petcare.app.common.UbicacionActual
 import com.petcare.app.databinding.ActivityMainBinding
 import com.petcare.app.cronograma.CronogramaFragment
 import com.petcare.app.cuidado.CuidadosFragment
@@ -27,8 +28,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     // Android 13+ pide permiso para mostrar notificaciones. Se acepte o no, se registra el celular.
+    // Después se pide la ubicación (uno a la vez, para no mostrar dos cuadros juntos).
     private val permisoNotificaciones =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { registrarDispositivo() }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            registrarDispositivo()
+            pedirUbicacion()
+        }
+
+    // El cuadro de Android de la ubicación. El usuario puede dar solo la aproximada o no darla.
+    private val permisoUbicacion =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +76,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Al abrir la app se piden los permisos que falten. Android deja de mostrar el cuadro si el usuario lo
+    // rechaza un par de veces; entonces solo se pueden activar desde los ajustes del celular.
     private fun activarNotificaciones() {
-        if (Notificaciones.tienePermiso(this)) registrarDispositivo()
-        else permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (Notificaciones.tienePermiso(this)) {
+            registrarDispositivo()
+            pedirUbicacion()
+        } else {
+            permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun pedirUbicacion() {
+        if (!UbicacionActual.tienePermiso(this)) permisoUbicacion.launch(UbicacionActual.PERMISOS)
     }
 
     private fun registrarDispositivo() {
@@ -95,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         return when (intent.getStringExtra(EXTRA_SECCION)) {
             "mapa" -> R.id.nav_mapa
             "cuidados" -> R.id.nav_cuidados
-            else -> R.id.nav_mascotas
+            else -> R.id.nav_cronograma
         }
     }
 

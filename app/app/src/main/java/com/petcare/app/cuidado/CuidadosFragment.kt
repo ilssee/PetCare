@@ -3,6 +3,9 @@ package com.petcare.app.cuidado
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.TypefaceSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +15,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -35,6 +41,7 @@ import com.petcare.app.mascota.MascotaRespuesta
 import com.petcare.app.mascota.comoFechaLegible
 import com.petcare.app.mascota.configurarSiNoHayMascotas
 import com.petcare.app.mascota.mostrarMascota
+import com.petcare.app.notificacion.AvisoNotificaciones
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -43,6 +50,9 @@ import java.time.LocalDate
  * y las acciones para agregar (RF12), editar (RF14) y eliminar (RF15) un cuidado.
  */
 class CuidadosFragment : Fragment() {
+
+    // Franja "notificaciones desactivadas": se muestra sola mientras falte el permiso.
+    private val avisoNotificaciones = AvisoNotificaciones(this)
 
     private var _binding: FragmentCuidadosBinding? = null
     private val binding get() = _binding!!
@@ -53,12 +63,15 @@ class CuidadosFragment : Fragment() {
     private var inactivaVisible = 0 // mascota inactiva pedida desde su perfil (0 = ninguna)
     private var mascotaId = 0
     private var filtro = TODOS
+    private var cuidadoAEnfocar = 0 // cuidado al que hay que bajar al dibujar la lista (0 = ninguno)
+    private var posicionAConservar: Int? = null // scroll a devolver tras recargar por una acción (null = ninguno)
     private var lista: List<CuidadoRespuesta> = emptyList()
     private var conteos = ConteoCuidados(0, 0, 0)
 
     // Qué tarjetas están abiertas y en cuáles se desplegaron los detalles (por id de cuidado).
     private val abiertos = mutableSetOf<Int>()
     private val conDetalles = mutableSetOf<Int>()
+    private val historialCompleto = mutableSetOf<Int>() // cuidados cuyo historial se muestra entero
 
     override fun onCreateView(inflater: LayoutInflater, contenedor: ViewGroup?, estado: Bundle?): View {
         _binding = FragmentCuidadosBinding.inflate(inflater, contenedor, false)
@@ -69,12 +82,14 @@ class CuidadosFragment : Fragment() {
         binding.pestanaFinalizados.setOnClickListener { elegirFiltro(FINALIZADOS) }
         binding.campoBusqueda.doAfterTextChanged { dibujarLista() }
         binding.botonAgregar.setOnClickListener { mostrarHojaAgregar() }
+        avisoNotificaciones.vincular(binding.avisoNotificaciones)
         return binding.root
     }
 
     // Se vuelve a cargar al regresar de registrar, agregar o editar algo.
     override fun onResume() {
         super.onResume()
+        avisoNotificaciones.actualizar() // por si se activaron las notificaciones desde los ajustes
         cargarMascotas()
     }
 
@@ -93,6 +108,14 @@ class CuidadosFragment : Fragment() {
             // Una mascota inactiva solo aparece aquí cuando se llega desde su perfil ("Ver cuidados", RF23).
             val pedida = SeleccionCuidados.mascotaId
             SeleccionCuidados.mascotaId = 0
+            // Si se llega desde el Cronograma, ese cuidado se abre desplegado y se muestra entre "Todos".
+            val cuidadoPedido = SeleccionCuidados.cuidadoId
+            SeleccionCuidados.cuidadoId = 0
+            if (cuidadoPedido != 0) {
+                abiertos.add(cuidadoPedido)
+                cuidadoAEnfocar = cuidadoPedido
+                filtro = TODOS
+            }
             if (pedida != 0 && todas.any { it.id == pedida && it.estaInactiva }) inactivaVisible = pedida
             activas = todas.filter { !it.estaInactiva || it.id == inactivaVisible }
 
@@ -135,6 +158,7 @@ class CuidadosFragment : Fragment() {
                     mascotaId = mascota.id
                     abiertos.clear()
                     conDetalles.clear()
+                    historialCompleto.clear()
                     dibujarSelector()
                     cargarCuidados()
                 }
@@ -148,6 +172,12 @@ class CuidadosFragment : Fragment() {
     private fun elegirFiltro(nuevo: String) {
         if (nuevo == filtro) return
         filtro = nuevo
+        cargarCuidados()
+    }
+
+    /** Recarga tras completar, anular o editar algo, y deja la pantalla donde estaba. */
+    private fun recargarConservandoScroll() {
+        posicionAConservar = _binding?.scrollCuidados?.scrollY
         cargarCuidados()
     }
 
@@ -187,12 +217,28 @@ class CuidadosFragment : Fragment() {
         val texto = vista.campoBusqueda.text.toString().trim()
         val visibles = lista.filter { texto.isEmpty() || it.nombre.contains(texto, ignoreCase = true) }
         if (visibles.isEmpty()) {
+            posicionAConservar = null
             mostrarVacio(mascota, buscando = texto.isNotEmpty())
             return
         }
 
         vista.vacioLista.root.visibility = View.GONE
-        visibles.forEach { vista.listaCuidados.addView(crearTarjeta(it, mascota)) }
+        val enfocar = cuidadoAEnfocar
+        cuidadoAEnfocar = 0
+        val posicion = posicionAConservar
+        posicionAConservar = null
+        // Al redibujar la lista el scroll podía saltar; se devuelve a donde estaba.
+        if (posicion != null && enfocar == 0) {
+            vista.scrollCuidados.post { _binding?.scrollCuidados?.scrollTo(0, posicion) }
+        }
+        visibles.forEach { cuidado ->
+            val tarjeta = crearTarjeta(cuidado, mascota)
+            vista.listaCuidados.addView(tarjeta)
+            // Baja hasta el cuidado pedido para que no quede fuera de pantalla.
+            if (cuidado.id == enfocar) {
+                tarjeta.post { _binding?.scrollCuidados?.smoothScrollTo(0, vista.listaCuidados.top + tarjeta.top) }
+            }
+        }
     }
 
     /** Qué decir cuando no hay nada que listar: sin cuidados, sin resultados o un estado vacío. */
@@ -259,10 +305,14 @@ class CuidadosFragment : Fragment() {
             }
         }
 
-        t.valorProximaFecha.text = if (c.estaFinalizado) getString(R.string.dato_vacio) else c.fechaRecurrente.comoFechaLegible()
+        t.valorProximaFecha.text = if (c.estaFinalizado) getString(R.string.cuidado_estado_finalizado) else c.fechaRecurrente.comoFechaLegible()
         t.valorFrecuencia.text = c.textoFrecuencia(ctx)
-        t.valorDuracion.text = c.textoDuracion(ctx)
-        t.valorAviso.setText(if (c.avisoAnticipado) R.string.cuidado_activado else R.string.cuidado_desactivado)
+        // "Duración: Se repite sin fecha final", con el subtítulo en negrita.
+        t.valorDuracion.text = conSubtitulo(getString(R.string.cuidado_duracion), c.textoRepeticion(ctx))
+        t.valorAviso.text = conSubtitulo(
+            getString(R.string.cuidado_aviso_titulo),
+            getString(if (c.avisoAnticipado) R.string.cuidado_aviso_frase_activado else R.string.cuidado_aviso_frase_desactivado),
+        )
 
         t.cajaDescripcion.visibility = if (c.descripcion.isBlank()) View.GONE else View.VISIBLE
         t.valorDescripcion.text = c.descripcion
@@ -275,15 +325,15 @@ class CuidadosFragment : Fragment() {
         t.avisoFinalizado.visibility = if (c.estaFinalizado) View.VISIBLE else View.GONE
 
         dibujarHistorial(t, c)
-        aplicarEstadoDeTarjeta(t, c.id)
+        aplicarEstadoDeTarjeta(t, c)
 
         t.cabecera.setOnClickListener {
             if (!abiertos.remove(c.id)) abiertos.add(c.id)
-            aplicarEstadoDeTarjeta(t, c.id)
+            aplicarEstadoDeTarjeta(t, c)
         }
         t.verDetalles.setOnClickListener {
             if (!conDetalles.remove(c.id)) conDetalles.add(c.id)
-            aplicarEstadoDeTarjeta(t, c.id)
+            aplicarEstadoDeTarjeta(t, c)
         }
         t.botonCompletar.setOnClickListener { iniciarCompletar(c) }
         t.botonOpciones.setOnClickListener { mostrarHojaDelCuidado(c) }
@@ -291,9 +341,24 @@ class CuidadosFragment : Fragment() {
     }
 
     private fun dibujarHistorial(t: ItemCuidadoBinding, c: CuidadoRespuesta) {
+        t.tituloHistorial.text = getString(R.string.cuidado_historial_cantidad, c.realizadas)
         t.historial.removeAllViews()
         t.sinHistorial.visibility = if (c.actividades.isEmpty()) View.VISIBLE else View.GONE
-        c.actividades.forEach { actividad ->
+
+        // Se muestran las últimas actividades; con más de MAXIMO_ACTIVIDADES hay un botón para ver todas.
+        val excede = c.actividades.size > MAXIMO_ACTIVIDADES
+        val completo = c.id in historialCompleto
+        val mostradas = if (excede && !completo) c.actividades.take(MAXIMO_ACTIVIDADES) else c.actividades
+        t.verTodasActividades.visibility = if (excede) View.VISIBLE else View.GONE
+        t.verTodasActividades.text =
+            if (completo) getString(R.string.cuidado_historial_ver_menos)
+            else getString(R.string.cuidado_historial_ver_todas, c.actividades.size)
+        t.verTodasActividades.setOnClickListener {
+            if (!historialCompleto.remove(c.id)) historialCompleto.add(c.id)
+            dibujarHistorial(t, c)
+        }
+
+        mostradas.forEach { actividad ->
             val fila = ItemActividadBinding.inflate(layoutInflater, t.historial, false)
             fila.fecha.text = actividad.fechaRealizacion.comoFechaLegible()
             // Las actividades anuladas no llegan: el historial solo muestra las completadas.
@@ -305,10 +370,35 @@ class CuidadosFragment : Fragment() {
         }
     }
 
+    /** "Subtítulo: texto" en una sola línea, con el subtítulo en la misma letra que "Descripción". */
+    private fun conSubtitulo(subtitulo: String, texto: String) = buildSpannedString {
+        // Igual que los títulos "Descripción" e "Importancia": seminegrita, 11sp (12sp del texto) y gris
+        val letra = ResourcesCompat.getFont(requireContext(), R.font.poppins_semibold)
+        val gris = ContextCompat.getColor(requireContext(), R.color.petcare_text_muted)
+        inSpans(ForegroundColorSpan(gris), RelativeSizeSpan(11f / 12f)) {
+            if (letra != null) {
+                inSpans(TypefaceSpan(letra)) { append("$subtitulo:") }
+            } else {
+                bold { append("$subtitulo:") }
+            }
+        }
+        append(" ")
+        append(texto)
+    }
+
     /** Refleja si la tarjeta está abierta y si tiene los detalles desplegados. */
-    private fun aplicarEstadoDeTarjeta(t: ItemCuidadoBinding, id: Int) {
-        val abierta = id in abiertos
-        val detalles = id in conDetalles
+    private fun aplicarEstadoDeTarjeta(t: ItemCuidadoBinding, c: CuidadoRespuesta) {
+        val abierta = c.id in abiertos
+        val detalles = c.id in conDetalles
+        // Abierta, la fecha y las veces realizadas ya se ven abajo (cuadro "Próxima fecha" y título del
+        // historial); solo se conserva el aviso "Venció hace N días" cuando el cuidado está vencido.
+        t.realizado.visibility = if (abierta) View.GONE else View.VISIBLE
+        t.proxima.visibility = when {
+            c.estaFinalizado -> View.GONE
+            abierta && c.diasVencido() <= 0 -> View.GONE
+            else -> View.VISIBLE
+        }
+        t.botonOpciones.visibility = if (abierta) View.VISIBLE else View.GONE // los 3 puntitos, solo con el cuidado abierto
         t.detalle.visibility = if (abierta) View.VISIBLE else View.GONE
         t.flecha.rotation = if (abierta) 180f else 0f
         t.bloqueDetalles.visibility = if (detalles) View.VISIBLE else View.GONE
@@ -369,7 +459,7 @@ class CuidadosFragment : Fragment() {
                     avisar(getString(R.string.cuidado_eliminado))
                     abiertos.remove(c.id)
                     conDetalles.remove(c.id)
-                    if (_binding != null) cargarCuidados()
+                    if (_binding != null) recargarConservandoScroll()
                 }
                 is Resultado.Fallo -> avisar(resultado.paraMostrar(requireContext()))
             }
@@ -403,7 +493,7 @@ class CuidadosFragment : Fragment() {
                         if (cuidado.estaFinalizado) getString(R.string.actividad_registrada)
                         else getString(R.string.actividad_registrada_proxima, cuidado.fechaRecurrente.comoFechaLegible()),
                     )
-                    if (_binding != null) cargarCuidados()
+                    if (_binding != null) recargarConservandoScroll()
                 }
                 is Resultado.Fallo -> avisar(resultado.paraMostrar(requireContext()))
             }
@@ -456,7 +546,7 @@ class CuidadosFragment : Fragment() {
             when (val resultado = accion()) {
                 is Resultado.Exito -> {
                     avisar(resultado.dato.mensaje)
-                    if (_binding != null) cargarCuidados()
+                    if (_binding != null) recargarConservandoScroll()
                 }
                 is Resultado.Fallo -> avisar(resultado.paraMostrar(requireContext()))
             }
@@ -473,6 +563,7 @@ class CuidadosFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        avisoNotificaciones.desvincular()
         _binding = null
     }
 
@@ -480,5 +571,6 @@ class CuidadosFragment : Fragment() {
         const val TODOS = "todos"
         const val PENDIENTES = "pendientes"
         const val FINALIZADOS = "finalizados"
+        const val MAXIMO_ACTIVIDADES = 5 // actividades del historial que se ven antes de "Ver todas"
     }
 }
