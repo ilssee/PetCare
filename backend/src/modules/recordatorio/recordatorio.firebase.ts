@@ -28,10 +28,25 @@ export class EnviadorFirebase implements Enviador {
 
     const respuesta = await this.mensajeria.sendEachForMulticast({
       tokens,
-      notification: { title: aviso.titulo, body: aviso.cuerpo },
-      // La sección dice qué pestaña abre la app al tocar el aviso.
-      data: { tipo: aviso.tipo, cuidadoId: String(aviso.cuidadoId), seccion: seccionDe(aviso.tipo) },
-      android: { priority: 'high', notification: { channelId: CANAL_RECORDATORIOS } },
+      // Solo datos (sin bloque "notification"): así la app arma siempre el aviso, también con la app
+      // cerrada, y puede poner de ícono el dibujo de la mascota o el de la campaña o veterinaria.
+      // El título y el texto viajan igual que antes. La sección dice qué pestaña abre la app al tocarlo.
+      data: {
+        tipo: aviso.tipo,
+        cuidadoId: String(aviso.cuidadoId),
+        seccion: seccionDe(aviso.tipo),
+        titulo: aviso.titulo,
+        cuerpo: aviso.cuerpo,
+        especie: aviso.especie ?? '',
+        variante: aviso.variante ?? '',
+        // Qué pantalla se abre al tocar el aviso (vacíos si solo se abre la sección).
+        lugarId: aviso.lugarId ? String(aviso.lugarId) : '',
+        veterinariaId: aviso.veterinariaId ? String(aviso.veterinariaId) : '',
+        mascotaId: aviso.mascotaId ? String(aviso.mascotaId) : '',
+        reglas: (aviso.reglasIds ?? []).join(','),
+        canal: CANAL_RECORDATORIOS,
+      },
+      android: { priority: 'high' },
     });
 
     // Los celulares que Firebase ya no reconoce se borran para no volver a intentarlo.

@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
 import com.petcare.app.common.respetarBarrasYTeclado
+import com.petcare.app.common.confirmarAlRetroceder
+import com.petcare.app.common.salirConfirmando
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.databinding.ActivityRegistroBinding
@@ -26,11 +28,17 @@ class RegistroActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.raiz.respetarBarrasYTeclado()
 
-        binding.botonVolver.setOnClickListener { finish() }
-        binding.enlaceLogin.setOnClickListener { finish() }
+        binding.botonVolver.setOnClickListener { salirConfirmando(::hayCambiosSinGuardar) }
+        binding.enlaceLogin.setOnClickListener { salirConfirmando(::hayCambiosSinGuardar) }
+        confirmarAlRetroceder(::hayCambiosSinGuardar)
         binding.botonOjo.setOnClickListener { binding.campoContrasena.alternarVisibilidadContrasena(binding.botonOjo) }
         binding.botonRegistrarse.setOnClickListener { registrar() }
     }
+
+    /** Hay cambios si alguno de los tres campos tiene texto. */
+    private fun hayCambiosSinGuardar(): Boolean =
+        listOf(binding.campoNombre, binding.campoCorreo, binding.campoContrasena)
+            .any { it.text.toString().isNotEmpty() }
 
     private fun registrar() {
         val nombre = binding.campoNombre.text.toString()

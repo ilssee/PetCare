@@ -68,6 +68,19 @@
             android:paddingBottom="3dp"
             android:textSize="11sp" />
 
+        <!-- Opciones del cuidado (editar y eliminar): a la izquierda de la flecha, solo con el cuidado abierto -->
+        <ImageView
+            android:id="@+id/botonOpciones"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="-4dp"
+            android:contentDescription="@string/cuidado_mas_opciones"
+            android:padding="10dp"
+            android:src="@drawable/ic_mas_opciones"
+            android:tint="@color/petcare_text"
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/flecha"
             android:layout_width="22dp"
@@ -149,47 +162,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/botonCompletar"
-                style="@style/BotonPrincipal"
-                android:layout_width="0dp"
-                android:layout_height="46dp"
-                android:layout_weight="1"
-                android:text="@string/cuidado_completar"
-                android:textSize="14sp"
-                app:icon="@drawable/ic_check_blanco"
-                app:iconGravity="textStart"
-                app:iconTint="@color/white" />
-
-            <TextView
-                android:id="@+id/avisoFinalizado"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/cuidado_finalizo"
-                android:textColor="@color/petcare_text_muted"
-                android:textSize="12sp"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/botonOpciones"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_campo"
-                android:contentDescription="@string/cuidado_mas_opciones"
-                android:padding="12dp"
-                android:src="@drawable/ic_mas_opciones"
-                android:tint="@color/petcare_text" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/verDetalles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -226,73 +198,27 @@
             android:visibility="gone">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/cuidado_duracion"
-                    android:textColor="@color/petcare_text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/valorDuracion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:textColor="@color/petcare_text"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/cuidado_aviso_titulo"
-                    android:textColor="@color/petcare_text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/valorAviso"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:textColor="@color/petcare_text"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/cajaDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_caja_suave"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_tarjeta_suave"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
                     android:text="@string/cuidado_descripcion"
-                    android:textColor="@color/petcare_primary_dark"
+                    android:textColor="@color/petcare_text_muted"
                     android:textSize="11sp" />
 
                 <TextView
                     android:id="@+id/valorDescripcion"
+                    android:layout_marginTop="2dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/poppins_regular"
                     android:justificationMode="inter_word"
                     android:textColor="@color/petcare_text"
@@ -303,17 +229,17 @@
                 android:id="@+id/cajaImportancia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_caja_suave"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_tarjeta_suave"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
                     android:text="@string/propuesta_importancia"
-                    android:textColor="@color/petcare_primary_dark"
+                    android:textColor="@color/petcare_text_muted"
                     android:textSize="11sp" />
 
                 <TextView
@@ -331,17 +257,17 @@
                 android:id="@+id/cajaNota"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_caja_suave"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_tarjeta_suave"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
-                    android:text="@string/cuidado_etiqueta_nota"
-                    android:textColor="@color/petcare_primary_dark"
+                    android:text="@string/cuidado_nota_titulo"
+                    android:textColor="@color/petcare_text_muted"
                     android:textSize="11sp" />
 
                 <TextView
@@ -353,10 +279,70 @@
                     android:textColor="@color/petcare_text"
                     android:textSize="12sp" />
             </LinearLayout>
+
+            <!-- Duración y aviso anticipado: datos secundarios, juntos en una caja al final de los detalles -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_tarjeta_suave"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <!-- Cada dato en una línea: el subtítulo en negrita lo agrega el código al inicio del texto -->
+                <TextView
+                    android:id="@+id/valorDuracion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textColor="@color/petcare_text"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/valorAviso"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textColor="@color/petcare_text"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Marcar como completado: después de los detalles y antes del historial -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/botonCompletar"
+                style="@style/BotonPrincipal"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="@string/cuidado_completar"
+                android:textSize="14sp"
+                app:icon="@drawable/ic_check_blanco"
+                app:iconGravity="textStart"
+                app:iconTint="@color/white" />
+
+            <TextView
+                android:id="@+id/avisoFinalizado"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/cuidado_finalizo"
+                android:textColor="@color/petcare_text_muted"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Historial de actividades -->
         <TextView
+            android:id="@+id/tituloHistorial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -380,5 +366,17 @@
             android:text="@string/cuidado_sin_historial"
             android:textColor="@color/petcare_texto_suave"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/verTodasActividades"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/petcare_primary_dark"
+            android:textSize="13sp"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

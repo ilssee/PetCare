@@ -72,13 +72,16 @@ describe('qué avisos corresponden en un día', () => {
     const avisos = decidirAvisos(MIERCOLES, [cuidado({ fechaRecurrente: MIERCOLES })], new Map());
     assert.equal(avisos.length, 1);
     assert.equal(avisos[0].tipo, 'pendiente');
-    assert.equal(avisos[0].cuerpo, 'Luna: Vacuna contra rabia toca hoy');
+    assert.equal(avisos[0].titulo, 'Cuidado para hoy');
+    assert.equal(avisos[0].cuerpo, 'Luna: Vacuna contra rabia');
   });
 
   it('RF22: un cuidado vencido se avisa todos los días hasta completarse, con los días que lleva', () => {
     const vencido = cuidado({ fechaRecurrente: LUNES });
-    assert.equal(decidirAvisos(MARTES, [vencido], new Map())[0].cuerpo, 'Luna: Vacuna contra rabia venció hace 1 día');
-    assert.equal(decidirAvisos(MIERCOLES, [vencido], new Map())[0].cuerpo, 'Luna: Vacuna contra rabia venció hace 2 días');
+    const [deMartes] = decidirAvisos(MARTES, [vencido], new Map());
+    assert.equal(deMartes.titulo, 'Cuidado vencido');
+    assert.equal(deMartes.cuerpo, 'Luna: Vacuna contra rabia, hace 1 día');
+    assert.equal(decidirAvisos(MIERCOLES, [vencido], new Map())[0].cuerpo, 'Luna: Vacuna contra rabia, hace 2 días');
   });
 
   it('RF22: se avisa aunque el cuidado no tenga aviso anticipado', () => {
@@ -113,9 +116,18 @@ describe('qué avisos corresponden en un día', () => {
     assert.equal(decidirAvisos(MARTES, [c], elegidos).length, 0);
   });
 
-  it('RF21: el aviso adelantado dice la fecha completa del vencimiento', () => {
+  it('RF21: el aviso adelantado dice el día de la semana: "este miércoles" si es de esta semana', () => {
     const [aviso] = decidirAvisos(LUNES, [cuidado({ fechaRecurrente: MIERCOLES })], dias('lunes', 'miercoles'));
-    assert.equal(aviso.cuerpo, 'Luna: Vacuna contra rabia vence el miércoles 28 de octubre');
+    assert.equal(aviso.cuerpo, 'Luna: Vacuna contra rabia vence este miércoles');
+  });
+
+  it('RF21: si el vencimiento cae en la semana siguiente dice "el próximo" y el día', () => {
+    // Sábado 31 de octubre: el lunes 2 de noviembre ya es de la semana siguiente.
+    const [deSabado] = decidirAvisos('2026-10-31', [cuidado({ fechaRecurrente: '2026-11-02' })], dias('sabado'));
+    assert.equal(deSabado.cuerpo, 'Luna: Vacuna contra rabia vence el próximo lunes');
+    // Justo 7 días después: lunes 26 de octubre avisando el lunes 2 de noviembre.
+    const [aSieteDias] = decidirAvisos(LUNES, [cuidado({ fechaRecurrente: '2026-11-02' })], dias('lunes'));
+    assert.equal(aSieteDias.cuerpo, 'Luna: Vacuna contra rabia vence el próximo lunes');
   });
 
   it('RF21: no se avisa dos veces en días distintos de la misma ventana', () => {

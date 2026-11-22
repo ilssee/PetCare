@@ -71,7 +71,7 @@ class ResenasActivity : AppCompatActivity() {
 
     private fun pintarOpcion(vista: android.widget.TextView, activa: Boolean) {
         vista.setBackgroundResource(if (activa) R.drawable.bg_chip_opcion_activo else R.drawable.bg_chip_opcion)
-        vista.setTextColor(ContextCompat.getColor(this, if (activa) R.color.petcare_primary_dark else R.color.petcare_text))
+        vista.setTextColor(ContextCompat.getColor(this, if (activa) R.color.petcare_text else R.color.petcare_text_muted))
     }
 
     private fun cargar() {

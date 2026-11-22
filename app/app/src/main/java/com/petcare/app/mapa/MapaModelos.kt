@@ -75,6 +75,8 @@ data class DetalleCampanaRespuesta(
     val costo: String,
     val descripcion: String,
     val direccion: String?,
+    val lat: Double,
+    val lng: Double,
     val especies: List<String>,
     val servicios: List<ServicioRespuesta>,
     val veterinariaId: Int?,

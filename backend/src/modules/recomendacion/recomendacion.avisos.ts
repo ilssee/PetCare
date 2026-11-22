@@ -6,6 +6,7 @@ export interface Coincidencia {
   mascotaId: number;
   mascota: string;
   reglaId: number;
+  especie?: string; // la app la usa para elegir el ícono del aviso
 }
 
 /** Recomendaciones nuevas de una mascota, juntas para avisar una sola vez. */
@@ -23,11 +24,12 @@ export function agruparAvisos(coincidencias: Coincidencia[]): AvisoDeMascota[] {
   }
 
   return [...porMascota.values()].map((grupo) => {
-    const { usuarioId, mascotaId, mascota } = grupo[0];
+    const { usuarioId, mascotaId, mascota, especie } = grupo[0];
     const cantidad = grupo.length;
+    const reglasIds = grupo.map((c) => c.reglaId);
     return {
       mascotaId,
-      reglasIds: grupo.map((c) => c.reglaId),
+      reglasIds,
       aviso: {
         usuarioId,
         cuidadoId: 0,
@@ -35,8 +37,12 @@ export function agruparAvisos(coincidencias: Coincidencia[]): AvisoDeMascota[] {
         titulo: `Nuevas recomendaciones para ${mascota}`,
         cuerpo:
           cantidad === 1
-            ? `Hay 1 nueva recomendación preventiva disponible para ${mascota}.`
-            : `Hay ${cantidad} nuevas recomendaciones preventivas disponibles para ${mascota}.`,
+            ? 'Tenemos 1 nuevo cuidado preventivo para recomendarte.'
+            : `Tenemos ${cantidad} nuevos cuidados preventivos para recomendarte.`,
+        ...(especie ? { especie } : {}),
+        // Al tocarlo se abre la información preventiva de la mascota con estas recomendaciones desplegadas.
+        mascotaId,
+        reglasIds,
       },
     };
   });

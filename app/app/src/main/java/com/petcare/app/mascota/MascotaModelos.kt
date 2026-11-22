@@ -23,6 +23,7 @@ data class MascotaRespuesta(
     val foto: String?,
     val estado: String,
     val edadTexto: String?,
+    val totalCuidados: Int = 0,
 ) {
     val estaInactiva: Boolean get() = estado == "inactiva"
 }

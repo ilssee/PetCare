@@ -2,15 +2,21 @@ package com.petcare.app.cuidado
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.petcare.app.R
 import com.petcare.app.databinding.VistaFormularioCuidadoBinding
 import com.petcare.app.mascota.comoFechaLegible
+import com.petcare.app.notificacion.Notificaciones
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -61,7 +67,25 @@ class FormularioCuidado(
         "anios" to vista.unidadAnios,
     )
 
+    /** Verdadero mientras el código (y no la persona) cambia el interruptor del aviso anticipado. */
+    private var cambiandoAviso = false
+
+    /** Pide el permiso de notificaciones; solo existe si el formulario vive dentro de una pantalla. */
+    private val pedirPermisoDeNotificaciones = (contexto as? ComponentActivity)?.registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { concedido ->
+        if (concedido) fijarAviso(true) else avisarQueHacePermiso()
+    }
+
     init {
+        // El aviso anticipado solo sirve si el celular deja mostrar notificaciones: sin ese permiso no se activa.
+        vista.interruptorAviso.setOnCheckedChangeListener { _, activado ->
+            if (activado && !cambiandoAviso && !Notificaciones.tienePermiso(contexto)) {
+                fijarAviso(false)
+                val pedir = pedirPermisoDeNotificaciones
+                if (pedir != null) pedir.launch(android.Manifest.permission.POST_NOTIFICATIONS) else avisarQueHacePermiso()
+            }
+        }
         botonesDeModo.forEach { (clave, boton) -> boton.setOnClickListener { elegirModo(clave) } }
         botonesDeUnidad.forEach { (clave, boton) -> boton.setOnClickListener { elegirUnidad(clave) } }
         vista.verMasInformacion.setOnClickListener { mostrarInformacion(vista.bloqueInformacion.visibility != View.VISIBLE) }
@@ -116,10 +140,47 @@ class FormularioCuidado(
             fechaLimite = limite
             fijarFecha(vista.campoLimite, limite)
         }
-        vista.interruptorAviso.isChecked = cuidado.avisoAnticipado
+        fijarAviso(cuidado.avisoAnticipado) // un cuidado que ya tenía el aviso lo conserva
         vista.campoNota.setText(cuidado.nota.orEmpty())
         actualizarAproximado()
     }
+
+    /** Cambia el interruptor del aviso sin disparar la revisión del permiso. */
+    private fun fijarAviso(activado: Boolean) {
+        cambiandoAviso = true
+        vista.interruptorAviso.isChecked = activado
+        cambiandoAviso = false
+    }
+
+    /** Sin permiso no se puede activar el aviso: explica por qué y ofrece abrir los ajustes de PetCare. */
+    private fun avisarQueHacePermiso() {
+        MaterialAlertDialogBuilder(contexto)
+            .setMessage(R.string.cuidado_aviso_permiso)
+            .setPositiveButton(R.string.cuidado_aviso_abrir_ajustes) { _, _ -> abrirAjustesDeNotificaciones() }
+            .setNegativeButton(R.string.propuesta_ahora_no, null)
+            .show()
+    }
+
+    private fun abrirAjustesDeNotificaciones() {
+        contexto.startActivity(
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, contexto.packageName),
+        )
+    }
+
+    /** Foto de lo que hay en el formulario ahora; comparada con una anterior indica si el usuario cambió algo. */
+    fun estado(): List<Any?> = listOf(
+        vista.campoNombre.text.toString().trim(),
+        vista.campoDescripcion.text.toString().trim(),
+        modo,
+        unidad.clave,
+        vista.campoFrecuencia.text.toString().trim(),
+        vista.campoVeces.text.toString().trim(),
+        fechaInicio,
+        fechaLimite,
+        vista.interruptorAviso.isChecked,
+        vista.campoNota.text.toString().trim(),
+    )
 
     private fun mostrarTarjeta(nombre: String, descripcion: String, importancia: String) {
         vista.bloqueNombre.visibility = View.GONE
@@ -152,7 +213,8 @@ class FormularioCuidado(
         elegirUnidad("meses")
         quitarFecha(vista.campoInicio)
         quitarFecha(vista.campoLimite)
-        vista.interruptorAviso.isChecked = true
+        // Un cuidado nuevo empieza con el aviso activado solo si el celular permite notificaciones.
+        fijarAviso(Notificaciones.tienePermiso(contexto))
 
         ocultarErrores()
     }

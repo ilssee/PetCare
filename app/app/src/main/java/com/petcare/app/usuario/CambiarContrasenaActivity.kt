@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
 import com.petcare.app.common.respetarBarrasYTeclado
+import com.petcare.app.common.confirmarAlRetroceder
+import com.petcare.app.common.salirConfirmando
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.SessionManager
 import com.petcare.app.common.paraMostrar
@@ -28,12 +30,18 @@ class CambiarContrasenaActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.raiz.respetarBarrasYTeclado()
 
-        binding.botonVolver.setOnClickListener { finish() }
+        binding.botonVolver.setOnClickListener { salirConfirmando(::hayCambiosSinGuardar) }
+        confirmarAlRetroceder(::hayCambiosSinGuardar)
         binding.ojoActual.setOnClickListener { binding.campoActual.alternarVisibilidadContrasena(binding.ojoActual) }
         binding.ojoNueva.setOnClickListener { binding.campoNueva.alternarVisibilidadContrasena(binding.ojoNueva) }
         binding.ojoRepetir.setOnClickListener { binding.campoRepetir.alternarVisibilidadContrasena(binding.ojoRepetir) }
         binding.botonGuardarContrasena.setOnClickListener { guardar() }
     }
+
+    /** Hay cambios si alguno de los tres campos tiene texto. */
+    private fun hayCambiosSinGuardar(): Boolean =
+        listOf(binding.campoActual, binding.campoNueva, binding.campoRepetir)
+            .any { it.text.toString().isNotEmpty() }
 
     private fun guardar() {
         val actual = binding.campoActual.text.toString()

@@ -12,6 +12,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
 import com.petcare.app.common.Resultado
+import com.petcare.app.common.confirmarAlRetroceder
+import com.petcare.app.common.salirConfirmando
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.common.respetarBarrasYTeclado
 import com.petcare.app.databinding.ActivityEscribirResenaBinding
@@ -42,7 +44,8 @@ class EscribirResenaActivity : AppCompatActivity() {
         binding.nombre.text = intent.getStringExtra(EXTRA_NOMBRE).orEmpty()
         binding.titulo.setText(if (editando) R.string.resenas_editar_titulo else R.string.resenas_escribir_titulo)
         binding.botonEnviar.setText(if (editando) R.string.resenas_guardar_cambios else R.string.resenas_enviar)
-        binding.botonVolver.setOnClickListener { finish() }
+        binding.botonVolver.setOnClickListener { salirConfirmando(::hayCambiosSinGuardar) }
+        confirmarAlRetroceder(::hayCambiosSinGuardar)
         binding.botonEnviar.setOnClickListener { enviar() }
 
         if (savedInstanceState == null && editando) {
@@ -52,6 +55,14 @@ class EscribirResenaActivity : AppCompatActivity() {
             calificacion = savedInstanceState?.getInt(ESTADO_CALIFICACION) ?: 0
         }
         crearEstrellas()
+    }
+
+    /** Hay cambios si la calificación o el comentario difieren de lo que traía la pantalla al abrirse. */
+    private fun hayCambiosSinGuardar(): Boolean {
+        val calificacionInicial = if (editando) intent.getIntExtra(EXTRA_CALIFICACION, 0) else 0
+        val comentarioInicial = if (editando) intent.getStringExtra(EXTRA_COMENTARIO).orEmpty().trim() else ""
+        return calificacion != calificacionInicial ||
+            binding.campoComentario.text.toString().trim() != comentarioInicial
     }
 
     override fun onSaveInstanceState(estado: Bundle) {

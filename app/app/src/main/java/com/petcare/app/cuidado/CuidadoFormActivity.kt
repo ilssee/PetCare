@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.petcare.app.R
 import com.petcare.app.common.respetarBarrasYTeclado
+import com.petcare.app.common.confirmarAlRetroceder
+import com.petcare.app.common.salirConfirmando
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.databinding.ActivityCuidadoFormBinding
@@ -34,6 +36,9 @@ class CuidadoFormActivity : AppCompatActivity() {
     private var cuidadoId = 0
     private var cuidado: CuidadoRespuesta? = null
     private var recomendacion: RecomendacionRespuesta? = null
+
+    // Estado del formulario ya cargado, para saber si hay cambios sin guardar.
+    private var estadoInicial: List<Any?>? = null
 
     private val editando get() = cuidadoId != 0
 
@@ -65,7 +70,8 @@ class CuidadoFormActivity : AppCompatActivity() {
             },
         )
         if (recomendacion != null) binding.botonGuardar.setText(R.string.cuidado_confirmar)
-        binding.botonVolver.setOnClickListener { finish() }
+        binding.botonVolver.setOnClickListener { salirConfirmando(::hayCambiosSinGuardar) }
+        confirmarAlRetroceder(::hayCambiosSinGuardar)
         binding.botonGuardar.setOnClickListener { guardar() }
 
         cargar()
@@ -86,6 +92,7 @@ class CuidadoFormActivity : AppCompatActivity() {
                 val elegida = recomendacion
                 if (elegida != null) formulario.cargarRecomendacion(elegida) else formulario.cargarPersonalizado()
             }
+            estadoInicial = formulario.estado()
 
             when (val resultado = mascotas.obtener(mascotaId)) {
                 is Resultado.Exito -> {
@@ -96,6 +103,12 @@ class CuidadoFormActivity : AppCompatActivity() {
             }
             binding.cuerpo.visibility = View.VISIBLE
         }
+    }
+
+    /** Antes de que cargue el formulario no hay nada que perder. */
+    private fun hayCambiosSinGuardar(): Boolean {
+        val inicial = estadoInicial ?: return false
+        return formulario.estado() != inicial
     }
 
     private fun guardar() {

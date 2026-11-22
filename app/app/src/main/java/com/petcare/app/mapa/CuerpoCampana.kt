@@ -13,8 +13,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.chip.ChipGroup
 import com.petcare.app.R
+import com.petcare.app.common.Enlaces
+import com.petcare.app.common.CuadriculaDeOpciones
 import com.petcare.app.mascota.Especies
 
 /** Lo que muestra el detalle de una campaña (RF43), venga de su pantalla o de una tarjeta desplegada en el perfil. */
@@ -27,6 +28,8 @@ data class DatosCuerpoCampana(
     val horaApertura: String,
     val horaCierre: String,
     val direccion: String?,
+    val lat: Double,
+    val lng: Double,
 )
 
 fun CampanaRespuesta.comoCuerpo() = DatosCuerpoCampana(
@@ -38,6 +41,8 @@ fun CampanaRespuesta.comoCuerpo() = DatosCuerpoCampana(
     horaApertura = horaApertura,
     horaCierre = horaCierre,
     direccion = direccion,
+    lat = lat,
+    lng = lng,
 )
 
 fun DetalleCampanaRespuesta.comoCuerpo() = DatosCuerpoCampana(
@@ -49,6 +54,8 @@ fun DetalleCampanaRespuesta.comoCuerpo() = DatosCuerpoCampana(
     horaApertura = horaApertura,
     horaCierre = horaCierre,
     direccion = direccion,
+    lat = lat,
+    lng = lng,
 )
 
 /**
@@ -82,12 +89,8 @@ object CuerpoCampana {
 
         if (d.servicios.isNotEmpty()) {
             cuerpo.addView(v.titulo(R.string.campana_servicios))
-            val chips = ChipGroup(contexto).apply {
-                chipSpacingHorizontal = v.dp(8)
-                chipSpacingVertical = v.dp(8)
-            }
-            for (servicio in d.servicios) chips.addView(v.chipDeServicio(servicio))
-            cuerpo.addView(chips)
+            // Dos columnas iguales; si queda un servicio solo al final, ocupa toda la fila.
+            cuerpo.addView(CuadriculaDeOpciones.crear(contexto, d.servicios.map { v.chipDeServicio(it) }, columnas = 2, separacion = v.dp(10)))
         }
 
         cuerpo.addView(v.titulo(R.string.campana_cuando_donde))
@@ -148,11 +151,12 @@ object CuerpoCampana {
 
         fun chipDeServicio(nombre: String) = TextView(contexto).apply {
             text = nombre
-            setBackgroundResource(R.drawable.bg_pildora_ordenar)
+            gravity = Gravity.CENTER
+            setBackgroundResource(R.drawable.bg_servicio_pildora)
             setTextColor(color(R.color.petcare_primary_dark))
             textSize = 13f
             typeface = fuente(R.font.poppins_semibold)
-            setPadding(dp(14), dp(8), dp(14), dp(8))
+            setPadding(dp(12), dp(13), dp(12), dp(13))
         }
 
         private fun iconoEnCuadro(@DrawableRes icono: Int) = ImageView(contexto).apply {
@@ -177,6 +181,31 @@ object CuerpoCampana {
             for (linea in lineas) columna.addView(linea)
             fila.addView(columna)
             return fila
+        }
+
+        /** La dirección y, en la misma línea a su derecha, "Cómo llegar" (abre la ruta en Google Maps). */
+        fun lineaDeDireccion(d: DatosCuerpoCampana): View {
+            val linea = LinearLayout(contexto).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.TOP
+            }
+            val direccion = d.direccion?.takeIf { it.isNotBlank() } ?: contexto.getString(R.string.campana_sin_direccion)
+            linea.addView(
+                texto(direccion, 14f, R.color.petcare_text, negrita = true).apply {
+                    layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                },
+            )
+            linea.addView(
+                TextView(contexto).apply {
+                    setText(R.string.como_llegar)
+                    setTextColor(color(R.color.petcare_primary_dark))
+                    textSize = 14f
+                    typeface = fuente(R.font.poppins_semibold)
+                    setPadding(dp(12), 0, 0, 0)
+                    setOnClickListener { Enlaces.comoLlegar(contexto, d.lat, d.lng) }
+                },
+            )
+            return linea
         }
 
         fun tarjetaCuandoYDonde(d: DatosCuerpoCampana): View {
@@ -208,15 +237,14 @@ object CuerpoCampana {
                     texto(contexto.getString(R.string.campana_mismo_horario), 12f, R.color.petcare_text_muted),
                 ),
             )
-            if (!d.direccion.isNullOrBlank()) {
-                tarjeta.addView(
-                    fila(
-                        R.drawable.ic_mapa,
-                        texto(contexto.getString(R.string.campana_ubicacion), 12f, R.color.petcare_text_muted),
-                        texto(d.direccion, 14f, R.color.petcare_text, negrita = true),
-                    ),
-                )
-            }
+            // La ubicación siempre se muestra: aunque no tenga dirección escrita, se puede abrir la ruta.
+            tarjeta.addView(
+                fila(
+                    R.drawable.ic_mapa,
+                    texto(contexto.getString(R.string.campana_ubicacion), 12f, R.color.petcare_text_muted),
+                    lineaDeDireccion(d),
+                ),
+            )
             return tarjeta
         }
     }

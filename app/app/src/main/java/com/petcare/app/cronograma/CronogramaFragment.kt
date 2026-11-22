@@ -36,6 +36,7 @@ import com.petcare.app.mascota.MascotaRespuesta
 import com.petcare.app.mascota.comoFechaLegible
 import com.petcare.app.mascota.configurarSiNoHayMascotas
 import com.petcare.app.mascota.mostrarMascota
+import com.petcare.app.notificacion.AvisoNotificaciones
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -48,6 +49,9 @@ import java.util.Locale
  * vencidos, esta semana, próxima semana y más adelante. Se puede filtrar por mascota, por día y por nombre.
  */
 class CronogramaFragment : Fragment() {
+
+    // Franja "notificaciones desactivadas": se muestra sola mientras falte el permiso.
+    private val avisoNotificaciones = AvisoNotificaciones(this)
 
     private var _binding: FragmentCronogramaBinding? = null
     private val binding get() = _binding!!
@@ -71,12 +75,14 @@ class CronogramaFragment : Fragment() {
         binding.botonBuscar.setOnClickListener { alternarBusqueda() }
         binding.campoBusqueda.doAfterTextChanged { dibujarLista() }
         binding.mostrarTodo.setOnClickListener { elegirDia(null) }
+        avisoNotificaciones.vincular(binding.avisoNotificaciones)
         return binding.root
     }
 
     // Se vuelve a cargar al regresar de registrar una mascota o de tocar un cuidado.
     override fun onResume() {
         super.onResume()
+        avisoNotificaciones.actualizar() // por si se activaron las notificaciones desde los ajustes
         cargar()
     }
 
@@ -267,7 +273,7 @@ class CronogramaFragment : Fragment() {
     private fun agregarFila(c: CuidadoRespuesta) {
         val fila = ItemCronogramaBinding.inflate(layoutInflater, binding.lista, false)
         fila.mostrarCuidado(c, activas.firstOrNull { it.id == c.mascotaId })
-        fila.tarjeta.setOnClickListener { requireContext().abrirCuidadosDe(c.mascotaId) }
+        fila.tarjeta.setOnClickListener { requireContext().abrirCuidadosDe(c.mascotaId, c.id) }
         binding.lista.addView(fila.root)
     }
 
@@ -327,6 +333,7 @@ class CronogramaFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        avisoNotificaciones.desvincular()
         _binding = null
     }
 }

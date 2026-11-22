@@ -7,4 +7,7 @@ package com.petcare.app.cuidado
  */
 object SeleccionCuidados {
     var mascotaId = 0
+
+    /** Cuidado que debe abrirse ya desplegado (0 = ninguno); lo deja el Cronograma al tocar un cuidado. */
+    var cuidadoId = 0
 }

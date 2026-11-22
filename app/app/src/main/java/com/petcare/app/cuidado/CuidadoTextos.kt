@@ -64,6 +64,17 @@ fun CuidadoRespuesta.textoDuracion(contexto: Context): String = when (modoTermin
     else -> contexto.getString(R.string.modo_una_vez)
 }
 
+/** La duración escrita como frase, para los detalles del cuidado: "Se repite sin fecha final". */
+fun CuidadoRespuesta.textoRepeticion(contexto: Context): String = when (modoTermino) {
+    "varias_veces" -> {
+        val veces = totalRepeticiones ?: 0
+        contexto.resources.getQuantityString(R.plurals.cuidado_repite_veces, veces, veces)
+    }
+    "hasta_fecha" -> contexto.getString(R.string.cuidado_repite_hasta, fechaLimite?.comoFechaLegible() ?: "")
+    "indefinido" -> contexto.getString(R.string.cuidado_repite_indefinido)
+    else -> contexto.getString(R.string.cuidado_repite_una_vez)
+}
+
 /**
  * Próxima fecha del cuidado si se calcula a partir de [base] (planificada o de realización).
  * Es la misma cuenta que hace el servidor; sirve para mostrar el resultado antes de elegir.

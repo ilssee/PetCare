@@ -13,7 +13,7 @@ import com.petcare.app.mascota.mostrarMascota
 
 /**
  * Fila de un cuidado pendiente: la mascota, el nombre, "Mascota · frecuencia" y la fecha a la derecha
- * (en rosa, con "Venció hace N días", si ya venció). La usan el Cronograma y el perfil de la mascota.
+ * (si ya venció: tarjeta con borde rojo suave y "Venció hace N días" como etiqueta roja). La usan el Cronograma y el perfil de la mascota.
  */
 fun ItemCronogramaBinding.mostrarCuidado(c: CuidadoRespuesta, mascota: MascotaRespuesta?) {
     val contexto = root.context
@@ -28,16 +28,30 @@ fun ItemCronogramaBinding.mostrarCuidado(c: CuidadoRespuesta, mascota: MascotaRe
     val vencido = c.diasVencido()
     if (vencido > 0) {
         fecha.text = contexto.resources.getQuantityString(R.plurals.cuidado_vencio, vencido.toInt(), vencido.toInt())
-        tarjeta.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(contexto, R.color.petcare_danger_100))
+        // Vencido: tarjeta con borde rojo suave y "Venció hace N días" como etiqueta roja, igual que en Cuidados.
+        tarjeta.setBackgroundResource(R.drawable.bg_tarjeta_vencida)
+        val densidad = contexto.resources.displayMetrics.density
+        fecha.setBackgroundResource(R.drawable.bg_pastilla)
+        fecha.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(contexto, R.color.petcare_danger_100))
+        fecha.setPadding((10 * densidad).toInt(), (3 * densidad).toInt(), (10 * densidad).toInt(), (3 * densidad).toInt())
+        fecha.setTextColor(ContextCompat.getColor(contexto, R.color.petcare_error))
     } else {
         fecha.text = c.fechaRecurrente.comoFechaCorta()
-        tarjeta.backgroundTintList = null
+        tarjeta.setBackgroundResource(R.drawable.bg_tarjeta_suave)
+        fecha.background = null
+        fecha.backgroundTintList = null
+        fecha.setPadding(0, 0, 0, 0)
+        fecha.setTextColor(ContextCompat.getColor(contexto, R.color.petcare_text))
     }
 }
 
-/** Abre la pestaña Cuidados con la mascota indicada elegida (aunque esté inactiva). */
-fun Context.abrirCuidadosDe(mascotaId: Int) {
+/**
+ * Abre la pestaña Cuidados con la mascota indicada elegida (aunque esté inactiva).
+ * Si se indica [cuidadoId], ese cuidado se abre ya desplegado.
+ */
+fun Context.abrirCuidadosDe(mascotaId: Int, cuidadoId: Int = 0) {
     SeleccionCuidados.mascotaId = mascotaId
+    SeleccionCuidados.cuidadoId = cuidadoId
     startActivity(
         Intent(this, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)

@@ -22,8 +22,9 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import coil.load
-import com.google.android.material.chip.ChipGroup
 import com.petcare.app.R
+import com.petcare.app.common.Enlaces
+import com.petcare.app.common.CuadriculaDeOpciones
 import com.petcare.app.common.Resultado
 import com.petcare.app.common.paraMostrar
 import com.petcare.app.common.respetarBarrasYTeclado
@@ -53,6 +54,10 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
     private val campanasAbiertas = mutableSetOf<Int>()
     private var campanaResaltada = 0
     private var tarjetaResaltada: View? = null
+
+    // Filtro de campañas por estado (RF42).
+    private var filtroActivas = false
+    private var filtroProximas = false
 
     private enum class Pestana { SERVICIOS, CONTACTO, RESENAS, CAMPANAS }
 
@@ -116,8 +121,12 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
     private fun pintar(p: PerfilVeterinariaRespuesta) {
         binding.contenido.visibility = View.VISIBLE
         binding.nombre.text = p.nombre
-        binding.direccion.isVisible = !p.direccion.isNullOrBlank()
+        val tieneDireccion = !p.direccion.isNullOrBlank()
+        binding.iconoDireccion.isVisible = tieneDireccion
+        binding.direccion.isVisible = tieneDireccion
+        binding.espacioDireccion.isVisible = !tieneDireccion
         binding.direccion.text = p.direccion.orEmpty()
+        binding.comoLlegar.setOnClickListener { Enlaces.comoLlegar(this, p.lat, p.lng) }
 
         val municipal = p.tipo == "municipal"
         binding.etiquetaTipo.setText(if (municipal) R.string.mapa_tipo_municipal else R.string.mapa_tipo_privada)
@@ -239,9 +248,8 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         if (p.serviciosPorCategoria.isEmpty()) {
             cont.addView(textoSimple(getString(R.string.perfil_sin_servicios)))
         }
-        val iconos = listOf(R.drawable.ic_escudo, R.drawable.ic_corazon, R.drawable.ic_regalo)
-        p.serviciosPorCategoria.forEachIndexed { posicion, categoria ->
-            cont.addView(tarjetaDeCategoria(categoria, iconos[posicion % iconos.size]))
+        p.serviciosPorCategoria.forEach { categoria ->
+            cont.addView(tarjetaDeCategoria(categoria))
         }
     }
 
@@ -282,7 +290,19 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         return tarjeta
     }
 
-    private fun tarjetaDeCategoria(categoria: ServiciosDeCategoria, @DrawableRes icono: Int): View {
+    /** El ícono depende del nombre de la categoría, no de su posición: así no cambia si la veterinaria no ofrece alguna. */
+    @DrawableRes
+    private fun iconoDeCategoria(nombre: String): Int {
+        val texto = nombre.lowercase()
+        return when {
+            "higiene" in texto || "bienestar" in texto -> R.drawable.ic_regalo
+            "especialidad" in texto -> R.drawable.ic_corazon
+            else -> R.drawable.ic_escudo // medicina preventiva y cualquier otra
+        }
+    }
+
+    private fun tarjetaDeCategoria(categoria: ServiciosDeCategoria): View {
+        val icono = iconoDeCategoria(categoria.categoria)
         val tarjeta = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(R.drawable.bg_tarjeta_borde)
@@ -298,24 +318,24 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         )
         tarjeta.addView(encabezado)
 
-        val chips = ChipGroup(this).apply {
-            chipSpacingHorizontal = dp(8)
-            chipSpacingVertical = dp(8)
-            setPadding(0, dp(12), 0, 0)
+        // Todos los servicios, en dos columnas iguales; si queda uno solo al final, ocupa toda la fila.
+        val chips = categoria.servicios.map { servicio ->
+            TextView(this).apply {
+                text = servicio
+                gravity = Gravity.CENTER
+                setBackgroundResource(R.drawable.bg_servicio_pildora)
+                setTextColor(color(R.color.petcare_primary_dark))
+                textSize = 13f
+                typeface = fuente(R.font.poppins_semibold)
+                setPadding(dp(12), dp(13), dp(12), dp(13))
+            }
         }
-        for (servicio in categoria.servicios) {
-            chips.addView(
-                TextView(this).apply {
-                    text = servicio
-                    setBackgroundResource(R.drawable.bg_pildora_ordenar)
-                    setTextColor(color(R.color.petcare_primary_dark))
-                    textSize = 13f
-                    typeface = fuente(R.font.poppins_semibold)
-                    setPadding(dp(14), dp(8), dp(14), dp(8))
-                },
-            )
-        }
-        tarjeta.addView(chips)
+        tarjeta.addView(
+            CuadriculaDeOpciones.crear(this, chips, columnas = 2, separacion = dp(10)).apply {
+                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    .apply { topMargin = dp(14) }
+            },
+        )
         return tarjeta
     }
 
@@ -374,7 +394,14 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
             setPadding(dp(14), dp(14), dp(14), dp(14))
         }
         if (p.telefonos.isNotEmpty()) {
-            tarjeta.addView(filaDeContacto(R.drawable.ic_telefono, getString(R.string.perfil_telefonos), p.telefonos.map { "" to it }))
+            // Tocar un teléfono abre el marcador con el número escrito.
+            tarjeta.addView(
+                filaDeContacto(
+                    R.drawable.ic_telefono,
+                    getString(R.string.perfil_telefonos),
+                    p.telefonos.map { telefono -> LineaContacto("", telefono) { Enlaces.llamar(this, telefono) } },
+                ),
+            )
         }
         if (p.telefonos.isNotEmpty() && p.redes.isNotEmpty()) {
             tarjeta.addView(
@@ -388,23 +415,41 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
             )
         }
         if (p.redes.isNotEmpty()) {
-            tarjeta.addView(filaDeContacto(R.drawable.ic_web, getString(R.string.perfil_redes), p.redes.map { redLegible(it) }))
+            // Tocar una red social o web abre el enlace en la aplicación o el navegador.
+            tarjeta.addView(
+                filaDeContacto(
+                    R.drawable.ic_web,
+                    getString(R.string.perfil_redes),
+                    p.redes.map { enlace ->
+                        val (nombre, usuario) = redLegible(enlace)
+                        LineaContacto(nombre, usuario) { Enlaces.abrirEnlace(this, enlace) }
+                    },
+                ),
+            )
         }
         cont.addView(tarjeta)
     }
 
-    /** Ícono, un rótulo pequeño y debajo las líneas: cada una con una parte normal y otra en negrita. */
-    private fun filaDeContacto(@DrawableRes icono: Int, rotulo: String, lineas: List<Pair<String, String>>): View {
+    /** Una línea de contacto: parte normal, parte en negrita y qué hacer al tocarla. */
+    private class LineaContacto(val normal: String, val fuerte: String, val alTocar: () -> Unit)
+
+    /** Ícono, un rótulo pequeño y debajo las líneas tocables: cada una con una parte normal y otra en negrita. */
+    private fun filaDeContacto(@DrawableRes icono: Int, rotulo: String, lineas: List<LineaContacto>): View {
         val fila = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val columna = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = pesoUno().apply { marginStart = dp(12) }
         }
         columna.addView(textoSimple(rotulo, tamano = 13f))
-        for ((normal, fuerte) in lineas) {
-            val linea = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-            if (normal.isNotEmpty()) linea.addView(textoSimple("$normal "))
-            linea.addView(textoSimple(fuerte, negrita = true))
+        for (contacto in lineas) {
+            val linea = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, dp(4), 0, dp(4)) // más alto para que sea fácil de tocar
+                setOnClickListener { contacto.alTocar() }
+            }
+            if (contacto.normal.isNotEmpty()) linea.addView(textoSimple("${contacto.normal} "))
+            // Se ve en color de acción para indicar que se puede tocar.
+            linea.addView(textoSimple(contacto.fuerte, negrita = true, colorId = R.color.petcare_primary_dark))
             columna.addView(linea)
         }
         fila.addView(iconoEnCuadro(icono))
@@ -507,7 +552,38 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
     private fun pintarCampanas(p: PerfilVeterinariaRespuesta) {
         val cont = binding.contenidoCampanas
         cont.removeAllViews()
-        for (campana in p.campanas) {
+
+        // Filtro por estado (RF42): sin ninguno elegido se ven todas; con uno, solo ese estado; con los dos, todas.
+        val filtros = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                .apply { topMargin = dp(14) }
+        }
+        filtros.addView(chipDeEstado(R.string.mapa_estado_activa, filtroActivas, primero = true) {
+            filtroActivas = !filtroActivas
+            pintarCampanas(p)
+        })
+        filtros.addView(chipDeEstado(R.string.mapa_estado_proxima, filtroProximas, primero = false) {
+            filtroProximas = !filtroProximas
+            pintarCampanas(p)
+        })
+        cont.addView(filtros)
+
+        val ninguno = !filtroActivas && !filtroProximas
+        val visibles = p.campanas
+            .filter { ninguno || (it.estado == "activa" && filtroActivas) || (it.estado == "proxima" && filtroProximas) }
+            // Las activas primero y luego las próximas, cada grupo por fecha de inicio.
+            .sortedWith(compareBy({ it.estado != "activa" }, { it.fechaInicio }))
+        if (visibles.isEmpty()) {
+            cont.addView(
+                textoSimple(getString(R.string.perfil_sin_campanas_estado)).apply {
+                    gravity = Gravity.CENTER
+                    setPadding(0, dp(28), 0, dp(12))
+                },
+            )
+        }
+
+        for (campana in visibles) {
             val tarjeta = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setBackgroundResource(R.drawable.bg_tarjeta_borde)
@@ -586,6 +662,19 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         }
     }
 
+    private fun chipDeEstado(@StringRes texto: Int, elegido: Boolean, primero: Boolean, alTocar: () -> Unit) = TextView(this).apply {
+        setText(texto)
+        gravity = Gravity.CENTER
+        // Igual que los demás filtros de la app: elegido con borde verde azulado grueso, sin elegir con borde gris fino.
+        setBackgroundResource(if (elegido) R.drawable.bg_chip_opcion_activo else R.drawable.bg_chip_opcion)
+        setTextColor(color(if (elegido) R.color.petcare_text else R.color.petcare_text_muted))
+        textSize = 14f
+        typeface = fuente(R.font.poppins_semibold)
+        setPadding(dp(20), 0, dp(20), 0)
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(40)).apply { marginStart = if (primero) 0 else dp(10) }
+        setOnClickListener { alTocar() }
+    }
+
     /** Distancia desde la parte de arriba de [ancestro] hasta [vista], para llevar el desplazamiento hasta ella. */
     private fun distanciaDesde(ancestro: View, vista: View): Int {
         var total = 0
@@ -642,20 +731,21 @@ class PerfilVeterinariaActivity : AppCompatActivity() {
         setPadding(dp(14), dp(14), dp(14), dp(14))
     }
 
-    private fun iconoEnCuadro(@DrawableRes icono: Int) = ImageView(this).apply {
+    private fun iconoEnCuadro(@DrawableRes icono: Int, @DrawableRes fondo: Int = R.drawable.bg_icono_info) = ImageView(this).apply {
         setImageResource(icono)
-        setBackgroundResource(R.drawable.bg_icono_info)
+        setBackgroundResource(fondo)
         imageTintList = ColorStateList.valueOf(color(R.color.petcare_primary_dark))
         setPadding(dp(10), dp(10), dp(10), dp(10))
         layoutParams = LinearLayout.LayoutParams(dp(42), dp(42))
     }
 
+    /** Encabezado de una categoría de servicios: su ícono en un cuadro rectangular, el nombre y cuántos servicios tiene. */
     private fun filaConIcono(@DrawableRes icono: Int, titulo: String, subtitulo: String): View {
         val fila = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        fila.addView(iconoEnCuadro(icono))
+        fila.addView(iconoEnCuadro(icono, R.drawable.bg_icono_categoria))
         val columna = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = pesoUno().apply { marginStart = dp(12) }

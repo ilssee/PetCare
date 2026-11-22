@@ -21,6 +21,7 @@ export interface CuidadoPorAvisar {
   mascota: string;
   fechaRecurrente: string; // AAAA-MM-DD
   avisoAnticipado: boolean;
+  especie?: string; // 'perro', 'gato' o 'conejo': la app la usa para elegir el ícono del aviso
 }
 
 /** Una notificación lista para enviar al celular del usuario. */
@@ -30,6 +31,18 @@ export interface Notificacion {
   tipo: TipoNotificacion;
   titulo: string;
   cuerpo: string;
+  /** Especie de la mascota del aviso (si lo hay): la app muestra el dibujo de esa especie como ícono. */
+  especie?: string;
+  /**
+   * Solo en los avisos de lugares cercanos: 'privada' o 'municipal' (veterinaria) y 'activa' o 'proxima' (campaña).
+   * La app lo usa para pintar el ícono con el mismo color que el marcador del mapa.
+   */
+  variante?: string;
+  /** A qué pantalla lleva el aviso al tocarlo (solo en los avisos de lugares cercanos y de recomendaciones). */
+  lugarId?: number; // campaña o veterinaria del aviso
+  veterinariaId?: number; // perfil que se abre; en una campaña, solo si la organiza una veterinaria
+  mascotaId?: number; // mascota de las recomendaciones nuevas
+  reglasIds?: number[]; // recomendaciones nuevas: se abren desplegadas en la información preventiva
 }
 
 /** Un recordatorio de cuidado listo para enviar, con el nombre de la mascota y del cuidado. */
@@ -59,27 +72,44 @@ export function fechaLarga(fecha: string): string {
   return `${NOMBRES_DIA[diaDeLaSemana(fecha)]} ${dia} de ${MESES[mes - 1]}`;
 }
 
+const SEMANA: Dia[] = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+
+/**
+ * Cuándo vence, dicho como se habla: "mañana", "este miércoles" (si cae en lo que queda de la semana,
+ * de lunes a domingo) o "el próximo lunes" (si cae en la semana siguiente). El aviso anticipado se envía
+ * como máximo 7 días antes, así que el día de la semana basta y no hace falta la fecha.
+ */
+function cuandoVence(hoy: string, vence: string, faltan: number): string {
+  if (faltan === 1) return 'mañana';
+  const nombre = NOMBRES_DIA[diaDeLaSemana(vence)];
+  const sigueEnLaSemana = SEMANA.indexOf(diaDeLaSemana(hoy)) + faltan <= 6;
+  return sigueEnLaSemana ? `este ${nombre}` : `el próximo ${nombre}`;
+}
+
 function avisoAnticipado(c: CuidadoPorAvisar, hoy: string): Aviso {
   const faltan = diasEntre(hoy, c.fechaRecurrente);
-  const cuando = faltan === 1 ? 'mañana' : `el ${fechaLarga(c.fechaRecurrente)}`;
+  const cuando = cuandoVence(hoy, c.fechaRecurrente, faltan);
   return {
     usuarioId: c.usuarioId,
     cuidadoId: c.cuidadoId,
     tipo: 'anticipado',
     titulo: 'Cuidado próximo a vencer',
     cuerpo: `${c.mascota}: ${c.cuidado} vence ${cuando}`,
+    ...(c.especie ? { especie: c.especie } : {}),
   };
 }
 
 function avisoPendiente(c: CuidadoPorAvisar, hoy: string): Aviso {
   const vencido = diasEntre(c.fechaRecurrente, hoy);
-  const estado = vencido === 0 ? 'toca hoy' : `venció hace ${vencido} ${vencido === 1 ? 'día' : 'días'}`;
+  // El título dice la situación y el texto solo qué cuidado es y, si ya pasó la fecha, hace cuánto.
+  const detalle = vencido === 0 ? '' : `, hace ${vencido} ${vencido === 1 ? 'día' : 'días'}`;
   return {
     usuarioId: c.usuarioId,
     cuidadoId: c.cuidadoId,
     tipo: 'pendiente',
-    titulo: 'Cuidado pendiente',
-    cuerpo: `${c.mascota}: ${c.cuidado} ${estado}`,
+    titulo: vencido === 0 ? 'Cuidado para hoy' : 'Cuidado vencido',
+    cuerpo: `${c.mascota}: ${c.cuidado}${detalle}`,
+    ...(c.especie ? { especie: c.especie } : {}),
   };
 }
 

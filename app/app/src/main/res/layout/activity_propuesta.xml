@@ -214,6 +214,15 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </ScrollView>
+
+        <!-- Error al cargar la propuesta: aviso centrado, con Reintentar y Ahora no en el pie -->
+        <include
+            android:id="@+id/vistaError"
+            layout="@layout/vista_estado_vacio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
     </FrameLayout>
 
     <TextView

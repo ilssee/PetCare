@@ -27,4 +27,8 @@ export interface LugarNuevo {
   organizador: string; // para una veterinaria es su propio nombre
   lat: number;
   lng: number;
+  /** Veterinaria: 'privada' o 'municipal'. Campaña: 'activa' o 'proxima'. Define el color del ícono del aviso. */
+  variante?: string;
+  /** Solo en campañas: id de la veterinaria que la organiza (vacío si la organiza una entidad externa). */
+  veterinariaId?: number;
 }

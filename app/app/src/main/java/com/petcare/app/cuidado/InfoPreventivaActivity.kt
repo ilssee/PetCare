@@ -3,8 +3,10 @@ package com.petcare.app.cuidado
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
+import android.widget.ScrollView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -39,6 +41,7 @@ class InfoPreventivaActivity : AppCompatActivity() {
     private var mascotaId = 0
     private var recomendaciones: List<RecomendacionRespuesta> = emptyList()
     private val expandidas = mutableSetOf<Int>() // ids de las recomendaciones desplegadas
+    private var porEnfocar: Set<Int> = emptySet() // recomendaciones nuevas del aviso: se muestran una sola vez
 
     private val mascota get() = todas.firstOrNull { it.id == mascotaId }
 
@@ -54,6 +57,13 @@ class InfoPreventivaActivity : AppCompatActivity() {
         }
 
         mascotaId = intent.getIntExtra(EXTRA_MASCOTA_ID, 0)
+        // Desde el aviso de nuevas recomendaciones (RF26): se abren ya desplegadas.
+        if (savedInstanceState == null) {
+            intent.getIntArrayExtra(EXTRA_DESPLEGAR)?.let {
+                expandidas.addAll(it.toList())
+                porEnfocar = it.toSet() // al dibujar la lista se baja hasta la primera de ellas
+            }
+        }
         binding.botonVolver.setOnClickListener { finish() }
         binding.expandirTodo.setOnClickListener {
             if (expandidas.size == recomendaciones.size) expandidas.clear() else expandidas.addAll(recomendaciones.map { it.id })
@@ -134,7 +144,30 @@ class InfoPreventivaActivity : AppCompatActivity() {
         )
 
         binding.lista.removeAllViews()
-        recomendaciones.forEach { binding.lista.addView(crearTarjeta(it, m)) }
+        var aEnfocar: View? = null
+        recomendaciones.forEach { r ->
+            val tarjeta = crearTarjeta(r, m)
+            if (aEnfocar == null && r.id in porEnfocar) aEnfocar = tarjeta
+            binding.lista.addView(tarjeta)
+        }
+        aEnfocar?.let {
+            porEnfocar = emptySet() // solo la primera vez: al volver de otra pantalla no se mueve la lista
+            enfocar(it)
+        }
+    }
+
+    /** Baja la pantalla hasta [tarjeta] y la deja arriba, a la vista (la recomendación nueva del aviso). */
+    private fun enfocar(tarjeta: View) {
+        tarjeta.post {
+            var padre = tarjeta.parent
+            while (padre != null && padre !is ScrollView) padre = padre.parent
+            val desplazamiento = padre as? ScrollView ?: return@post
+            val zona = Rect()
+            tarjeta.getDrawingRect(zona)
+            desplazamiento.offsetDescendantRectToMyCoords(tarjeta, zona)
+            val margen = (16 * resources.displayMetrics.density).toInt()
+            desplazamiento.smoothScrollTo(0, (zona.top - margen).coerceAtLeast(0))
+        }
     }
 
     private fun crearTarjeta(r: RecomendacionRespuesta, m: MascotaRespuesta): View {
@@ -174,8 +207,12 @@ class InfoPreventivaActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_MASCOTA_ID = "mascota_id"
+        private const val EXTRA_DESPLEGAR = "desplegar"
 
-        fun intent(contexto: Context, mascotaId: Int) =
-            Intent(contexto, InfoPreventivaActivity::class.java).putExtra(EXTRA_MASCOTA_ID, mascotaId)
+        /** [desplegar]: ids de las recomendaciones que se muestran abiertas al entrar. */
+        fun intent(contexto: Context, mascotaId: Int, desplegar: List<Int> = emptyList()) =
+            Intent(contexto, InfoPreventivaActivity::class.java)
+                .putExtra(EXTRA_MASCOTA_ID, mascotaId)
+                .putExtra(EXTRA_DESPLEGAR, desplegar.toIntArray())
     }
 }

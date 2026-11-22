@@ -16,12 +16,15 @@
     <color name="petcare_brand_50">#EEF8F8</color>
     <color name="petcare_brand_100">#D9EFF0</color>
     <color name="petcare_danger_100">#FBE3E8</color>
+    <color name="petcare_error_borde">#F2B8C2</color>
+    <!-- Fondo de la franja de notificaciones apagadas -->
+    <color name="franja_aviso_fondo">#FBE3E8</color>
     <color name="petcare_acento">#FF7F50</color>
 
     <!-- Colores por especie (tomados del prototipo) -->
     <color name="especie_perro">#FCE8C8</color>
     <color name="especie_gato">#E6E1F8</color>
-    <color name="especie_conejo">#FBDDE6</color>
+    <color name="especie_conejo">#D6EAF8</color>
     <color name="estado_activa_fondo">#DDF3E6</color>
     <color name="estado_activa_texto">#2F8F5B</color>
     <color name="estado_inactiva_fondo">#3A4349</color>
